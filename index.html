@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛡️ BESA×SUPERNOVA</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root { --bg: #050814; --primary: #f5c242; --text: #eef; }
+        body { background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
+        .lock-box { background: #111827; padding: 2.5rem; border-radius: 2rem; border: 1px solid #f5c242; text-align: center; width: 90%; max-width: 380px; box-shadow: 0 0 30px rgba(245, 194, 66, 0.1); }
+        img { width: 180px; border-radius: 15px; margin-bottom: 20px; border: 2px solid #f5c242; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #1e293b; color: white; margin-bottom: 10px; text-align: center; }
+        button { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--primary); color: #000; font-weight: bold; cursor: pointer; }
+        #dashboard { display: none; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div id="lockScreen" class="lock-box">
+        <img src="LOGO.png" alt="BESA SUPERNOVA">
+        <h2>SISTEMI CIVIL</h2>
+        <input type="password" id="passInput" placeholder="sherimi-i-njerezimit">
+        <button onclick="checkAccess()">HYR NË SISTEM</button>
+        <p id="msg" style="color: #ef4444; margin-top: 10px;"></p>
+    </div>
+
+    <div id="dashboard">
+        <h1 style="color: #f5c242;">MIRËSEVINI MANDI</h1>
+        <p>Projekti BESA×SUPERNOVA është Live.</p>
+    </div>
+
+    <script>
+        const PASS = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791"; // NDRYSHOJE SI TË DUASH
+        function checkAccess() {
+            const input = document.getElementById('passInput').value;
+            if(input === PASS) {
+                document.getElementById('lockScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+            } else {
+                document.getElementById('msg').innerText = "Akses i refuzuar!";
+            }
+        }
+    </script>
+</body>
+</html>

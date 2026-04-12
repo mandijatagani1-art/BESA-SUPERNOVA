@@ -2,12 +2,12 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <title>BESA-SUPERNOVA | ADMIN PC CONTROL</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>BESA-SUPERNOVA | PC MASTER MONITOR</title>
     <style>
         :root {
-            --bg: #010204;
+            --bg: #020406;
             --sun-gold: #f5c242;
+            --pagan-blue: #1b4d8e;
             --neon-blue: #00f2ff;
             --terminal: #00ff41;
         }
@@ -15,146 +15,159 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: #fff; font-family: 'Consolas', monospace; height: 100vh; overflow: hidden; }
 
-        /* LOCK SCREEN MASTER */
-        #lockScreen { 
-            position: fixed; inset: 0; background: #000; 
-            display: flex; align-items: center; justify-content: center; z-index: 10000; 
-        }
-        .lock-card { 
-            background: #0d1117; padding: 50px; border-radius: 10px; 
-            border: 2px solid var(--sun-gold); text-align: center; width: 450px;
-            box-shadow: 0 0 60px rgba(245, 194, 66, 0.2);
-        }
-        input[type="password"] { 
-            width: 100%; padding: 15px; margin: 25px 0; background: #000; 
-            border: 1px solid #333; color: var(--sun-gold); text-align: center; 
-            border-radius: 5px; font-size: 14px; outline: none;
-        }
+        /* LOCK SCREEN */
+        #lockScreen { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .lock-card { background: #0d1117; padding: 40px; border-radius: 10px; border: 2px solid var(--sun-gold); text-align: center; width: 400px; }
+        input[type="password"] { width: 100%; padding: 12px; margin: 20px 0; background: #000; border: 1px solid #333; color: var(--sun-gold); text-align: center; border-radius: 5px; outline: none; }
 
-        /* MASTER INTERFACE */
+        /* HEADER */
+        header { padding: 15px 30px; border-bottom: 2px solid var(--sun-gold); display: flex; justify-content: space-between; align-items: center; background: #000; }
+
+        /* MAIN MONITOR */
         #masterControl { display: none; height: 100vh; flex-direction: column; }
-        header { 
-            padding: 15px 30px; border-bottom: 2px solid var(--sun-gold); 
-            display: flex; justify-content: space-between; align-items: center; background: #000;
-        }
-
-        .main-layout { display: grid; grid-template-columns: 280px 1fr; flex-grow: 1; overflow: hidden; }
-        .sidebar { background: #080a0c; border-right: 1px solid #222; padding: 25px; }
-        .stat-box { background: #000; border: 1px solid var(--neon-blue); padding: 12px; margin-bottom: 15px; border-radius: 4px; }
-
-        /* GRIDI I QELIZAVE PAGANE */
-        .dashboard { padding: 40px; overflow-y: auto; background: radial-gradient(circle, #0a0f1a, #010204); }
-        .pagan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 40px; }
-        .pagan-cell { display: flex; flex-direction: column; align-items: center; gap: 15px; cursor: pointer; transition: 0.3s; }
-        .pagan-cell:hover { transform: scale(1.1); filter: drop-shadow(0 0 20px var(--sun-gold)); }
+        .layout { display: grid; grid-template-columns: 280px 1fr; flex-grow: 1; overflow: hidden; }
         
-        .symbol { 
-            width: 80px; height: 80px; border-radius: 50%; display: flex; 
-            align-items: center; justify-content: center; font-size: 35px; 
-            border: 2px solid var(--sun-gold); background: radial-gradient(#f5c242, #8a6d1b);
+        .sidebar { background: #080a0c; border-right: 1px solid #222; padding: 20px; }
+        .stat-card { background: #000; border: 1px solid var(--neon-blue); padding: 10px; margin-bottom: 10px; border-radius: 4px; font-size: 12px; }
+
+        .content { padding: 30px; overflow-y: auto; background: radial-gradient(circle, #0a111a, #020406); }
+        h3 { color: var(--sun-gold); font-size: 12px; letter-spacing: 2px; margin: 20px 0; border-left: 3px solid var(--sun-gold); padding-left: 10px; }
+
+        /* GRIDI I PLOTË I IKONAVE */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .cell { display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; transition: 0.3s; padding: 10px; border-radius: 8px; }
+        .cell:hover { background: rgba(245, 194, 66, 0.1); transform: scale(1.05); }
+
+        .icon-circle { 
+            width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-size: 30px; border: 2px solid var(--sun-gold); box-shadow: 0 0 15px rgba(245, 194, 66, 0.2);
         }
+        .gold { background: radial-gradient(#f5c242, #8a6d1b); }
+        .blue { background: radial-gradient(#1b4d8e, #0a1b33); }
+        .label { font-size: 9px; font-weight: bold; text-align: center; color: #ccc; }
 
-        /* QELIZA E HAPUR (CHAT AI + VIEW) */
-        #overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; flex-direction: column; }
-        .ov-header { padding: 15px 30px; border-bottom: 1px solid var(--sun-gold); display: flex; justify-content: space-between; }
-        .ov-body { display: grid; grid-template-columns: 400px 1fr; flex-grow: 1; }
+        /* OVERLAY: CHAT AI DHE FAQJA */
+        #moduleOverlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; flex-direction: column; }
+        .ov-header { padding: 15px 30px; border-bottom: 1px solid var(--sun-gold); display: flex; justify-content: space-between; align-items: center; }
+        .ov-body { display: grid; grid-template-columns: 400px 1fr; flex-grow: 1; overflow: hidden; }
         
-        .chat-area { background: #000; border-right: 1px solid #222; display: flex; flex-direction: column; padding: 20px; }
-        #chat-log { flex-grow: 1; overflow-y: auto; color: var(--terminal); font-size: 13px; margin-bottom: 15px; }
-        .chat-in { background: #05070a; border: 1px solid var(--sun-gold); color: #fff; padding: 12px; border-radius: 5px; outline: none; }
+        .chat-sidebar { background: #000; border-right: 1px solid #222; display: flex; flex-direction: column; padding: 20px; }
+        #chat-window { flex-grow: 1; overflow-y: auto; color: var(--terminal); font-size: 13px; margin-bottom: 15px; border-bottom: 1px solid #222; }
+        .chat-input { background: #080a0c; border: 1px solid var(--sun-gold); color: #fff; padding: 12px; border-radius: 5px; outline: none; }
 
-        .app-view { background: #fff; color: #000; display: flex; flex-direction: column; align-items: center; padding: 50px; }
+        .page-preview { background: #fff; color: #333; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
 <div id="lockScreen">
     <div class="lock-card">
-        <h1 style="color: var(--sun-gold); letter-spacing: 4px;">BESA-SUPERNOVA</h1>
-        <p style="font-size: 10px; color: #555;">SISTEMI I KONTROLLIT - ADMIN MANDI JATAGANI</p>
-        <input type="password" id="master-pass" placeholder="SHKRUAJ PASSWORDIN TONË">
-        <button onclick="boot()" style="width:100%; padding:15px; background:var(--sun-gold); border:none; font-weight:bold; cursor:pointer; border-radius:5px;">AKTIVIZO PC</button>
+        <h1 style="color: var(--sun-gold)">BESA-SUPERNOVA</h1>
+        <input type="password" id="pass" placeholder="PASSWORDIN SIÇ E KISHIM">
+        <button onclick="login()" style="width:100%; padding:12px; background:var(--sun-gold); border:none; font-weight:bold; cursor:pointer;">HYR NË PC</button>
     </div>
 </div>
 
 <div id="masterControl">
     <header>
-        <div style="font-weight:bold; letter-spacing:2px; color: var(--sun-gold);">BESA-SUPERNOVA MASTER MONITOR</div>
-        <div id="ops" style="color: var(--neon-blue)">30,000 OPS/S</div>
+        <div style="font-weight:bold; letter-spacing:2px; color:var(--sun-gold);">SUPERNOVA MASTER MONITOR</div>
+        <div id="ops" style="color:var(--neon-blue)">29,987 OPS/S</div>
     </header>
-    <div class="main-layout">
+    <div class="layout">
         <aside class="sidebar">
-            <div class="stat-box"><div style="font-size:9px; color:var(--neon-blue);">ADMIN STATUS</div><div style="font-weight:bold">MANDI JATAGANI</div></div>
-            <div class="stat-box"><div style="font-size:9px; color:var(--neon-blue);">PROTOKOLLI</div><div style="font-weight:bold">BESA-AKTIV</div></div>
+            <div class="stat-card">PROTOKOLLI: BESA-SUPERNOVA ACTIVE</div>
+            <div class="stat-card">DREJTORITË: 200 NYJE ONLINE</div>
+            <div class="stat-card" style="border-color:var(--sun-gold)">USER: MANDI JATAGANI</div>
         </aside>
-        <main class="dashboard">
-            <div class="pagan-grid">
-                <div class="pagan-cell" onclick="openCell('Ballina', '☀️')"><div class="symbol">☀️</div><span>BALLINA</span></div>
-                <div class="pagan-cell" onclick="openCell('Kërkimi', '🐍')"><div class="symbol">🐍</div><span>KËRKIMI</span></div>
-                <div class="pagan-cell" onclick="openCell('Pronat', '🌀')"><div class="symbol">🌀</div><span>PRONAT</span></div>
-                <div class="pagan-cell" onclick="openCell('Trending', '🔥')"><div class="symbol">🔥</div><span>TRENDING</span></div>
+        <main class="content">
+            <h3>| 12 MODULET E APP BESA (PUBLIKE)</h3>
+            <div class="grid">
+                <div class="cell" onclick="openMod('Ballina', '☀️', 'gold')"><div class="icon-circle gold">☀️</div><div class="label">BALLINA</div></div>
+                <div class="cell" onclick="openMod('Kërkimi', '🔍', 'blue')"><div class="icon-circle blue">🔍</div><div class="label">KËRKIMI</div></div>
+                <div class="cell" onclick="openMod('Pronat', '🏢', 'gold')"><div class="icon-circle gold">🏢</div><div class="label">PRONAT</div></div>
+                <div class="cell" onclick="openMod('Trending', '🔥', 'blue')"><div class="icon-circle blue">🔥</div><div class="label">TRENDING</div></div>
+                <div class="cell" onclick="openMod('Agjentët', '👔', 'gold')"><div class="icon-circle gold">👔</div><div class="label">AGJENTËT</div></div>
+                <div class="cell" onclick="openMod('Harta', '📍', 'blue')"><div class="icon-circle blue">📍</div><div class="label">HARTA</div></div>
+                <div class="cell" onclick="openMod('Statistikat', '📊', 'gold')"><div class="icon-circle gold">📊</div><div class="label">STATISTIKAT</div></div>
+                <div class="cell" onclick="openMod('Kalkulatori', '🧮', 'blue')"><div class="icon-circle blue">🧮</div><div class="label">KALKULATORI</div></div>
+                <div class="cell" onclick="openMod('Mesazhet', '📩', 'gold')"><div class="icon-circle gold">📩</div><div class="label">MESAZHET</div></div>
+                <div class="cell" onclick="openMod('Kategoritë', '📁', 'blue')"><div class="icon-circle blue">📁</div><div class="label">KATEGORITË</div></div>
+                <div class="cell" onclick="openMod('Pagesat', '💳', 'gold')"><div class="icon-circle gold">💳</div><div class="label">PAGESAT</div></div>
+                <div class="cell" onclick="openMod('Rreth Nesh', 'ℹ️', 'blue')"><div class="icon-circle blue">ℹ️</div><div class="label">RRETH NESH</div></div>
+            </div>
+
+            <h3>| IKONAT E PUNËS (KONTROLLI I QELIZAVE)</h3>
+            <div class="grid">
+                <div class="cell" onclick="openMod('Protokolli Besa', '📜', 'gold')"><div class="icon-circle gold">📜</div><div class="label">PROTOKOLLI BESA</div></div>
+                <div class="cell" onclick="openMod('Noteri Digjital', '✒️', 'blue')"><div class="icon-circle blue">✒️</div><div class="label">NOTERI DIGJITAL</div></div>
+                <div class="cell" onclick="openMod('Tekniku Core', '⚙️', 'gold')"><div class="icon-circle gold">⚙️</div><div class="label">TEKNIKU CORE</div></div>
+                <div class="cell" onclick="openMod('Arkiva SNBesa', '🗄️', 'blue')"><div class="icon-circle blue">🗄️</div><div class="label">ARKIVA SNBESA</div></div>
+                <div class="cell" onclick="openMod('Xhiro 30K', '🚀', 'gold')"><div class="icon-circle gold">🚀</div><div class="label">XHIRO 30K</div></div>
+                <div class="cell" onclick="openMod('Supabase Log', '☁️', 'blue')"><div class="icon-circle blue">☁️</div><div class="label">SUPABASE LOG</div></div>
+                <div class="cell" onclick="openMod('Eksporti PDF', '📄', 'gold')"><div class="icon-circle gold">📄</div><div class="label">EKSPORTI PDF</div></div>
+                <div class="cell" onclick="openMod('Rrjeti Global', '🌐', 'blue')"><div class="icon-circle blue">🌐</div><div class="label">RRJETI GLOBAL</div></div>
             </div>
         </main>
     </div>
 </div>
 
-<div id="overlay">
+<div id="moduleOverlay">
     <div class="ov-header">
-        <h2 id="ov-title" style="color: var(--sun-gold);"></h2>
-        <button onclick="closeCell()" style="background:red; color:#fff; border:none; padding:8px 20px; cursor:pointer; font-weight:bold; border-radius:5px;">KTHEHU NË PC</button>
+        <h2 id="ov-title" style="color: var(--sun-gold)"></h2>
+        <button onclick="closeMod()" style="background:red; color:#fff; border:none; padding:8px 20px; cursor:pointer; font-weight:bold;">MBYLL</button>
     </div>
     <div class="ov-body">
-        <div class="chat-area">
+        <div class="chat-sidebar">
             <div style="font-size:10px; color:var(--sun-gold); margin-bottom:10px;">CHAT AI BESA-SUPERNOVA</div>
-            <div id="chat-log"></div>
-            <input type="text" id="user-in" class="chat-in" placeholder="Pyet AI..." onkeypress="if(event.key==='Enter') talk()">
+            <div id="chat-window"></div>
+            <input type="text" id="chat-in" class="chat-input" placeholder="Pyet AI Besën..." onkeypress="if(event.key==='Enter') askAI()">
         </div>
-        <div class="app-view">
-            <h1 id="app-title" style="font-size: 50px; margin-bottom: 20px;"></h1>
-            <p>Duke sinkronizuar të gjitha të dhënat e Besa-Supernova në PC...</p>
+        <div class="page-preview">
+            <h1 id="page-h1" style="font-size: 60px; color: #ddd;"></h1>
+            <p>Duke sinkronizuar të dhënat live në PC...</p>
         </div>
     </div>
 </div>
 
 <script>
-    // PASWORDI I NJEJTË I ADMINIT
-    const MASTER_KEY = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
+    const KEY = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
 
-    function boot() {
-        const p = document.getElementById('master-pass').value;
-        if(p === MASTER_KEY) {
+    function login() {
+        if(document.getElementById('pass').value === KEY) {
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('masterControl').style.display = 'flex';
         } else { alert("KODI I GABUAR!"); }
     }
 
-    function openCell(name, symbol) {
-        document.getElementById('overlay').style.display = 'flex';
-        document.getElementById('ov-title').innerText = "QELIZA: " + name.toUpperCase() + " " + symbol;
-        document.getElementById('app-title').innerText = name;
-        const log = document.getElementById('chat-log');
-        log.innerHTML = `<div>[SYS]: PC lidhur me qelizën ${name}.</div>`;
-        log.innerHTML += `<div style="color:var(--sun-gold)">[AI]: Mandi, jam Chat AI Besa-Supernova. Jam gati për pyetjet tuaja.</div>`;
+    function openMod(name, icon, color) {
+        document.getElementById('moduleOverlay').style.display = 'flex';
+        document.getElementById('ov-title').innerText = "KONTROLLI: " + name.toUpperCase();
+        document.getElementById('page-h1').innerText = name + " " + icon;
+        
+        const win = document.getElementById('chat-window');
+        win.innerHTML = `<div style="margin-bottom:10px;">[SYS]: Qeliza ${name} u hap me sukses.</div>`;
+        win.innerHTML += `<div style="color:var(--sun-gold)">[BESA-AI]: Mandi, jam në pritje të komandave për këtë modul.</div>`;
     }
 
-    function closeCell() { document.getElementById('overlay').style.display = 'none'; }
+    function closeMod() { document.getElementById('moduleOverlay').style.display = 'none'; }
 
-    function talk() {
-        const input = document.getElementById('user-in');
-        const log = document.getElementById('chat-log');
+    function askAI() {
+        const input = document.getElementById('chat-in');
+        const win = document.getElementById('chat-window');
         if(!input.value) return;
-        log.innerHTML += `<div style="color:#fff">> ${input.value}</div>`;
+
+        win.innerHTML += `<div style="color:#fff; margin-top:10px;">> ${input.value}</div>`;
         setTimeout(() => {
-            log.innerHTML += `<div>[AI]: Mandi, kërkesa juaj po përpunohet nga sistemi Supernova. Çdo gjë është e pasqyruar në PC.</div>`;
-            log.scrollTop = log.scrollHeight;
+            win.innerHTML += `<div style="color:var(--sun-gold); margin-top:5px;">[BESA-AI]: Mandi, po e analizoj kërkesën në PC. Sistemi Besa-Supernova është gati.</div>`;
+            win.scrollTop = win.scrollHeight;
         }, 600);
         input.value = "";
     }
 
     setInterval(() => {
-        const val = 29900 + Math.floor(Math.random()*200);
+        const val = 29950 + Math.floor(Math.random()*50);
         document.getElementById('ops').innerText = val.toLocaleString() + " OPS/S";
-    }, 500);
+    }, 700);
 </script>
 </body>
 </html>

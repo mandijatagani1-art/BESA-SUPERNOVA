@@ -1,44 +1,126 @@
-async function askAI() {
-    const input = document.getElementById('aiQuery');
-    const val = input.value.trim().toUpperCase();
-    if (!val) return;
-
-    addMessage("user", val);
-    input.value = "";
-
-    await logToSystem('COMMAND', val);
-
-    // --- KOMANDA E RE: LOGSCAN ---
-    if (val === "LOGSCAN") {
-        addMessage("ai", "Duke u lidhur me serverin në Londër... Duke tërhequr loget e fundit...");
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <title>BESA-SUPERNOVA | IMPLEMENTIM GLOBAL</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --bg: #010208; --gold: #f5c242; --neon: #00f2ff; --dark: #0a0c1a; }
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; }
         
-        // Marrim 3 lëvizjet e fundit nga Supabase
-        const { data, error } = await _supabase
-            .from('system_logs')
-            .select('action, target')
-            .order('created_at', { ascending: false })
-            .limit(3);
+        #lockScreen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .lock-card { background: var(--dark); padding: 40px; border: 1px solid var(--gold); border-radius: 15px; text-align: center; }
 
-        if (data) {
-            let raporti = "LËVIZJET E FUNDIT NË RRJET:<br>";
-            data.forEach(log => {
-                raporti += `• ${log.action}: ${log.target}<br>`;
-            });
-            setTimeout(() => addMessage("ai", raporti), 1000);
-        }
-        return;
+        header { background: #000; padding: 15px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .main-container { display: grid; grid-template-columns: 250px 1fr 300px; flex-grow: 1; overflow: hidden; }
+        
+        .panel { padding: 15px; border-right: 1px solid #222; overflow-y: auto; }
+        .dir-item { font-size: 10px; color: #666; padding: 5px; border-bottom: 1px solid #111; }
+        
+        #chat-window { display: flex; flex-direction: column; height: 100%; background: #050505; }
+        #logs { flex-grow: 1; padding: 20px; overflow-y: auto; font-size: 13px; }
+        .msg { margin-bottom: 12px; padding-left: 10px; border-left: 2px solid var(--gold); }
+        
+        .input-bar { padding: 15px; background: #0a0a0a; display: flex; gap: 10px; }
+        input[type="text"] { flex-grow: 1; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 5px; }
+        button { background: var(--gold); border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 5px; }
+
+        .stat-card { background: var(--dark); padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 3px solid var(--neon); }
+        .big-val { font-size: 22px; font-family: monospace; color: var(--neon); }
+    </style>
+</head>
+<body>
+
+<div id="lockScreen">
+    <div class="lock-card">
+        <h2 style="color: var(--gold)">BESA-SUPERNOVA</h2>
+        <p style="font-size: 11px; color: #888;">DREJTORI I IMPLEMENTIMIT: MANDI</p>
+        <input type="password" id="pass" placeholder="Kodi i Sigurimit">
+        <button onclick="boot()">LIDHU ME RRJETIN</button>
+    </div>
+</div>
+
+<header>
+    <div style="color: var(--gold); font-weight: bold;">SNBESA GRAPHIC NETWORK / 30,000 OPS</div>
+    <div id="speed" style="color: var(--neon); font-family: monospace;">XHIRO: 30,000</div>
+</header>
+
+<div class="main-container">
+    <div class="panel">
+        <h5 style="color: var(--gold)">200 DREJTORITË</h5>
+        <div id="dirs"></div>
+    </div>
+
+    <div id="chat-window">
+        <div id="logs"></div>
+        <div class="input-bar">
+            <input type="text" id="cmd" placeholder="Komanda për teknikët..." onkeypress="if(event.key==='Enter') execute()">
+            <button onclick="execute()">DËRGO</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="stat-card">
+            <div style="font-size: 10px;">DREJTORI TEKNIK</div>
+            <div id="status-tech" style="color: var(--neon); font-size: 12px;">SINKRONIZUAR</div>
+        </div>
+        <div class="stat-card">
+            <div style="font-size: 10px;">NOTERI DIGJITAL</div>
+            <div style="color: var(--gold); font-size: 12px;">VULOSJE: ACTIVE</div>
+        </div>
+        <div class="stat-card">
+            <div style="font-size: 10px;">PRODHIMI (GRAPHICS)</div>
+            <div style="color: #fff; font-size: 12px;">30,000 XHIRO/S</div>
+        </div>
+    </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://opmderjnjhhqrajijlrh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wbWRlcmpuamhocXJhajlqbHJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMyMDUzMzEsImV4cCI6MjAyODc4MTMzMX0.6xvCJmn9RsTJnnhAaHQHJA_eTnsoV1Z4jQ90n2N6V_g';
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function boot() {
+    if(document.getElementById('pass').value === "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791") {
+        document.getElementById('lockScreen').style.display = 'none';
+        setup();
+        addMsg("SISTEMI", "Lidhja u krye. Drejtori Teknik dhe Prodhimi janë në linjë.");
     }
+}
 
-    // --- KOMANDAT E TJERA ---
-    setTimeout(() => {
-        let pergjigja = "";
-        if (val === "STATUS") {
-            pergjigja = "SISTEMI: OPTIMAL. LIDHJA: STABILE. ENERGJIA: 98%.";
-        } else if (val === "JEPI ZJARR") {
-            pergjigja = "PROTOKOLLI SUPERNOVA U AKTIVIZUA. ANALIZA E DEEP-DATA NË PROCES...";
-        } else {
-            pergjigja = `BESA-SUPERNOVA pranoi komandën: "${val}".`;
-        }
-        addMessage("ai", pergjigja);
+function setup() {
+    const d = document.getElementById('dirs');
+    for(let i=1; i<=200; i++) d.innerHTML += `<div class="dir-item">Drejtoritë-BESA-${i} ●</div>`;
+    setInterval(() => {
+        const s = 29500 + Math.floor(Math.random()*1000);
+        document.getElementById('speed').innerText = "XHIRO: " + s.toLocaleString();
     }, 700);
 }
+
+function addMsg(u, m) {
+    const l = document.getElementById('logs');
+    l.innerHTML += `<div class="msg"><strong>${u}:</strong> ${m}</div>`;
+    l.scrollTop = l.scrollHeight;
+}
+
+async function execute() {
+    const i = document.getElementById('cmd');
+    const v = i.value.trim().toUpperCase();
+    if(!v) return;
+    addMsg("DREJTORI", v);
+    i.value = "";
+    await _sb.from('system_logs').insert([{ action: 'GLOBAL_CMD', target: v }]);
+
+    setTimeout(() => {
+        if(v === "STATUS") {
+            addMsg("TEKNIKU", "Sistemi 30k është stabil. 200 drejtoritë po procesojnë imazhet.");
+            addMsg("PRODHIMI", "Prodhimi i SNBESA vazhdon pa ndërprerje.");
+            addMsg("NOTERI", "Certifikoj të gjitha xhirot e fundit.");
+        } else {
+            addMsg("BESA-AI", "Urdhri u përcoll te 200 njësitë e implementimit.");
+        }
+    }, 800);
+}
+</script>
+</body>
+</html>

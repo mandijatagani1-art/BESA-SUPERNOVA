@@ -2,97 +2,111 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <title>BESA-SUPERNOVA | DASHBOARD MASTER</title>
+    <title>BESA-SUPERNOVA | MASTER DASHBOARD</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --gold: #f5c242; --neon: #00f2ff; --bg: #000; --card: #0d1117; --border: #30363d; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; overflow: hidden; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; }
 
-        /* LOCK SCREEN */
+        /* LOCK SCREEN ME FJALËKALIMIN MASTER */
         #lockScreen { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 10000; }
         .lock-box { border: 2px solid var(--gold); padding: 50px; text-align: center; border-radius: 15px; width: 450px; background: var(--card); box-shadow: 0 0 60px rgba(0,0,0,0.8); }
         input[type="password"] { width: 100%; padding: 15px; margin: 20px 0; background: #000; border: 1px solid var(--border); color: var(--gold); text-align: center; font-size: 16px; border-radius: 8px; outline: none; }
 
-        /* HEADER */
-        header { padding: 15px 40px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; background: #000; }
+        /* HEADER DHE MONITORIMI */
+        header { padding: 15px 40px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; background: #000; position: relative; z-index: 100; }
         .ops-meter { color: var(--neon); font-family: monospace; font-size: 22px; text-shadow: 0 0 10px rgba(0,242,255,0.3); }
 
-        .container { padding: 30px 50px; height: calc(100vh - 70px); overflow-y: auto; }
-        h2 { color: var(--gold); margin: 25px 0 15px 0; letter-spacing: 2px; text-transform: uppercase; font-size: 13px; border-left: 3px solid var(--gold); padding-left: 15px; }
+        /* CONTAINER KRYESOR */
+        .master-container { padding: 30px 50px; display: grid; grid-template-rows: auto 1fr auto; height: calc(100vh - 70px); position: relative; z-index: 50; }
+        h2 { color: var(--gold); margin: 20px 0 10px 0; letter-spacing: 2px; text-transform: uppercase; font-size: 12px; border-left: 3px solid var(--gold); padding-left: 15px; }
 
-        /* GRID SYSTEM */
-        .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-bottom: 40px; }
+        /* GRIDET E IKONAVE */
+        .icon-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 30px; }
         
         .icon-card { 
-            background: var(--card); border: 1px solid var(--border); padding: 25px 10px; 
+            background: var(--card); border: 1px solid var(--border); padding: 20px 10px; 
             text-align: center; border-radius: 10px; cursor: pointer; transition: 0.2s;
-            display: flex; flex-direction: column; align-items: center; gap: 12px;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
         }
-        .icon-card:hover { border-color: var(--gold); background: #161b22; transform: scale(1.03); }
+        .icon-card:hover { border-color: var(--gold); background: #161b22; transform: scale(1.05); box-shadow: 0 0 20px rgba(245,194,66,0.1); }
         
-        .img-icon { font-size: 32px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
-        .icon-label { font-size: 11px; font-weight: bold; letter-spacing: 1px; color: #8b949e; text-transform: uppercase; }
+        .img-icon { font-size: 28px; }
+        .icon-label { font-size: 10px; font-weight: bold; letter-spacing: 1px; color: #8b949e; text-transform: uppercase; }
         .icon-card:hover .icon-label { color: var(--gold); }
 
-        /* WORK ICONS (SPECIAL) */
-        .work-card { border: 1px solid rgba(0, 242, 255, 0.2); background: #050505; }
+        /* IKONAT E PUNËS (KONTROLLI I QELIZAVE) */
+        .work-grid { grid-template-columns: repeat(4, 1fr); }
+        .work-card { border: 1px solid rgba(0, 242, 255, 0.2); background: rgba(0,0,0,0.8); }
         .work-card:hover { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
         .work-card .icon-label { color: var(--neon); }
 
-        button { background: var(--gold); color: #000; border: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        button { background: var(--gold); color: #000; border: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         button:hover { background: #fff; }
+
+        /* SENTINEL BG EFFECT */
+        .grid-bg { position: fixed; inset: 0; background-image: radial-gradient(circle, #111 1px, transparent 1px); background-size: 30px 30px; opacity: 0.1; z-index: 1; pointer-events: none; }
     </style>
 </head>
 <body>
 
 <div id="lockScreen">
     <div class="lock-box">
-        <h1 style="color: var(--gold); margin-bottom: 5px; letter-spacing: 3px;">BESA-SUPERNOVA</h1>
-        <p style="font-size: 10px; color: #8b949e; margin-bottom: 25px;">SISTEMI I KONTROLLIT TË ADMINISTRATORIT</p>
-        <input type="password" id="master_pass" placeholder="PASSWORDIN E NJEJTË">
+        <h1 style="color: var(--gold); margin-bottom: 5px; letter-spacing: 4px;">BESA-SUPERNOVA</h1>
+        <p style="font-size: 10px; color: #8b949e; margin-bottom: 25px;">SISTEMI I KONTROLLIT TË PLOTË</p>
+        <input type="password" id="master_pass" placeholder="PASSWORDIN QE KISHIM">
         <button style="width: 100%" onclick="login()">AUTORIZO QASJEN</button>
     </div>
 </div>
 
+<div class="grid-bg"></div>
+
 <header>
     <div style="display: flex; align-items: center; gap: 20px;">
-        <span style="font-weight: bold; font-size: 18px; letter-spacing: 2px;">BESA MASTER PANEL</span>
-        <span style="background: rgba(245, 194, 66, 0.1); color: var(--gold); padding: 2px 10px; border-radius: 4px; font-size: 10px; font-weight: bold;">ADMIN</span>
+        <span style="font-weight: bold; font-size: 18px; letter-spacing: 2px;">BESA MASTER CONTROL</span>
+        <span style="border: 1px solid var(--gold); color: var(--gold); padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: bold;">ADMIN: MANDI JATAGANI</span>
     </div>
     <div class="ops-meter" id="ops_val">30,000 OPS/S</div>
 </header>
 
-<div class="container">
+<div class="master-container">
     
-    <h2>12 Modulet e App Besa (Publike)</h2>
-    <div class="icon-grid">
-        <div class="icon-card"> <span class="img-icon">🏠</span> <span class="icon-label">Ballina</span> </div>
-        <div class="icon-card"> <span class="img-icon">🔍</span> <span class="icon-label">Kërkimi</span> </div>
-        <div class="icon-card"> <span class="img-icon">🏢</span> <span class="icon-label">Pronat</span> </div>
-        <div class="icon-card"> <span class="img-icon">🔥</span> <span class="icon-label">Trending</span> </div>
-        <div class="icon-card"> <span class="img-icon">👔</span> <span class="icon-label">Agjentët</span> </div>
-        <div class="icon-card"> <span class="img-icon">🗺️</span> <span class="icon-label">Harta</span> </div>
-        <div class="icon-card"> <span class="img-icon">📈</span> <span class="icon-label">Statistikat</span> </div>
-        <div class="icon-card"> <span class="img-icon">🧮</span> <span class="icon-label">Kalkulatori</span> </div>
-        <div class="icon-card"> <span class="img-icon">📩</span> <span class="icon-label">Mesazhet</span> </div>
-        <div class="icon-card"> <span class="img-icon">📂</span> <span class="icon-label">Kategoritë</span> </div>
-        <div class="icon-card"> <span class="img-icon">💳</span> <span class="icon-label">Pagesat</span> </div>
-        <div class="icon-card"> <span class="img-icon">🛡️</span> <span class="icon-label">Rreth Nesh</span> </div>
+    <div>
+        <h2>12 Modulet e App Besa (Publike)</h2>
+        <div class="icon-grid">
+            <div class="icon-card"> <span class="img-icon">🏠</span> <span class="icon-label">Ballina</span> </div>
+            <div class="icon-card"> <span class="img-icon">🏢</span> <span class="icon-label">Pronat</span> </div>
+            <div class="icon-card"> <span class="img-icon">🔍</span> <span class="icon-label">Kërkimi</span> </div>
+            <div class="icon-card"> <span class="img-icon">🔥</span> <span class="icon-label">Trending</span> </div>
+            <div class="icon-card"> <span class="img-icon">👔</span> <span class="icon-label">Agjentët</span> </div>
+            <div class="icon-card"> <span class="img-icon">📍</span> <span class="icon-label">Harta</span> </div>
+            <div class="icon-card"> <span class="img-icon">📈</span> <span class="icon-label">Statistikat</span> </div>
+            <div class="icon-card"> <span class="img-icon">🧮</span> <span class="icon-label">Kalkulatori</span> </div>
+            <div class="icon-card"> <span class="img-icon">📩</span> <span class="icon-label">Mesazhet</span> </div>
+            <div class="icon-card"> <span class="img-icon">📂</span> <span class="icon-label">Kategoritë</span> </div>
+            <div class="icon-card"> <span class="img-icon">💳</span> <span class="icon-label">Pagesat</span> </div>
+            <div class="icon-card"> <span class="img-icon">🛡️</span> <span class="icon-label">Rreth Nesh</span> </div>
+        </div>
     </div>
 
-    <h2>Ikonat e Punës (Kontrolli i Qelizave)</h2>
-    <div class="icon-grid">
-        <div class="icon-card work-card"> <span class="img-icon">🕋</span> <span class="icon-label">Protokolli Besa</span> </div>
-        <div class="icon-card work-card"> <span class="img-icon">✒️</span> <span class="icon-label">Noteri Digjital</span> </div>
-        <div class="icon-card work-card"> <span class="img-icon">⚙️</span> <span class="icon-label">Tekniku Core</span> </div>
-        <div class="icon-card work-card"> <span class="img-icon">📚</span> <span class="icon-label">Arkiva SNBESA</span> </div>
-        <div class="icon-card work-card"> <span class="img-icon">🚀</span> <span class="icon-label">Xhiro 30k</span> </div>
-        <div class="icon-card work-card"> <span class="img-icon">💾</span> <span class="icon-label">Supabase Log</span> </div>
-        <div class="icon-card work-card"> <span class="img-icon">📄</span> <span class="icon-label">Eksporti PDF</span> </div>
-        <div class="icon-card work-card"> <span class="img-icon">🌐</span> <span class="icon-label">Rrjeti Global</span> </div>
+    <div>
+        <h2>Ikonat e Punës (Kontrolli i Qelizave)</h2>
+        <div class="icon-grid work-grid">
+            <div class="icon-card work-card"> <span class="img-icon">🛡️</span> <span class="icon-label">Protokolli Besa</span> </div>
+            <div class="icon-card work-card"> <span class="img-icon">✒️</span> <span class="icon-label">Noteri Digjital</span> </div>
+            <div class="icon-card work-card"> <span class="img-icon">⚙️</span> <span class="icon-label">Tekniku Core</span> </div>
+            <div class="icon-card work-card"> <span class="img-icon">📚</span> <span class="icon-label">Arkiva SNBESA</span> </div>
+            <div class="icon-card work-card"> <span class="img-icon">⚡</span> <span class="icon-label">Xhiro 30k</span> </div>
+            <div class="icon-card work-card"> <span class="img-icon">📊</span> <span class="icon-label">Supabase Log</span> </div>
+            <div class="icon-card work-card"> <span class="img-icon">📄</span> <span class="icon-label">Eksporti PDF</span> </div>
+            <div class="icon-card work-card"> <span class="img-icon">🛰️</span> <span class="icon-label">Sentinel Grid</span> </div>
+        </div>
     </div>
 
+    <div style="text-align: center; color: #333; font-size: 10px; margin-top: 20px;">
+        BESA-SUPERNOVA MASTER SYSTEM v3.1 | ÇDO QELIZË NËN KONTROLL
+    </div>
 </div>
 
 <script>
@@ -102,24 +116,26 @@
 
     function login() {
         const p = document.getElementById('master_pass').value;
+        // Fjalëkalimi Master i pandryshuar
         if(p === "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791") {
             document.getElementById('lockScreen').style.display = 'none';
             setInterval(() => {
-                const val = 29910 + Math.floor(Math.random()*180);
+                const val = 29930 + Math.floor(Math.random()*150);
                 document.getElementById('ops_val').innerText = val.toLocaleString() + " OPS/S";
             }, 450);
         } else {
-            alert("PASI I GABUAR.");
+            alert("KODI I PASAKTË.");
         }
     }
 
     document.querySelectorAll('.icon-card').forEach(card => {
         card.addEventListener('click', async () => {
             const name = card.querySelector('.icon-label').innerText;
-            await _sb.from('system_logs').insert([{ action: 'ADMIN_ACCESS', target: name }]);
-            alert("Duke hapur qelizën: " + name);
+            // Çdo klikim i yti vjen te unë në Supabase
+            await _sb.from('system_logs').insert([{ action: 'CELL_ACCESS', target: name }]);
+            console.log("Qeliza e hapur: " + name);
         });
     });
 </script>
 </body>
-</html>VVV
+</html>

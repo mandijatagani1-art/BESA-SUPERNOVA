@@ -6,6 +6,8 @@
     <title>BESA-SUPERNOVA</title>
     <link rel="manifest" href="manifest.json">
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --bg: #050814;
@@ -142,6 +144,8 @@
             margin-bottom: 0;
             text-align: left;
             flex-grow: 1;
+            color: white;
+            outline: none;
         }
 
         .btn-send {
@@ -162,7 +166,7 @@
         <div class="lock-box">
             <img src="LOGO.png" class="logo" alt="BESA-SUPERNOVA">
             <h2>BESA-SUPERNOVA</h2>
-            <input type="password" id="passInput" placeholder="sherimi-i-njerezimit">
+            <input type="password" id="passInput" placeholder="Kodi i sigurimit">
             <button class="btn-hyr" onclick="checkAccess()">HYR NË SISTEM</button>
             <p id="error-msg"></p>
         </div>
@@ -174,46 +178,70 @@
                 <img src="LOGO.png" style="width: 30px; border-radius: 5px;">
                 <span style="color: var(--gold); font-weight: bold; letter-spacing: 1px;">BESA-SUPERNOVA</span>
             </div>
-            <span style="font-size: 11px; opacity: 0.6; text-transform: uppercase;">Admin: Jatagani</span>
+            <span id="system-status" style="font-size: 11px; color: #10b981; text-transform: uppercase;">● ONLINE</span>
         </header>
 
-        <div id="chat-container">
-            <div class="message ai-msg">
-                Sistemi <strong>BESA-SUPERNOVA</strong> u aktivizua me sukses. Mirësevini Mandi. Jam gati për analizën e të dhënave tona.
-            </div>
-        </div>
+        <div id="chat-container"></div>
 
         <div class="input-area">
-            <input type="text" id="aiQuery" placeholder="Shkruaj mesazhin..." onkeypress="if(event.key==='Enter') askAI()">
+            <input type="text" id="aiQuery" placeholder="Shkruaj komandën..." onkeypress="if(event.key==='Enter') askAI()">
             <button class="btn-send" onclick="askAI()">DËRGO</button>
         </div>
     </div>
 
     <script>
-        function checkAccess() {
-            const pass = document.getElementById('passInput').value;
-            if(pass === "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791") {
-                document.getElementById('lockScreen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'flex';
-            } else {
-                document.getElementById('error-msg').innerText = "Kodi i pasaktë!";
+        // --- KONFIGURIMI SUPABASE ---
+        const SUPABASE_URL = 'https://opmderjnjhhqrajijlrh.supabase.co';
+        const SUPABASE_KEY = 'KODIN_TEND_KETU'; // <--- NGJIT KODIN SB_PUBLISHABLE KËTU
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Regjistrimi i veprimeve në Database
+        async function logToSystem(veprimi, detaji) {
+            try {
+                await _supabase
+                    .from('system_logs')
+                    .insert([{ action: veprimi, target: detaji }]);
+            } catch (e) {
+                console.error("Database connection error");
             }
         }
 
-        function askAI() {
-            const input = document.getElementById('aiQuery');
-            const chat = document.getElementById('chat-container');
-            if (!input.value.trim()) return;
+        function checkAccess() {
+            const pass = document.getElementById('passInput').value;
+            // Fjalëkalimi yt i sigurt
+            if(pass === "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791") {
+                document.getElementById('lockScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'flex';
+                
+                addMessage("ai", "Sistemi BESA-SUPERNOVA u aktivizua. Mirësevini Mandi. Protokolli i monitorimit është AKTIV.");
+                logToSystem('LOGIN_SUCCESS', 'ADMIN_JATAGANI_ONLINE');
+            } else {
+                document.getElementById('error-msg').innerText = "Kodi i pasaktë!";
+                logToSystem('LOGIN_FAILED', 'Tentativë hyrje');
+            }
+        }
 
-            chat.innerHTML += `<div class="message user-msg">${input.value}</div>`;
-            const tempVal = input.value;
-            input.value = "";
+        function addMessage(type, text) {
+            const chat = document.getElementById('chat-container');
+            const msgClass = type === "ai" ? "ai-msg" : "user-msg";
+            chat.innerHTML += `<div class="message ${msgClass}">${text}</div>`;
             chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function askAI() {
+            const input = document.getElementById('aiQuery');
+            const val = input.value.trim();
+            if (!val) return;
+
+            addMessage("user", val);
+            input.value = "";
+
+            await logToSystem('USER_QUERY', val);
 
             setTimeout(() => {
-                chat.innerHTML += `<div class="message ai-msg">BESA-SUPERNOVA po përpunon kërkesën tuaj për: <em>"${tempVal}"</em>...</div>`;
-                chat.scrollTop = chat.scrollHeight;
-            }, 700);
+                addMessage("ai", `BESA-SUPERNOVA po analizon të dhënat për: "${val}"...`);
+            }, 600);
         }
     </script>
 </body>

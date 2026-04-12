@@ -1,122 +1,44 @@
-<!DOCTYPE html>
-<html lang="sq">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BESA-SUPERNOVA</title>
-    <link rel="manifest" href="manifest.json">
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+async function askAI() {
+    const input = document.getElementById('aiQuery');
+    const val = input.value.trim().toUpperCase();
+    if (!val) return;
 
-    <style>
-        :root {
-            --bg: #050814;
-            --gold: #f5c242;
-            --dark-card: #111827;
-            --glass: rgba(255, 255, 255, 0.05);
-            --text: #eef;
-            --neon: #10b981;
+    addMessage("user", val);
+    input.value = "";
+
+    await logToSystem('COMMAND', val);
+
+    // --- KOMANDA E RE: LOGSCAN ---
+    if (val === "LOGSCAN") {
+        addMessage("ai", "Duke u lidhur me serverin në Londër... Duke tërhequr loget e fundit...");
+        
+        // Marrim 3 lëvizjet e fundit nga Supabase
+        const { data, error } = await _supabase
+            .from('system_logs')
+            .select('action, target')
+            .order('created_at', { ascending: false })
+            .limit(3);
+
+        if (data) {
+            let raporti = "LËVIZJET E FUNDIT NË RRJET:<br>";
+            data.forEach(log => {
+                raporti += `• ${log.action}: ${log.target}<br>`;
+            });
+            setTimeout(() => addMessage("ai", raporti), 1000);
         }
+        return;
+    }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', -apple-system, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+    // --- KOMANDAT E TJERA ---
+    setTimeout(() => {
+        let pergjigja = "";
+        if (val === "STATUS") {
+            pergjigja = "SISTEMI: OPTIMAL. LIDHJA: STABILE. ENERGJIA: 98%.";
+        } else if (val === "JEPI ZJARR") {
+            pergjigja = "PROTOKOLLI SUPERNOVA U AKTIVIZUA. ANALIZA E DEEP-DATA NË PROCES...";
+        } else {
+            pergjigja = `BESA-SUPERNOVA pranoi komandën: "${val}".`;
         }
-
-        /* --- LOCK SCREEN --- */
-        #lockScreen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            width: 100%;
-            padding: 20px;
-        }
-
-        .lock-box {
-            background: var(--dark-card);
-            padding: 2.5rem;
-            border-radius: 2rem;
-            border: 1px solid var(--gold);
-            width: 100%;
-            max-width: 380px;
-            box-shadow: 0 0 40px rgba(245, 194, 66, 0.1);
-        }
-
-        img.logo {
-            width: 120px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            border: 2px solid var(--gold);
-        }
-
-        h2 { color: var(--gold); margin-bottom: 1.5rem; letter-spacing: 2px; font-size: 1.2rem; }
-
-        input {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: 1px solid #334155;
-            background: #1e293b;
-            color: white;
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 16px;
-            outline: none;
-        }
-
-        button.btn-hyr {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            background: var(--gold);
-            color: #000;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        button.btn-hyr:hover { background: #eab308; }
-
-        /* --- AI DASHBOARD --- */
-        #dashboard {
-            display: none;
-            flex-direction: column;
-            width: 100%;
-            height: 100vh;
-            max-width: 800px;
-            padding: 20px;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--glass);
-        }
-
-        #chat-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px;
-            margin: 20px 0;
-            background: var(--glass);
-            border-radius: 20px;
-            border: 1px solid rgba(245, 194, 66, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .message {
+        addMessage("ai", pergjigja);
+    }, 700);
+}

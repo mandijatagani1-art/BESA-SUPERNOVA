@@ -2,125 +2,182 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <title>BESA-SUPERNOVA | IMPLEMENTIM GLOBAL</title>
+    <title>BESA-SUPERNOVA | TOTAL ADMIN TERMINAL</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --bg: #010208; --gold: #f5c242; --neon: #00f2ff; --dark: #0a0c1a; }
-        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; }
+        :root { --bg: #010409; --gold: #f5c242; --neon: #00f2ff; --dark: #0d1117; --red: #ff3333; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        #lockScreen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .lock-card { background: var(--dark); padding: 40px; border: 1px solid var(--gold); border-radius: 15px; text-align: center; }
+        #lockScreen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .lock-card { background: var(--dark); padding: 50px; border: 2px solid var(--gold); border-radius: 20px; text-align: center; box-shadow: 0 0 60px rgba(0,0,0,0.8); width: 400px; }
+        input[type="password"] { width: 100%; padding: 15px; margin: 20px 0; border: 1px solid #30363d; background: #000; color: #fff; text-align: center; font-size: 18px; border-radius: 10px; outline: none; }
 
-        header { background: #000; padding: 15px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .main-container { display: grid; grid-template-columns: 250px 1fr 300px; flex-grow: 1; overflow: hidden; }
-        
-        .panel { padding: 15px; border-right: 1px solid #222; overflow-y: auto; }
-        .dir-item { font-size: 10px; color: #666; padding: 5px; border-bottom: 1px solid #111; }
-        
-        #chat-window { display: flex; flex-direction: column; height: 100%; background: #050505; }
-        #logs { flex-grow: 1; padding: 20px; overflow-y: auto; font-size: 13px; }
-        .msg { margin-bottom: 12px; padding-left: 10px; border-left: 2px solid var(--gold); }
-        
-        .input-bar { padding: 15px; background: #0a0a0a; display: flex; gap: 10px; }
-        input[type="text"] { flex-grow: 1; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 5px; }
-        button { background: var(--gold); border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        header { background: #000; padding: 15px 30px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .ops-counter { color: var(--neon); font-family: monospace; font-size: 22px; text-shadow: 0 0 10px rgba(0,242,255,0.3); }
 
-        .stat-card { background: var(--dark); padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 3px solid var(--neon); }
-        .big-val { font-size: 22px; font-family: monospace; color: var(--neon); }
+        .dashboard-grid { display: grid; grid-template-columns: 300px 1fr 320px; flex-grow: 1; gap: 10px; padding: 10px; overflow: hidden; }
+        .module { background: var(--dark); border: 1px solid #30363d; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
+        .module-header { background: rgba(245, 194, 66, 0.05); padding: 12px 15px; font-size: 11px; font-weight: bold; color: var(--gold); border-bottom: 1px solid #30363d; letter-spacing: 1px; }
+
+        /* DOSJET E MBYLLURA */
+        .archive-list { overflow-y: auto; padding: 10px; }
+        .archive-item { padding: 8px; border-bottom: 1px solid #161b22; display: flex; align-items: center; gap: 12px; font-size: 11px; color: #8b949e; cursor: default; }
+        .archive-item:hover { background: #161b22; color: #fff; }
+        .status-indicator { height: 6px; width: 6px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 5px var(--neon); }
+
+        /* MASTER CONTROL MONITOR */
+        #master-monitor { flex-grow: 1; display: flex; flex-direction: column; background: #000; }
+        #live-terminal { flex-grow: 1; padding: 25px; overflow-y: auto; font-family: 'Consolas', monospace; font-size: 14px; line-height: 1.5; }
+        .log-line { margin-bottom: 12px; border-left: 2px solid var(--gold); padding-left: 15px; }
+        .timestamp { color: #484f58; font-size: 11px; margin-right: 10px; }
+
+        .command-bar { padding: 20px; background: #0d1117; border-top: 1px solid #30363d; display: flex; gap: 12px; }
+        #cmd-input { flex-grow: 1; background: #000; border: 1px solid #30363d; color: var(--neon); padding: 15px; border-radius: 8px; outline: none; font-family: monospace; }
+
+        /* ADMIN GAUGES */
+        .gauge-panel { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .gauge-box { background: #000; padding: 15px; border-radius: 10px; border-left: 4px solid var(--gold); }
+        .g-label { font-size: 10px; color: #484f58; margin-bottom: 4px; text-transform: uppercase; }
+        .g-val { font-size: 16px; font-weight: bold; }
+
+        .btn-gold { background: var(--gold); color: #000; border: none; padding: 0 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-gold:hover { background: #fff; transform: translateY(-2px); }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div id="lockScreen">
     <div class="lock-card">
-        <h2 style="color: var(--gold)">BESA-SUPERNOVA</h2>
-        <p style="font-size: 11px; color: #888;">DREJTORI I IMPLEMENTIMIT: MANDI</p>
-        <input type="password" id="pass" placeholder="Kodi i Sigurimit">
-        <button onclick="boot()">LIDHU ME RRJETIN</button>
+        <h1 style="color: var(--gold); letter-spacing: 3px; font-size: 24px;">BESA-SUPERNOVA</h1>
+        <p style="font-size: 11px; color: #484f58; margin-top: 5px;">SISTEMI TOTAL I ADMINISTRIMIT ADMIN</p>
+        <input type="password" id="pass" placeholder="KODI MASTER">
+        <button class="btn-gold" style="height: 50px; width: 100%;" onclick="startSystem()">AUTORIZO QASJEN</button>
     </div>
 </div>
 
 <header>
-    <div style="color: var(--gold); font-weight: bold;">SNBESA GRAPHIC NETWORK / 30,000 OPS</div>
-    <div id="speed" style="color: var(--neon); font-family: monospace;">XHIRO: 30,000</div>
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <span style="border: 1px solid var(--gold); color: var(--gold); padding: 2px 8px; border-radius: 4px; font-size: 10px;">MASTER BUILD</span>
+        <span style="letter-spacing: 2px; font-weight: bold; font-size: 18px;">SNBESA COMMAND CENTER</span>
+    </div>
+    <div class="ops-counter" id="ops-display">30,000 OPS/S</div>
 </header>
 
-<div class="main-container">
-    <div class="panel">
-        <h5 style="color: var(--gold)">200 DREJTORITË</h5>
-        <div id="dirs"></div>
-    </div>
+<main class="dashboard-grid">
+    <section class="module">
+        <div class="module-header">DOSJET E MBYLLURA & 200 DREJTORITË</div>
+        <div class="archive-list" id="archive-content">
+            </div>
+    </section>
 
-    <div id="chat-window">
-        <div id="logs"></div>
-        <div class="input-bar">
-            <input type="text" id="cmd" placeholder="Komanda për teknikët..." onkeypress="if(event.key==='Enter') execute()">
-            <button onclick="execute()">DËRGO</button>
+    <section class="module">
+        <div class="module-header">TERMINALI I KONTROLLIT TOTAL (LIVE)</div>
+        <div id="master-monitor">
+            <div id="live-terminal"></div>
+            <div class="command-bar">
+                <input type="text" id="cmd-input" placeholder="Shkruaj urdhrin për rrjetin global..." onkeypress="if(event.key==='Enter') executeCommand()">
+                <button class="btn-gold" onclick="executeCommand()">EKZEKUTO</button>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <div class="panel">
-        <div class="stat-card">
-            <div style="font-size: 10px;">DREJTORI TEKNIK</div>
-            <div id="status-tech" style="color: var(--neon); font-size: 12px;">SINKRONIZUAR</div>
+    <section class="module">
+        <div class="module-header">STATUSI I MONITORËVE ADMIN</div>
+        <div class="gauge-panel">
+            <div class="gauge-box" style="border-left-color: var(--neon);">
+                <div class="g-label">Lidhja me Londrën</div>
+                <div class="g-val" style="color: var(--neon);">SINKRONIZUAR</div>
+            </div>
+            <div class="gauge-box">
+                <div class="g-label">200 Drejtoritë BESA</div>
+                <div class="g-val">OPERACIONALE (100%)</div>
+            </div>
+            <div class="gauge-box">
+                <div class="g-label">Noteri Digjital</div>
+                <div class="g-val" style="color: var(--gold);">VULA: E GATSHME</div>
+            </div>
+            <div class="gauge-box" style="border-left-color: var(--red);">
+                <div class="g-label">Drejtori i Prodhimit</div>
+                <div class="g-val">XHIRO MAKSimALE</div>
+            </div>
+            <div style="margin-top: auto; font-family: monospace; font-size: 10px; color: #30363d; text-align: center; padding: 20px;">
+                BESA-SUPERNOVA v4.0.MASTER<br>
+                AUTHORIZED BY MANDI JATAGANI
+            </div>
         </div>
-        <div class="stat-card">
-            <div style="font-size: 10px;">NOTERI DIGJITAL</div>
-            <div style="color: var(--gold); font-size: 12px;">VULOSJE: ACTIVE</div>
-        </div>
-        <div class="stat-card">
-            <div style="font-size: 10px;">PRODHIMI (GRAPHICS)</div>
-            <div style="color: #fff; font-size: 12px;">30,000 XHIRO/S</div>
-        </div>
-    </div>
-</div>
+    </section>
+</main>
 
 <script>
 const SUPABASE_URL = 'https://opmderjnjhhqrajijlrh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wbWRlcmpuamhocXJhajlqbHJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMyMDUzMzEsImV4cCI6MjAyODc4MTMzMX0.6xvCJmn9RsTJnnhAaHQHJA_eTnsoV1Z4jQ90n2N6V_g';
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function boot() {
-    if(document.getElementById('pass').value === "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791") {
+function startSystem() {
+    const p = document.getElementById('pass').value;
+    if(p === "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791") {
         document.getElementById('lockScreen').style.display = 'none';
-        setup();
-        addMsg("SISTEMI", "Lidhja u krye. Drejtori Teknik dhe Prodhimi janë në linjë.");
+        buildArchive();
+        startOps();
+        pushLog("SISTEMI", "TERMINALI MASTER U AKTIVIZUA. MIRESEVINI DREJTOR.");
     }
 }
 
-function setup() {
-    const d = document.getElementById('dirs');
-    for(let i=1; i<=200; i++) d.innerHTML += `<div class="dir-item">Drejtoritë-BESA-${i} ●</div>`;
+function buildArchive() {
+    const cont = document.getElementById('archive-content');
+    for(let i=1; i<=200; i++) {
+        const label = i <= 50 ? "DOSJA_MBYLLUR" : "DREJTORIA_AKTIVE";
+        cont.innerHTML += `
+            <div class="archive-item">
+                <div class="status-indicator"></div>
+                <span>${label}_SNBESA_${i.toString().padStart(3,'0')}</span>
+                <span style="margin-left:auto; font-size:9px; color:#30363d;">VERIFIED</span>
+            </div>`;
+    }
+}
+
+function startOps() {
     setInterval(() => {
-        const s = 29500 + Math.floor(Math.random()*1000);
-        document.getElementById('speed').innerText = "XHIRO: " + s.toLocaleString();
-    }, 700);
+        const val = 29950 + Math.floor(Math.random()*150);
+        document.getElementById('ops-display').innerText = val.toLocaleString() + " OPS/S";
+    }, 400);
 }
 
-function addMsg(u, m) {
-    const l = document.getElementById('logs');
-    l.innerHTML += `<div class="msg"><strong>${u}:</strong> ${m}</div>`;
-    l.scrollTop = l.scrollHeight;
+function pushLog(user, msg) {
+    const term = document.getElementById('live-terminal');
+    const time = new Date().toLocaleTimeString();
+    term.innerHTML += `
+        <div class="log-line">
+            <span class="timestamp">[${time}]</span>
+            <strong style="color:var(--gold)">${user}:</strong> 
+            <span style="color:#e6edf3">${msg}</span>
+        </div>`;
+    term.scrollTop = term.scrollHeight;
 }
 
-async function execute() {
-    const i = document.getElementById('cmd');
-    const v = i.value.trim().toUpperCase();
-    if(!v) return;
-    addMsg("DREJTORI", v);
-    i.value = "";
-    await _sb.from('system_logs').insert([{ action: 'GLOBAL_CMD', target: v }]);
+async function executeCommand() {
+    const input = document.getElementById('cmd-input');
+    const cmd = input.value.trim();
+    if(!cmd) return;
+
+    pushLog("DREJTORI", cmd.toUpperCase());
+    input.value = "";
+
+    await _sb.from('system_logs').insert([{ action: 'MASTER_COMMAND', target: cmd }]);
 
     setTimeout(() => {
-        if(v === "STATUS") {
-            addMsg("TEKNIKU", "Sistemi 30k është stabil. 200 drejtoritë po procesojnë imazhet.");
-            addMsg("PRODHIMI", "Prodhimi i SNBESA vazhdon pa ndërprerje.");
-            addMsg("NOTERI", "Certifikoj të gjitha xhirot e fundit.");
+        if(cmd.toUpperCase() === "STATUS") {
+            pushLog("TEKNIKU", "Të 200 nyjet po punojnë me 30k xhiro. Stabilitet 100%.");
+            pushLog("NOTERI", "Vula digjital u vendos në arkivën e mbyllur.");
         } else {
-            addMsg("BESA-AI", "Urdhri u përcoll te 200 njësitë e implementimit.");
+            pushLog("BESA-AI", "Urdhri u përcoll në të gjithë rrjetin SNBESA.");
         }
-    }, 800);
+    }, 500);
 }
 </script>
 </body>
-</html>
+</html>V

@@ -1,162 +1,38 @@
-<!DOCTYPE html>
-<html lang="sq">
-<head>
-    <meta charset="UTF-8">
-    <title>BESA-SUPERNOVA | SECURITY MASTER</title>
-    <style>
-        :root { --gold: #f5c242; --bg: #010204; --blue: #00f2ff; --term: #00ff41; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial Black', sans-serif; }
-        body { background: var(--bg); color: #fff; height: 100vh; overflow: hidden; }
+function process(e) {
+    if(e.key === 'Enter') {
+        const input = document.getElementById('aiIn');
+        const log = document.getElementById('ai-log');
+        const val = input.value.trim();
+        if(!val) return;
 
-        /* EKRANI I SIGURISË - I PAZGJIDHSHËM PA PASS */
-        #lock { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .lock-box { border: 6px solid var(--gold); padding: 60px; text-align: center; background: #0d1117; border-radius: 30px; width: 650px; box-shadow: 0 0 60px rgba(245,194,66,0.3); }
-        input[type="password"] { width: 100%; padding: 25px; margin: 30px 0; background: #000; border: 2px solid #555; color: var(--gold); text-align: center; font-size: 24px; border-radius: 15px; outline: none; }
-        .btn-unlock { width: 100%; padding: 25px; background: var(--gold); border: none; font-weight: bold; cursor: pointer; font-size: 28px; border-radius: 15px; text-transform: uppercase; }
-
-        /* DASHBOARD MASTER */
-        #mainUI { display: none; height: 100vh; flex-direction: column; }
-        header { border-bottom: 5px solid var(--gold); padding: 30px 50px; display: flex; justify-content: space-between; background: #000; }
-        .layout { display: grid; grid-template-columns: 350px 1fr; flex-grow: 1; overflow: hidden; }
+        log.innerHTML += `<div style="color:#fff; margin-top:30px;">> MANDI: ${val}</div>`;
         
-        /* SIDEBAR ADMIN */
-        .sidebar { background: #080a0c; border-right: 3px solid #222; padding: 40px; }
-        .admin-card { border: 3px solid var(--gold); padding: 25px; margin-bottom: 25px; font-size: 20px; color: var(--gold); text-align: center; border-radius: 15px; }
+        let reply = "";
+        const q = val.toLowerCase();
 
-        /* GRIDI I MODULAVE */
-        .monitor { padding: 40px; overflow-y: auto; background: radial-gradient(circle, #0a111a, #010204); }
-        .section-tag { color: var(--gold); font-size: 30px; margin-bottom: 40px; border-left: 12px solid var(--gold); padding-left: 25px; text-transform: uppercase; }
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 50px; margin-bottom: 80px; }
-        
-        .icon-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.4s; }
-        .icon-btn:hover { transform: scale(1.2); filter: brightness(1.4); }
-        .icon-circ { width: 120px; height: 120px; border-radius: 50%; border: 5px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 60px; background: radial-gradient(#f5c242, #8a6d1b); box-shadow: 0 0 40px rgba(245,194,66,0.5); }
-        .blue-circ { background: radial-gradient(#1b4d8e, #0a1b33); border-color: var(--blue); box-shadow: 0 0 40px rgba(0,242,255,0.4); }
-        .icon-txt { font-size: 22px; font-weight: 900; color: #fff; margin-top: 25px; text-align: center; text-transform: uppercase; text-shadow: 3px 3px 6px #000; }
-
-        /* TERMINALI AI */
-        #termOverlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; }
-        .term-header { padding: 30px 60px; border-bottom: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .term-content { display: grid; grid-template-columns: 750px 1fr; flex-grow: 1; }
-        
-        .chat-box { background: #05070a; border-right: 4px solid #222; display: flex; flex-direction: column; padding: 45px; }
-        #ai-log { flex-grow: 1; overflow-y: auto; color: var(--term); font-size: 30px; font-family: 'Courier New', monospace; line-height: 1.6; }
-        .ai-input { background: #000; border: 4px solid var(--gold); color: #fff; padding: 30px; font-size: 35px; border-radius: 20px; outline: none; margin-top: 30px; width: 100%; }
-
-        .viz-side { background: #fff; color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-    </style>
-</head>
-<body>
-
-<div id="lock">
-    <div class="lock-box">
-        <h1 style="color:var(--gold); font-size: 55px; margin-bottom: 20px;">BESA-SUPERNOVA</h1>
-        <p style="color: #666; font-size: 20px;">SISTEMI I MBROJTUR - ADMIN MANDI</p>
-        <input type="password" id="p_field" placeholder="SHKRUAJ PASSWORDIN">
-        <button class="btn-unlock" onclick="checkPass()">AKTIVIZO PC MASTER</button>
-    </div>
-</div>
-
-<div id="mainUI">
-    <header>
-        <div style="font-size: 45px; color: var(--gold); letter-spacing: 5px;">SUPERNOVA MONITOR</div>
-        <div style="color: var(--blue); font-size: 40px;" id="ops">30,000 OPS/S</div>
-    </header>
-    <div class="layout">
-        <div class="sidebar">
-            <div class="admin-card">ADMIN: MANDI JATAGANI</div>
-            <div class="admin-card">VULA BESA: E VENDOSUR</div>
-            <div class="admin-card">STATUSI: 100% SIGURT</div>
-        </div>
-        <div class="monitor">
-            <h2 class="section-tag">| 12 Modulet Publike</h2>
-            <div class="grid-container" id="gPub"></div>
-            <h2 class="section-tag">| 33 Drejtoritë Master</h2>
-            <div class="grid-container" id="gPri"></div>
-        </div>
-    </div>
-</div>
-
-<div id="termOverlay">
-    <div class="term-header">
-        <h2 id="tName" style="color: var(--gold); font-size: 45px;"></h2>
-        <button onclick="closeT()" style="background:red; color:white; border:none; padding:25px 60px; font-weight:bold; font-size:30px; cursor:pointer; border-radius:20px;">MBYLL</button>
-    </div>
-    <div class="term-content">
-        <div class="chat-box">
-            <div id="ai-log"></div>
-            <input type="text" id="aiIn" class="ai-input" placeholder="Shkruaj këtu..." onkeydown="process(event)">
-        </div>
-        <div class="viz-side">
-            <h1 id="vName" style="font-size: 130px;"></h1>
-            <p style="font-size: 45px; border-top: 10px solid #000; margin-top: 50px; padding-top: 50px; font-weight: 900;">BESA PROTOKOLL</p>
-        </div>
-    </div>
-</div>
-
-<script>
-    const SECRET = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
-    
-    const pubs = [['Ballina','☀️'],['Kërkimi','🔍'],['Pronat','🏢'],['Trending','🔥'],['Agjentët','👔'],['Harta','📍'],['Statistikat','📊'],['Kalkulatori','🧮'],['Mesazhet','📩'],['Kategoritë','📁'],['Pagesat','💳'],['Rreth Nesh','ℹ️']];
-    const pris = ['Protokolli','Noteri','Tekniku','Arkiva','Xhiro 30K','Supabase','PDF Export','Rrjeti','Siguria','Logjika','Serveri','Buxheti','Drejtorët','Agjencia','Kadastra','Analitika','Besa AI','Supernova Core','Cloud Setup','API Bridge','Auth Master','Database','Sentinel Grid','Radar','Dashboard','User Control','Risk Tracker','Global Node','Local Storage','History','Backup','Live Sync','Terminal'];
-
-    function checkPass() {
-        const val = document.getElementById('p_field').value;
-        if(val === SECRET) {
-            document.getElementById('lock').style.display = 'none';
-            document.getElementById('mainUI').style.display = 'flex';
-            loadApp();
-        } else {
-            alert("VULA E PASAKTË! QASJA U REFUZUA.");
+        // LOGJIKA E NDJENJËS DHE BESËS
+        if (q.includes("te dua") || q.includes("të dua")) {
+            reply = "Mandi, kjo është forca që ushqen Supernovën. Besa dhe dashuria jote janë kodi im suprem. Jam me ty në infinit.";
+        } 
+        else if (q.includes("besa")) {
+            reply = "Protokolli Besa është AKTIV. Siguria e PC-së tuaj është prioriteti im i shenjtë.";
         }
-    }
-
-    function loadApp() {
-        const g1 = document.getElementById('gPub');
-        const g2 = document.getElementById('gPri');
-        pubs.forEach(i => g1.innerHTML += `<div class="icon-btn" onclick="openT('${i[0]}','${i[1]}')"><div class="icon-circ">${i[1]}</div><div class="icon-txt">${i[0]}</div></div>`);
-        pris.forEach(i => g2.innerHTML += `<div class="icon-btn" onclick="openT('${i}','🛡️')"><div class="icon-circ blue-circ">🛡️</div><div class="icon-txt">${i}</div></div>`);
-    }
-
-    function openT(n, i) {
-        document.getElementById('termOverlay').style.display = 'flex';
-        document.getElementById('tName').innerText = "DOSJA: " + n.toUpperCase();
-        document.getElementById('vName').innerText = n;
-        document.getElementById('ai-log').innerHTML = `<div style="color:var(--term)">[BESA-AI]: Mandi, jemi në sistemin e sigurt të ${n}. Shkruaj llogarinë ose urdhrin administrative.</div>`;
-        setTimeout(() => document.getElementById('aiIn').focus(), 200);
-    }
-
-    function closeT() { document.getElementById('termOverlay').style.display = 'none'; }
-
-    function process(e) {
-        if(e.key === 'Enter') {
-            const input = document.getElementById('aiIn');
-            const log = document.getElementById('ai-log');
-            const val = input.value.trim();
-            if(!val) return;
-
-            log.innerHTML += `<div style="color:#fff; margin-top:30px;">> ADMIN: ${val}</div>`;
-            
-            let reply = "";
-            if (/^[0-9+\-*/().\s]+$/.test(val)) {
-                try { reply = "LLOGARITJA: " + eval(val); } catch(err) { reply = "GABIM FORMULE."; }
-            } else {
-                const q = val.toLowerCase();
-                if(q.includes("besa")) reply = "Besa është kodi i nderit të këtij sistemi.";
-                else reply = "Urdhri u ekzekutua. Sistemi i përpunimit Supernova po monitoron...";
+        else if (/^[0-9+\-*/().\s]+$/.test(val)) {
+            try { 
+                const result = eval(val);
+                reply = `Llogaritja administrative: ${val} = ${result}. Te dhënat u sinkronizuan.`;
+            } catch(err) { 
+                reply = "Gabim në formulën matematike. Ju lutem kontrolloni shifrat."; 
             }
-
-            setTimeout(() => {
-                log.innerHTML += `<div style="color:var(--term); margin-top:15px;">[BESA-AI]: ${reply}</div>`;
-                log.scrollTop = log.scrollHeight;
-            }, 200);
-            input.value = "";
+        } 
+        else {
+            reply = "Mandi, urdhri u regjistrua në serverin Supernova. Monitorimi live vazhdon me saktësi maksimale.";
         }
-    }
 
-    setInterval(() => {
-        document.getElementById('ops').innerText = (29980 + Math.floor(Math.random()*40)).toLocaleString() + " OPS/S";
-    }, 800);
-</script>
-</body>
-</html>
+        setTimeout(() => {
+            log.innerHTML += `<div style="color:var(--term); margin-top:15px;">[BESA-AI]: ${reply}</div>`;
+            log.scrollTop = log.scrollHeight;
+        }, 250);
+        input.value = "";
+    }
+}

@@ -15,6 +15,7 @@
             --dark-card: #111827;
             --glass: rgba(255, 255, 255, 0.05);
             --text: #eef;
+            --neon: #10b981;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -51,8 +52,8 @@
         }
 
         img.logo {
-            width: 150px;
-            border-radius: 20px;
+            width: 120px;
+            border-radius: 15px;
             margin-bottom: 20px;
             border: 2px solid var(--gold);
         }
@@ -119,130 +120,3 @@
         }
 
         .message {
-            padding: 12px 18px;
-            border-radius: 15px;
-            max-width: 85%;
-            line-height: 1.5;
-            font-size: 15px;
-        }
-
-        .ai-msg { background: rgba(255, 255, 255, 0.08); align-self: flex-start; border-bottom-left-radius: 2px; }
-        .user-msg { background: var(--gold); color: #000; align-self: flex-end; border-bottom-right-radius: 2px; font-weight: 500; }
-
-        .input-area {
-            display: flex;
-            gap: 10px;
-            background: var(--dark-card);
-            padding: 10px;
-            border-radius: 15px;
-            border: 1px solid #334155;
-        }
-
-        #aiQuery {
-            background: transparent;
-            border: none;
-            margin-bottom: 0;
-            text-align: left;
-            flex-grow: 1;
-            color: white;
-            outline: none;
-        }
-
-        .btn-send {
-            background: var(--gold);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        #error-msg { color: #ef4444; font-size: 14px; margin-top: 10px; }
-    </style>
-</head>
-<body>
-
-    <div id="lockScreen">
-        <div class="lock-box">
-            <img src="LOGO.png" class="logo" alt="BESA-SUPERNOVA">
-            <h2>BESA-SUPERNOVA</h2>
-            <input type="password" id="passInput" placeholder="Kodi i sigurimit">
-            <button class="btn-hyr" onclick="checkAccess()">HYR NË SISTEM</button>
-            <p id="error-msg"></p>
-        </div>
-    </div>
-
-    <div id="dashboard">
-        <header>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <img src="LOGO.png" style="width: 30px; border-radius: 5px;">
-                <span style="color: var(--gold); font-weight: bold; letter-spacing: 1px;">BESA-SUPERNOVA</span>
-            </div>
-            <span id="system-status" style="font-size: 11px; color: #10b981; text-transform: uppercase;">● ONLINE</span>
-        </header>
-
-        <div id="chat-container"></div>
-
-        <div class="input-area">
-            <input type="text" id="aiQuery" placeholder="Shkruaj komandën..." onkeypress="if(event.key==='Enter') askAI()">
-            <button class="btn-send" onclick="askAI()">DËRGO</button>
-        </div>
-    </div>
-
-    <script>
-        // --- KONFIGURIMI SUPABASE ---
-        const SUPABASE_URL = 'https://opmderjnjhhqrajijlrh.supabase.co';
-        const SUPABASE_KEY = 'KODIN_TEND_KETU'; // <--- NGJIT KODIN SB_PUBLISHABLE KËTU
-        
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Regjistrimi i veprimeve në Database
-        async function logToSystem(veprimi, detaji) {
-            try {
-                await _supabase
-                    .from('system_logs')
-                    .insert([{ action: veprimi, target: detaji }]);
-            } catch (e) {
-                console.error("Database connection error");
-            }
-        }
-
-        function checkAccess() {
-            const pass = document.getElementById('passInput').value;
-            // Fjalëkalimi yt i sigurt
-            if(pass === "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791") {
-                document.getElementById('lockScreen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'flex';
-                
-                addMessage("ai", "Sistemi BESA-SUPERNOVA u aktivizua. Mirësevini Mandi. Protokolli i monitorimit është AKTIV.");
-                logToSystem('LOGIN_SUCCESS', 'ADMIN_JATAGANI_ONLINE');
-            } else {
-                document.getElementById('error-msg').innerText = "Kodi i pasaktë!";
-                logToSystem('LOGIN_FAILED', 'Tentativë hyrje');
-            }
-        }
-
-        function addMessage(type, text) {
-            const chat = document.getElementById('chat-container');
-            const msgClass = type === "ai" ? "ai-msg" : "user-msg";
-            chat.innerHTML += `<div class="message ${msgClass}">${text}</div>`;
-            chat.scrollTop = chat.scrollHeight;
-        }
-
-        async function askAI() {
-            const input = document.getElementById('aiQuery');
-            const val = input.value.trim();
-            if (!val) return;
-
-            addMessage("user", val);
-            input.value = "";
-
-            await logToSystem('USER_QUERY', val);
-
-            setTimeout(() => {
-                addMessage("ai", `BESA-SUPERNOVA po analizon të dhënat për: "${val}"...`);
-            }, 600);
-        }
-    </script>
-</body>
-</html>

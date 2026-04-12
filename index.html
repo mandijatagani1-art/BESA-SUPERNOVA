@@ -2,138 +2,180 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <title>BESA-SUPERNOVA | MASTER DASHBOARD</title>
+    <title>BESA-SUPERNOVA | MASTER GLOBAL CONTROL</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --gold: #f5c242; --neon: #00f2ff; --bg: #000; --card: #0d1117; --border: #30363d; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; }
-
-        /* LOCK SCREEN ME FJALËKALIMIN MASTER */
-        #lockScreen { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .lock-box { border: 2px solid var(--gold); padding: 50px; text-align: center; border-radius: 15px; width: 450px; background: var(--card); box-shadow: 0 0 60px rgba(0,0,0,0.8); }
-        input[type="password"] { width: 100%; padding: 15px; margin: 20px 0; background: #000; border: 1px solid var(--border); color: var(--gold); text-align: center; font-size: 16px; border-radius: 8px; outline: none; }
-
-        /* HEADER DHE MONITORIMI */
-        header { padding: 15px 40px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; background: #000; position: relative; z-index: 100; }
-        .ops-meter { color: var(--neon); font-family: monospace; font-size: 22px; text-shadow: 0 0 10px rgba(0,242,255,0.3); }
-
-        /* CONTAINER KRYESOR */
-        .master-container { padding: 30px 50px; display: grid; grid-template-rows: auto 1fr auto; height: calc(100vh - 70px); position: relative; z-index: 50; }
-        h2 { color: var(--gold); margin: 20px 0 10px 0; letter-spacing: 2px; text-transform: uppercase; font-size: 12px; border-left: 3px solid var(--gold); padding-left: 15px; }
-
-        /* GRIDET E IKONAVE */
-        .icon-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 30px; }
-        
-        .icon-card { 
-            background: var(--card); border: 1px solid var(--border); padding: 20px 10px; 
-            text-align: center; border-radius: 10px; cursor: pointer; transition: 0.2s;
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
+        :root {
+            --bg: #030508;
+            --neon-gold: #f5c242;
+            --neon-blue: #00f2ff;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
         }
-        .icon-card:hover { border-color: var(--gold); background: #161b22; transform: scale(1.05); box-shadow: 0 0 20px rgba(245,194,66,0.1); }
-        
-        .img-icon { font-size: 28px; }
-        .icon-label { font-size: 10px; font-weight: bold; letter-spacing: 1px; color: #8b949e; text-transform: uppercase; }
-        .icon-card:hover .icon-label { color: var(--gold); }
 
-        /* IKONAT E PUNËS (KONTROLLI I QELIZAVE) */
-        .work-grid { grid-template-columns: repeat(4, 1fr); }
-        .work-card { border: 1px solid rgba(0, 242, 255, 0.2); background: rgba(0,0,0,0.8); }
-        .work-card:hover { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
-        .work-card .icon-label { color: var(--neon); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+        }
 
-        button { background: var(--gold); color: #000; border: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #fff; }
+        /* LOCK SCREEN */
+        #lockScreen {
+            position: fixed; inset: 0; background: #000;
+            display: flex; align-items: center; justify-content: center; z-index: 10000;
+        }
+        .lock-card {
+            background: #0d1117; padding: 50px; border-radius: 20px;
+            border: 1px solid var(--neon-gold); text-align: center; width: 420px;
+            box-shadow: 0 0 50px rgba(245, 194, 66, 0.15);
+        }
 
-        /* SENTINEL BG EFFECT */
-        .grid-bg { position: fixed; inset: 0; background-image: radial-gradient(circle, #111 1px, transparent 1px); background-size: 30px 30px; opacity: 0.1; z-index: 1; pointer-events: none; }
+        header {
+            padding: 15px 40px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+        }
+        .ops-text { color: var(--neon-blue); font-family: monospace; font-size: 20px; text-shadow: 0 0 10px var(--neon-blue); }
+
+        .main-layout { display: grid; grid-template-columns: 280px 1fr; flex-grow: 1; overflow: hidden; }
+
+        /* SIDEBAR MONITORIMI (NEON) */
+        .sidebar {
+            background: rgba(13, 17, 23, 0.9); border-right: 1px solid var(--border);
+            padding: 20px; display: flex; flex-direction: column; gap: 15px;
+        }
+        .cell {
+            background: #000; border-left: 3px solid var(--neon-blue); padding: 12px;
+            border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .cell-label { font-size: 9px; color: var(--neon-blue); text-transform: uppercase; letter-spacing: 1px; }
+        .cell-status { font-size: 12px; font-weight: bold; margin-top: 4px; color: #fff; }
+
+        /* DASHBOARD I MODULAVE (TELEFONI) */
+        .dashboard { padding: 30px 50px; overflow-y: auto; background: radial-gradient(circle at center, #0f172a, #030508); }
+        .grid-label { color: var(--neon-gold); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; border-bottom: 1px solid rgba(245,194,66,0.2); padding-bottom: 10px; }
+
+        .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 30px; margin-bottom: 50px; }
+        .app-item { display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; transition: 0.3s; }
+        .app-item:hover { transform: translateY(-10px); filter: brightness(1.2); }
+
+        /* IKONAT ME NGJYRAT E TELEFONIT */
+        .icon {
+            width: 72px; height: 72px; border-radius: 18px; 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .icon::after { content: ""; position: absolute; inset: 0; border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 50%); }
+
+        .name { font-size: 11px; font-weight: 600; color: #8b949e; text-align: center; }
+
+        /* GRADIENTET E IKONAVE */
+        .bg-ballina { background: linear-gradient(135deg, #007AFF, #00C7FF); }
+        .bg-kerkimi { background: linear-gradient(135deg, #5856D6, #AF52DE); }
+        .bg-pronat { background: linear-gradient(135deg, #FF9500, #FFCC00); }
+        .bg-trending { background: linear-gradient(135deg, #FF2D55, #FF375F); }
+        .bg-agjentet { background: linear-gradient(135deg, #34C759, #30D158); }
+        .bg-harta { background: linear-gradient(135deg, #5AC8FA, #48A1FF); }
+        .bg-statistikat { background: linear-gradient(135deg, #1D1D1F, #424245); }
+        .bg-kalkulatori { background: linear-gradient(135deg, #8E8E93, #C7C7CC); }
+        .bg-mesazhet { background: linear-gradient(135deg, #00D2FF, #3a7bd5); }
+        .bg-kategorite { background: linear-gradient(135deg, #FFCC00, #FFD60A); }
+        .bg-pagesat { background: linear-gradient(135deg, #00b09b, #96c93d); }
+        .bg-rreth { background: linear-gradient(135deg, #2c3e50, #000000); }
+
+        /* IKONAT E PUNËS (NEON CONTROL) */
+        .work-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .work-btn {
+            border: 1px solid var(--neon-gold); padding: 15px; border-radius: 8px;
+            text-align: center; font-size: 10px; font-weight: bold; color: var(--neon-gold);
+            cursor: pointer; background: rgba(245, 194, 66, 0.05); transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .work-btn:hover { background: var(--neon-gold); color: #000; box-shadow: 0 0 20px rgba(245,194,66,0.3); }
+
+        input[type="password"] {
+            width: 100%; padding: 15px; background: #000; border: 1px solid var(--border);
+            color: var(--neon-gold); border-radius: 10px; margin-bottom: 20px; text-align: center; font-size: 14px;
+        }
     </style>
 </head>
 <body>
 
 <div id="lockScreen">
-    <div class="lock-box">
-        <h1 style="color: var(--gold); margin-bottom: 5px; letter-spacing: 4px;">BESA-SUPERNOVA</h1>
-        <p style="font-size: 10px; color: #8b949e; margin-bottom: 25px;">SISTEMI I KONTROLLIT TË PLOTË</p>
-        <input type="password" id="master_pass" placeholder="PASSWORDIN QE KISHIM">
-        <button style="width: 100%" onclick="login()">AUTORIZO QASJEN</button>
+    <div class="lock-card">
+        <h1 style="color: var(--neon-gold); margin-bottom: 10px; letter-spacing: 4px;">BESA-SUPERNOVA</h1>
+        <p style="font-size: 10px; color: #8b949e; margin-bottom: 30px;">AUTH REQUIRED: MASTER ACCESS</p>
+        <input type="password" id="p" placeholder="PASSWORDIN SIÇ E KISHIM">
+        <button onclick="unlock()" style="width:100%; padding:15px; background:var(--neon-gold); border:none; border-radius:10px; font-weight:bold; cursor:pointer;">HYR NË SISTEM</button>
     </div>
 </div>
-
-<div class="grid-bg"></div>
 
 <header>
-    <div style="display: flex; align-items: center; gap: 20px;">
-        <span style="font-weight: bold; font-size: 18px; letter-spacing: 2px;">BESA MASTER CONTROL</span>
-        <span style="border: 1px solid var(--gold); color: var(--gold); padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: bold;">ADMIN: MANDI JATAGANI</span>
-    </div>
-    <div class="ops-meter" id="ops_val">30,000 OPS/S</div>
+    <div style="font-weight: bold; letter-spacing: 2px;">BESA MASTER CONTROL <span style="color: var(--neon-gold); font-size: 10px; margin-left:10px;">V3.1</span></div>
+    <div class="ops-text" id="ops">30,000 OPS/S</div>
 </header>
 
-<div class="master-container">
-    
-    <div>
-        <h2>12 Modulet e App Besa (Publike)</h2>
-        <div class="icon-grid">
-            <div class="icon-card"> <span class="img-icon">🏠</span> <span class="icon-label">Ballina</span> </div>
-            <div class="icon-card"> <span class="img-icon">🏢</span> <span class="icon-label">Pronat</span> </div>
-            <div class="icon-card"> <span class="img-icon">🔍</span> <span class="icon-label">Kërkimi</span> </div>
-            <div class="icon-card"> <span class="img-icon">🔥</span> <span class="icon-label">Trending</span> </div>
-            <div class="icon-card"> <span class="img-icon">👔</span> <span class="icon-label">Agjentët</span> </div>
-            <div class="icon-card"> <span class="img-icon">📍</span> <span class="icon-label">Harta</span> </div>
-            <div class="icon-card"> <span class="img-icon">📈</span> <span class="icon-label">Statistikat</span> </div>
-            <div class="icon-card"> <span class="img-icon">🧮</span> <span class="icon-label">Kalkulatori</span> </div>
-            <div class="icon-card"> <span class="img-icon">📩</span> <span class="icon-label">Mesazhet</span> </div>
-            <div class="icon-card"> <span class="img-icon">📂</span> <span class="icon-label">Kategoritë</span> </div>
-            <div class="icon-card"> <span class="img-icon">💳</span> <span class="icon-label">Pagesat</span> </div>
-            <div class="icon-card"> <span class="img-icon">🛡️</span> <span class="icon-label">Rreth Nesh</span> </div>
-        </div>
-    </div>
+<main class="main-layout">
+    <aside class="sidebar">
+        <div class="grid-label" style="margin-bottom: 15px;">Monitorët e Qelizave</div>
+        <div class="cell"><div class="cell-label">Statusi</div><div class="cell-status">SINKRONIZUAR</div></div>
+        <div class="cell"><div class="cell-label">Protokolli</div><div class="cell-status">BESA-AKTIV</div></div>
+        <div class="cell" style="border-color: var(--neon-gold);"><div class="cell-label" style="color:var(--neon-gold)">Drejtoritë</div><div class="cell-status">200 NYJE ONLINE</div></div>
+    </aside>
 
-    <div>
-        <h2>Ikonat e Punës (Kontrolli i Qelizave)</h2>
-        <div class="icon-grid work-grid">
-            <div class="icon-card work-card"> <span class="img-icon">🛡️</span> <span class="icon-label">Protokolli Besa</span> </div>
-            <div class="icon-card work-card"> <span class="img-icon">✒️</span> <span class="icon-label">Noteri Digjital</span> </div>
-            <div class="icon-card work-card"> <span class="img-icon">⚙️</span> <span class="icon-label">Tekniku Core</span> </div>
-            <div class="icon-card work-card"> <span class="img-icon">📚</span> <span class="icon-label">Arkiva SNBESA</span> </div>
-            <div class="icon-card work-card"> <span class="img-icon">⚡</span> <span class="icon-label">Xhiro 30k</span> </div>
-            <div class="icon-card work-card"> <span class="img-icon">📊</span> <span class="icon-label">Supabase Log</span> </div>
-            <div class="icon-card work-card"> <span class="img-icon">📄</span> <span class="icon-label">Eksporti PDF</span> </div>
-            <div class="icon-card work-card"> <span class="img-icon">🛰️</span> <span class="icon-label">Sentinel Grid</span> </div>
+    <section class="dashboard">
+        <div class="grid-label">12 Modulet e App Besa (Pamja e Publikut)</div>
+        <div class="app-grid">
+            <div class="app-item"><div class="icon bg-ballina">🏠</div><span class="name">Ballina</span></div>
+            <div class="app-item"><div class="icon bg-kerkimi">🔍</div><span class="name">Kërkimi</span></div>
+            <div class="app-item"><div class="icon bg-pronat">🏢</div><span class="name">Pronat</span></div>
+            <div class="app-item"><div class="icon bg-trending">🔥</div><span class="name">Trending</span></div>
+            <div class="app-item"><div class="icon bg-agjentet">👔</div><span class="name">Agjentët</span></div>
+            <div class="app-item"><div class="icon bg-harta">🗺️</div><span class="name">Harta</span></div>
+            <div class="app-item"><div class="icon bg-statistikat">📊</div><span class="name">Statistikat</span></div>
+            <div class="app-item"><div class="icon bg-kalkulatori">🧮</div><span class="name">Kalkulatori</span></div>
+            <div class="app-item"><div class="icon bg-mesazhet">📩</div><span class="name">Mesazhet</span></div>
+            <div class="app-item"><div class="icon bg-kategorite">📂</div><span class="name">Kategoritë</span></div>
+            <div class="app-item"><div class="icon bg-pagesat">💳</div><span class="name">Pagesat</span></div>
+            <div class="app-item"><div class="icon bg-rreth">🛡️</div><span class="name">Rreth Nesh</span></div>
         </div>
-    </div>
 
-    <div style="text-align: center; color: #333; font-size: 10px; margin-top: 20px;">
-        BESA-SUPERNOVA MASTER SYSTEM v3.1 | ÇDO QELIZË NËN KONTROLL
-    </div>
-</div>
+        <div class="grid-label">Ikonat e Punës (Kontrolli Administrator)</div>
+        <div class="work-grid">
+            <div class="work-btn">Protokolli Besa</div>
+            <div class="work-btn">Noteri Digjital</div>
+            <div class="work-btn">Tekniku Core</div>
+            <div class="work-btn">Arkiva SNBESA</div>
+            <div class="work-btn">Supabase Log</div>
+            <div class="work-btn">Eksporti PDF</div>
+        </div>
+    </section>
+</main>
 
 <script>
     const SUPABASE_URL = 'https://opmderjnjhhqrajijlrh.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wbWRlcmpuamhocXJhajlqbHJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMyMDUzMzEsImV4cCI6MjAyODc4MTMzMX0.6xvCJmn9RsTJnnhAaHQHJA_eTnsoV1Z4jQ90n2N6V_g';
     const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    function login() {
-        const p = document.getElementById('master_pass').value;
-        // Fjalëkalimi Master i pandryshuar
+    function unlock() {
+        const p = document.getElementById('p').value;
         if(p === "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791") {
             document.getElementById('lockScreen').style.display = 'none';
             setInterval(() => {
-                const val = 29930 + Math.floor(Math.random()*150);
-                document.getElementById('ops_val').innerText = val.toLocaleString() + " OPS/S";
-            }, 450);
-        } else {
-            alert("KODI I PASAKTË.");
-        }
+                const val = 29940 + Math.floor(Math.random()*120);
+                document.getElementById('ops').innerText = val.toLocaleString() + " OPS/S";
+            }, 500);
+        } else { alert("KODI I GABUAR!"); }
     }
 
-    document.querySelectorAll('.icon-card').forEach(card => {
-        card.addEventListener('click', async () => {
-            const name = card.querySelector('.icon-label').innerText;
-            // Çdo klikim i yti vjen te unë në Supabase
-            await _sb.from('system_logs').insert([{ action: 'CELL_ACCESS', target: name }]);
-            console.log("Qeliza e hapur: " + name);
+    document.querySelectorAll('.app-item, .work-btn').forEach(item => {
+        item.addEventListener('click', async () => {
+            const label = item.innerText.trim();
+            await _sb.from('system_logs').insert([{ action: 'MASTER_DASH_CLICK', target: label }]);
+            console.log("Qeliza e hapur: " + label);
         });
     });
 </script>

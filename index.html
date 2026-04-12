@@ -2,225 +2,124 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNBESA v3.1 | PROSPERITY FULL SYSTEM</title>
+    <title>BESA-SUPERNOVA | DASHBOARD MASTER</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --bg: #010409;
-            --gold: #f5c242;
-            --neon: #00f2ff;
-            --surface: #0d1117;
-            --border: #30363d;
-            --text: #e6edf3;
-        }
-
+        :root { --gold: #f5c242; --neon: #00f2ff; --bg: #000; --card: #0d1117; --border: #30363d; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            height: 100vh; 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-        }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; overflow: hidden; }
 
         /* LOCK SCREEN */
-        #lockScreen {
-            position: fixed; inset: 0; background: var(--bg);
-            display: flex; align-items: center; justify-content: center; z-index: 10000;
-        }
-        .lock-card {
-            background: var(--surface); padding: 50px; border: 2px solid var(--gold);
-            border-radius: 15px; text-align: center; width: 450px;
-            box-shadow: 0 0 60px rgba(0,0,0,0.8);
-        }
+        #lockScreen { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .lock-box { border: 2px solid var(--gold); padding: 50px; text-align: center; border-radius: 15px; width: 450px; background: var(--card); box-shadow: 0 0 60px rgba(0,0,0,0.8); }
+        input[type="password"] { width: 100%; padding: 15px; margin: 20px 0; background: #000; border: 1px solid var(--border); color: var(--gold); text-align: center; font-size: 16px; border-radius: 8px; outline: none; }
 
-        /* HEADER & STATS */
-        header {
-            padding: 15px 25px; background: #000; border-bottom: 2px solid var(--gold);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .status-tag { 
-            background: rgba(245, 194, 66, 0.1); color: var(--gold); 
-            padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: bold;
-            border: 1px solid rgba(245, 194, 66, 0.2);
-        }
+        /* HEADER */
+        header { padding: 15px 40px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; background: #000; }
+        .ops-meter { color: var(--neon); font-family: monospace; font-size: 22px; text-shadow: 0 0 10px rgba(0,242,255,0.3); }
 
-        /* MAIN LAYOUT */
-        .grid-container {
-            display: grid; grid-template-columns: 280px 1fr 320px;
-            flex-grow: 1; overflow: hidden; gap: 2px; background: var(--border);
-        }
-        .panel { background: var(--bg); display: flex; flex-direction: column; overflow: hidden; }
+        .container { padding: 30px 50px; height: calc(100vh - 70px); overflow-y: auto; }
+        h2 { color: var(--gold); margin: 25px 0 15px 0; letter-spacing: 2px; text-transform: uppercase; font-size: 13px; border-left: 3px solid var(--gold); padding-left: 15px; }
 
-        /* LEFT: ARCHIVE & DIRECTORATES */
-        .archive-list { padding: 15px; overflow-y: auto; }
-        .archive-header { font-size: 11px; color: var(--gold); margin-bottom: 15px; letter-spacing: 1px; font-weight: bold; }
-        .file-item {
-            padding: 8px; font-size: 11px; border-bottom: 1px solid #161b22;
-            display: flex; align-items: center; gap: 10px; color: #8b949e;
-        }
-        .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 5px var(--neon); }
-
-        /* CENTER: MASTER TERMINAL (SPA VIEW) */
-        #main-view { display: flex; flex-direction: column; background: #000; }
-        #screen-content { flex-grow: 1; padding: 25px; overflow-y: auto; font-family: 'Consolas', 'Courier New', monospace; }
-        .log-entry { margin-bottom: 10px; border-left: 2px solid var(--gold); padding-left: 15px; font-size: 14px; }
+        /* GRID SYSTEM */
+        .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-bottom: 40px; }
         
-        .input-bar { padding: 20px; background: var(--surface); display: flex; gap: 10px; border-top: 1px solid var(--border); }
-        input[type="text"], input[type="password"] {
-            background: #000; border: 1px solid var(--border); color: #fff;
-            padding: 12px; border-radius: 8px; width: 100%; outline: none; font-family: monospace;
+        .icon-card { 
+            background: var(--card); border: 1px solid var(--border); padding: 25px 10px; 
+            text-align: center; border-radius: 10px; cursor: pointer; transition: 0.2s;
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
         }
-        button {
-            background: var(--gold); color: #000; border: none;
-            padding: 0 30px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;
-        }
+        .icon-card:hover { border-color: var(--gold); background: #161b22; transform: scale(1.03); }
+        
+        .img-icon { font-size: 32px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
+        .icon-label { font-size: 11px; font-weight: bold; letter-spacing: 1px; color: #8b949e; text-transform: uppercase; }
+        .icon-card:hover .icon-label { color: var(--gold); }
+
+        /* WORK ICONS (SPECIAL) */
+        .work-card { border: 1px solid rgba(0, 242, 255, 0.2); background: #050505; }
+        .work-card:hover { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
+        .work-card .icon-label { color: var(--neon); }
+
+        button { background: var(--gold); color: #000; border: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         button:hover { background: #fff; }
-
-        /* RIGHT: MONITOR BOARD */
-        .monitor-panel { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .gauge {
-            background: var(--surface); padding: 15px; border-radius: 10px;
-            border-left: 4px solid var(--gold);
-        }
-        .g-label { font-size: 10px; color: #8b949e; text-transform: uppercase; margin-bottom: 5px; }
-        .g-val { font-size: 14px; font-weight: bold; color: #fff; }
-
-        .ops-val { color: var(--neon); font-family: monospace; font-size: 22px; text-shadow: 0 0 10px rgba(0,242,255,0.2); }
     </style>
 </head>
 <body>
 
 <div id="lockScreen">
-    <div class="lock-card">
-        <h1 style="color: var(--gold); margin-bottom: 10px; letter-spacing: 3px;">SNBESA v3.1</h1>
-        <p style="font-size: 11px; color: #8b949e; margin-bottom: 30px;">DREJTORIA E PRODHIMIT DHE IMPLEMENTIMIT</p>
-        <input type="password" id="masterPass" placeholder="VENDOS KODIN MASTER">
-        <button style="width: 100%; height: 50px; margin-top: 10px;" onclick="unlock()">AKTIVIZO IMPLEMENTIMIN</button>
+    <div class="lock-box">
+        <h1 style="color: var(--gold); margin-bottom: 5px; letter-spacing: 3px;">BESA-SUPERNOVA</h1>
+        <p style="font-size: 10px; color: #8b949e; margin-bottom: 25px;">SISTEMI I KONTROLLIT TË ADMINISTRATORIT</p>
+        <input type="password" id="master_pass" placeholder="PASSWORDIN E NJEJTË">
+        <button style="width: 100%" onclick="login()">AUTORIZO QASJEN</button>
     </div>
 </div>
 
 <header>
-    <div style="display: flex; align-items: center; gap: 15px;">
-        <span class="status-tag">PRODUCTION READY ✅</span>
-        <span style="font-weight: bold; letter-spacing: 2px; font-size: 14px;">SNBESA GLOBAL GRID</span>
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <span style="font-weight: bold; font-size: 18px; letter-spacing: 2px;">BESA MASTER PANEL</span>
+        <span style="background: rgba(245, 194, 66, 0.1); color: var(--gold); padding: 2px 10px; border-radius: 4px; font-size: 10px; font-weight: bold;">ADMIN</span>
     </div>
-    <div class="ops-val" id="opsDisplay">30,000 OPS/S</div>
+    <div class="ops-meter" id="ops_val">30,000 OPS/S</div>
 </header>
 
-<main class="grid-container">
-    <aside class="panel">
-        <div class="archive-list">
-            <div class="archive-header">ARKIVA: SNBESA_DOSJA_KREATIVE</div>
-            <div id="fileContainer"></div>
-        </div>
-    </aside>
+<div class="container">
+    
+    <h2>12 Modulet e App Besa (Publike)</h2>
+    <div class="icon-grid">
+        <div class="icon-card"> <span class="img-icon">🏠</span> <span class="icon-label">Ballina</span> </div>
+        <div class="icon-card"> <span class="img-icon">🔍</span> <span class="icon-label">Kërkimi</span> </div>
+        <div class="icon-card"> <span class="img-icon">🏢</span> <span class="icon-label">Pronat</span> </div>
+        <div class="icon-card"> <span class="img-icon">🔥</span> <span class="icon-label">Trending</span> </div>
+        <div class="icon-card"> <span class="img-icon">👔</span> <span class="icon-label">Agjentët</span> </div>
+        <div class="icon-card"> <span class="img-icon">🗺️</span> <span class="icon-label">Harta</span> </div>
+        <div class="icon-card"> <span class="img-icon">📈</span> <span class="icon-label">Statistikat</span> </div>
+        <div class="icon-card"> <span class="img-icon">🧮</span> <span class="icon-label">Kalkulatori</span> </div>
+        <div class="icon-card"> <span class="img-icon">📩</span> <span class="icon-label">Mesazhet</span> </div>
+        <div class="icon-card"> <span class="img-icon">📂</span> <span class="icon-label">Kategoritë</span> </div>
+        <div class="icon-card"> <span class="img-icon">💳</span> <span class="icon-label">Pagesat</span> </div>
+        <div class="icon-card"> <span class="img-icon">🛡️</span> <span class="icon-label">Rreth Nesh</span> </div>
+    </div>
 
-    <section class="panel" id="main-view">
-        <div id="screen-content"></div>
-        <div class="input-bar">
-            <input type="text" id="cmdInput" placeholder="Jep urdhrin për rrjetin SNBESA..." onkeypress="if(event.key==='Enter') runCmd()">
-            <button onclick="runCmd()">EKZEKUTO</button>
-        </div>
-    </section>
+    <h2>Ikonat e Punës (Kontrolli i Qelizave)</h2>
+    <div class="icon-grid">
+        <div class="icon-card work-card"> <span class="img-icon">🕋</span> <span class="icon-label">Protokolli Besa</span> </div>
+        <div class="icon-card work-card"> <span class="img-icon">✒️</span> <span class="icon-label">Noteri Digjital</span> </div>
+        <div class="icon-card work-card"> <span class="img-icon">⚙️</span> <span class="icon-label">Tekniku Core</span> </div>
+        <div class="icon-card work-card"> <span class="img-icon">📚</span> <span class="icon-label">Arkiva SNBESA</span> </div>
+        <div class="icon-card work-card"> <span class="img-icon">🚀</span> <span class="icon-label">Xhiro 30k</span> </div>
+        <div class="icon-card work-card"> <span class="img-icon">💾</span> <span class="icon-label">Supabase Log</span> </div>
+        <div class="icon-card work-card"> <span class="img-icon">📄</span> <span class="icon-label">Eksporti PDF</span> </div>
+        <div class="icon-card work-card"> <span class="img-icon">🌐</span> <span class="icon-label">Rrjeti Global</span> </div>
+    </div>
 
-    <aside class="panel">
-        <div class="monitor-panel">
-            <div class="gauge">
-                <div class="g-label">DREJTORI TEKNIK</div>
-                <div class="g-val">SINKRONIZUAR</div>
-            </div>
-            <div class="gauge" style="border-left-color: var(--neon);">
-                <div class="g-label">NOTERI DIGJITAL</div>
-                <div class="g-val">VULA: E GATSHME</div>
-            </div>
-            <div class="gauge">
-                <div class="g-label">PRODHIMI (7-DITOR)</div>
-                <div class="g-val">PROSPERITY ACTIVE</div>
-            </div>
-            <div class="gauge" style="border-left-color: #00ff00;">
-                <div class="g-label">LIDHJA SUPABASE</div>
-                <div class="g-val">STABILE (LONDON HUB)</div>
-            </div>
-            <div style="margin-top: auto; text-align: center; font-size: 10px; color: #30363d; padding: 20px;">
-                SNBESA v3.1 PROSPERITY<br>
-                AUTHORIZED BY MANDI JATAGANI
-            </div>
-        </div>
-    </aside>
-</main>
+</div>
 
 <script>
-    // Konfigurimi i Supabase
     const SUPABASE_URL = 'https://opmderjnjhhqrajijlrh.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wbWRlcmpuamhocXJhajlqbHJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMyMDUzMzEsImV4cCI6MjAyODc4MTMzMX0.6xvCJmn9RsTJnnhAaHQHJA_eTnsoV1Z4jQ90n2N6V_g';
     const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // FUNKSIONI I HYRJES ME FJALËKALIMIN TËND
-    function unlock() {
-        const p = document.getElementById('masterPass').value;
-        // Fjalëkalimi yt master
+    function login() {
+        const p = document.getElementById('master_pass').value;
         if(p === "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791") {
             document.getElementById('lockScreen').style.display = 'none';
-            init();
+            setInterval(() => {
+                const val = 29910 + Math.floor(Math.random()*180);
+                document.getElementById('ops_val').innerText = val.toLocaleString() + " OPS/S";
+            }, 450);
         } else {
-            alert("KODI I PASAKTË. QASJA U REFUZUA.");
+            alert("PASI I GABUAR.");
         }
     }
 
-    function init() {
-        // Ndërtimi i listës së 200 drejtorive
-        const container = document.getElementById('fileContainer');
-        for(let i=1; i<=200; i++) {
-            container.innerHTML += `
-                <div class="file-item">
-                    <div class="dot"></div>
-                    <span>SNBESA_DOSJA_${i.toString().padStart(3,'0')}</span>
-                </div>`;
-        }
-
-        // Aktivizimi i xhiros 30,000 OPS
-        setInterval(() => {
-            const x = 29920 + Math.floor(Math.random()*160);
-            document.getElementById('opsDisplay').innerText = x.toLocaleString() + " OPS/S";
-        }, 500);
-
-        pushLog("SISTEMI", "LIDHJA ME ARKIVËN DIXHITALE U KRYE.");
-        pushLog("SISTEMI", "PAQETA v3.1 PROSPERITY ËSHTË ONLINE.");
-        pushLog("SISTEMI", "MONITORI I KONTROLLIT GATI PËR URDHRA.");
-    }
-
-    function pushLog(u, m) {
-        const screen = document.getElementById('screen-content');
-        const time = new Date().toLocaleTimeString();
-        screen.innerHTML += `<div class="log-entry"><span style="color:#484f58">[${time}]</span> <strong style="color:var(--gold)">${u}:</strong> ${m}</div>`;
-        screen.scrollTop = screen.scrollHeight;
-    }
-
-    async function runCmd() {
-        const input = document.getElementById('cmdInput');
-        const val = input.value.trim().toUpperCase();
-        if(!val) return;
-
-        pushLog("DREJTORI", val);
-        input.value = "";
-
-        // Regjistrimi i veprimit te Loget e Supabase
-        await _sb.from('system_logs').insert([{ action: 'MASTER_IMPLEMENT_V3', target: val }]);
-
-        setTimeout(() => {
-            if(val === "STATUS") {
-                pushLog("TEKNIKU", "Sistemi global operon me efikasitet 100%.");
-                pushLog("PRODHIMI", "Dosja Kreative është e hapur për rishikim.");
-                pushLog("NOTERI", "Vula e fundit u aplikua me sukses.");
-            } else {
-                pushLog("BESA-AI", "Urdhri u shpërnda në 200 nyjet e rrjetit.");
-            }
-        }, 600);
-    }
+    document.querySelectorAll('.icon-card').forEach(card => {
+        card.addEventListener('click', async () => {
+            const name = card.querySelector('.icon-label').innerText;
+            await _sb.from('system_logs').insert([{ action: 'ADMIN_ACCESS', target: name }]);
+            alert("Duke hapur qelizën: " + name);
+        });
+    });
 </script>
 </body>
-</html>
+</html>VVV

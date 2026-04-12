@@ -2,183 +2,153 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <title>BESA-SUPERNOVA | MASTER COMMAND PC</title>
+    <title>BESA-SUPERNOVA | MASTER COMMAND CENTER</title>
     <style>
-        :root {
-            --bg: #010204;
-            --sun-gold: #f5c242;
-            --terminal: #00ff41;
-            --neon-blue: #00f2ff;
-        }
-
+        :root { --gold: #f5c242; --bg: #010204; --blue: #00f2ff; --term: #00ff41; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: #fff; font-family: 'Consolas', monospace; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        body { background: var(--bg); color: #fff; font-family: 'Arial Black', 'Consolas', sans-serif; height: 100vh; overflow: hidden; }
 
-        /* LOCK SCREEN */
-        #lockScreen { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .lock-card { background: #0d1117; padding: 40px; border-radius: 10px; border: 2px solid var(--sun-gold); text-align: center; width: 400px; box-shadow: 0 0 50px rgba(245,194,66,0.2); }
-        input[type="password"] { width: 100%; padding: 12px; margin: 20px 0; background: #000; border: 1px solid #333; color: var(--sun-gold); text-align: center; outline: none; border-radius: 5px; }
+        /* LOGIN */
+        #lock { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .lock-box { border: 3px solid var(--gold); padding: 50px; text-align: center; background: #0d1117; border-radius: 15px; width: 450px; }
+        input { width: 100%; padding: 15px; margin: 20px 0; background: #000; border: 1px solid #333; color: var(--gold); text-align: center; border-radius: 5px; outline: none; font-size: 18px; }
 
-        /* HEADER */
-        header { padding: 10px 30px; border-bottom: 2px solid var(--sun-gold); display: flex; justify-content: space-between; align-items: center; background: #000; }
-
-        /* MAIN MONITOR */
-        #masterControl { display: none; flex-grow: 1; overflow: hidden; }
-        .layout { display: grid; grid-template-columns: 280px 1fr; height: 100%; }
+        /* MAIN UI */
+        #mainUI { display: none; height: 100vh; flex-direction: column; }
+        header { border-bottom: 2px solid var(--gold); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; background: #000; }
+        .layout { display: grid; grid-template-columns: 300px 1fr; flex-grow: 1; overflow: hidden; }
         
-        .sidebar { background: #080a0c; border-right: 1px solid #222; padding: 20px; overflow-y: auto; }
-        .stat-card { background: #000; border: 1px solid var(--neon-blue); padding: 10px; margin-bottom: 10px; font-size: 11px; color: var(--neon-blue); }
+        /* SIDEBAR */
+        .side { background: #080a0c; border-right: 1px solid #222; padding: 25px; }
+        .stat { border: 2px solid var(--blue); padding: 15px; margin-bottom: 15px; font-size: 14px; color: var(--blue); font-weight: bold; }
 
-        .content { padding: 20px 40px; overflow-y: auto; background: radial-gradient(circle at center, #0a111a 0%, #010204 100%); }
-        h3 { color: var(--sun-gold); font-size: 11px; letter-spacing: 2px; margin: 25px 0 15px 0; border-left: 3px solid var(--sun-gold); padding-left: 10px; text-transform: uppercase; }
+        /* GRID - ZMADHIMI KETU */
+        .content { padding: 30px; overflow-y: auto; background: radial-gradient(circle, #0a111a, #010204); }
+        .grid-section { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        .icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.2s; padding: 15px; }
+        .icon:hover { transform: scale(1.15); }
+        
+        /* RRATHET E IKONAVE */
+        .circ { width: 85px; height: 85px; border-radius: 50%; border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: 12px; background: radial-gradient(#f5c242, #8a6d1b); box-shadow: 0 0 15px rgba(245,194,66,0.3); }
+        .blue-circ { background: radial-gradient(#1b4d8e, #0a1b33); border-color: var(--blue); }
+        
+        /* SHKRONJAT E ZMADHUARA */
+        .label { font-size: 13px; font-weight: 900; color: #ffffff; text-transform: uppercase; text-align: center; letter-spacing: 1px; text-shadow: 1px 1px 2px #000; }
 
-        /* GRID ME 45 IKONA */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; }
-        .cell { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; padding: 10px; }
-        .cell:hover { transform: scale(1.1); }
-        
-        .icon-circle { 
-            width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            font-size: 25px; border: 1px solid var(--sun-gold); background: radial-gradient(#f5c242, #8a6d1b);
-            box-shadow: 0 0 10px rgba(245, 194, 66, 0.2);
-        }
-        .blue-icon { background: radial-gradient(#1b4d8e, #0a1b33); border-color: var(--neon-blue); }
-        .label { font-size: 8px; font-weight: bold; text-align: center; color: #aaa; text-transform: uppercase; margin-top: 5px; }
-
-        /* TERMINALI AI OVERLAY */
-        #overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; flex-direction: column; }
-        .ov-header { padding: 10px 30px; border-bottom: 1px solid var(--sun-gold); display: flex; justify-content: space-between; align-items: center; }
-        .ov-body { display: grid; grid-template-columns: 450px 1fr; flex-grow: 1; overflow: hidden; }
-        
-        .terminal { background: #05070a; border-right: 1px solid #222; display: flex; flex-direction: column; padding: 20px; font-family: 'Courier New', monospace; }
-        #chat-log { flex-grow: 1; overflow-y: auto; color: var(--terminal); font-size: 14px; line-height: 1.6; }
-        .chat-input { background: #000; border: 1px solid var(--sun-gold); color: #fff; padding: 15px; outline: none; border-radius: 5px; }
-        
-        .ai-msg { color: var(--terminal); margin-top: 10px; }
-        .user-msg { color: var(--sun-gold); margin-top: 10px; font-weight: bold; }
-        .preview-pane { background: #fff; color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        /* CHAT OVERLAY */
+        #chatOverlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; }
+        .ch-head { padding: 20px 40px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .ch-body { display: grid; grid-template-columns: 500px 1fr; flex-grow: 1; overflow: hidden; }
+        .term-side { background: #05070a; border-right: 1px solid #222; display: flex; flex-direction: column; padding: 25px; }
+        #log { flex-grow: 1; overflow-y: auto; color: var(--term); font-size: 18px; margin-bottom: 20px; font-family: 'Courier New', monospace; }
+        .in-box { background: #000; border: 2px solid var(--gold); color: #fff; padding: 20px; border-radius: 8px; outline: none; font-size: 18px; }
+        .view { background: #fff; color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-<div id="lockScreen">
-    <div class="lock-card">
-        <h1 style="color: var(--sun-gold); letter-spacing: 3px;">BESA-SUPERNOVA</h1>
-        <input type="password" id="pass" placeholder="PASSWORDIN E ADMINIT">
-        <button onclick="login()" style="width:100%; padding:12px; background:var(--sun-gold); border:none; font-weight:bold; cursor:pointer; border-radius:5px;">AKTIVIZO PC MASTER</button>
+<div id="lock">
+    <div class="lock-box">
+        <h1 style="color:var(--gold); margin-bottom:10px; font-size: 30px;">BESA-SUPERNOVA</h1>
+        <p style="color:#555; font-size: 12px;">SISTEMI I KONTROLLIT - ADMIN MANDI</p>
+        <input type="password" id="p" placeholder="SHKRUAJ PASSWORDIN">
+        <button onclick="boot()" style="width:100%; padding:15px; background:var(--gold); border:none; font-weight:bold; cursor:pointer; border-radius:5px; font-size:18px;">HAP MONITORIN MASTER</button>
     </div>
 </div>
 
-<div id="masterControl">
+<div id="mainUI">
     <header>
-        <div style="font-weight:bold; letter-spacing:2px; color:var(--sun-gold);">MASTER CONTROL | BESA-SUPERNOVA PC</div>
-        <div id="ops" style="color:var(--neon-blue)">30,000 OPS/S</div>
+        <div style="color:var(--gold); font-weight:bold; font-size: 22px; letter-spacing: 2px;">SUPERNOVA MASTER MONITOR</div>
+        <div style="color:var(--blue); font-size: 20px; font-weight: bold;" id="ops">30,000 OPS/S</div>
     </header>
     <div class="layout">
-        <aside class="sidebar">
-            <div class="stat-card">PROTOKOLLI: BESA AKTIV</div>
-            <div class="stat-card">DREJTORITË: 33 ONLINE</div>
-            <div class="stat-card">ADMIN: MANDI JATAGANI</div>
-        </aside>
-        <main class="content">
-            <h3>| 12 Module Publike</h3>
-            <div class="grid" id="pubGrid"></div>
-            <h3>| 33 Drejtoritë e Punës</h3>
-            <div class="grid" id="priGrid"></div>
-        </main>
+        <div class="side">
+            <div class="stat">SISTEMI: ONLINE</div>
+            <div class="stat">DREJTORITË: 33</div>
+            <div class="stat">ADMIN: MANDI JATAGANI</div>
+        </div>
+        <div class="content">
+            <h4 style="color:var(--gold); margin-bottom:20px; font-size:16px; border-left: 5px solid var(--gold); padding-left: 10px;">| 12 MODULET PUBLIKE</h4>
+            <div class="grid-section" id="g1"></div>
+            
+            <h4 style="color:var(--gold); margin-bottom:20px; font-size:16px; border-left: 5px solid var(--gold); padding-left: 10px;">| 33 DREJTORITË MASTER</h4>
+            <div class="grid-section" id="g2"></div>
+        </div>
     </div>
 </div>
 
-<div id="overlay">
-    <div class="ov-header">
-        <h2 id="ov-title" style="color: var(--sun-gold); font-size: 14px;"></h2>
-        <button onclick="closeMod()" style="background:red; color:#fff; border:none; padding:5px 15px; cursor:pointer; font-weight:bold;">MBYLL TERMINALIN</button>
+<div id="chatOverlay">
+    <div class="ch-head">
+        <h2 id="title" style="color:var(--gold); font-size: 24px;"></h2>
+        <button onclick="closeCH()" style="background:red; color:#fff; border:none; padding:10px 30px; cursor:pointer; font-weight:bold; border-radius: 5px; font-size: 16px;">MBYLL</button>
     </div>
-    <div class="ov-body">
-        <div class="terminal">
-            <div id="chat-log"></div>
-            <input type="text" id="chat-in" class="chat-input" placeholder="Pyet Besa-AI (Llogari, Status, Informacion)..." onkeypress="if(event.key==='Enter') askAI()">
+    <div class="ch-body">
+        <div class="term-side">
+            <div id="log"></div>
+            <input type="text" id="aiIn" class="in-box" placeholder="Shkruaj pyetjen këtu..." onkeypress="if(event.key==='Enter') startAI()">
         </div>
-        <div class="preview-pane">
-            <h1 id="page-h1" style="font-size: 50px; margin-bottom: 20px;"></h1>
-            <p>Duke sinkronizuar bazën e të dhënave të Jataganit...</p>
+        <div class="view">
+            <h1 id="vTitle" style="font-size:70px; margin-bottom:20px;"></h1>
+            <p style="font-size: 20px;">SISTEMI BESA-SUPERNOVA LIVE</p>
         </div>
     </div>
 </div>
 
 <script>
-    const KEY = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
-    let currentModule = "";
+    const P = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
+    const m1 = [['Ballina','☀️'],['Kërkimi','🔍'],['Pronat','🏢'],['Trending','🔥'],['Agjentët','👔'],['Harta','📍'],['Statistikat','📊'],['Kalkulatori','🧮'],['Mesazhet','📩'],['Kategoritë','📁'],['Pagesat','💳'],['Rreth Nesh','ℹ️']];
+    const m2 = ['Protokolli','Noteri','Tekniku','Arkiva','Xhiro 30K','Supabase','PDF Export','Rrjeti','Siguria','Logjika','Serveri','Buxheti','Drejtorët','Agjencia','Kadastra','Analitika','Besa AI','Supernova Core','Cloud Setup','API Bridge','Auth Master','Database','Sentinel Grid','Radar','Dashboard','User Control','Risk Tracker','Global Node','Local Storage','History','Backup','Live Sync','Terminal'];
 
-    const pubs = [['Ballina','☀️'],['Kërkimi','🔍'],['Pronat','🏢'],['Trending','🔥'],['Agjentët','👔'],['Harta','📍'],['Statistikat','📊'],['Kalkulatori','🧮'],['Mesazhet','📩'],['Kategoritë','📁'],['Pagesat','💳'],['Rreth Nesh','ℹ️']];
-    const privs = ['Protokolli','Noteri','Tekniku','Arkiva','Xhiro 30K','Supabase','PDF Export','Rrjeti','Siguria','Logjika','Serveri','Buxheti','Drejtorët','Agjencia','Kadastra','Analitika','Besa AI','Supernova Core','Cloud Setup','API Bridge','Auth Master','Database','Sentinel Grid','Radar','Dashboard','User Control','Risk Tracker','Global Node','Local Storage','History','Backup','Live Sync','Terminal'];
-
-    function login() {
-        if(document.getElementById('pass').value === KEY) {
-            document.getElementById('lockScreen').style.display = 'none';
-            document.getElementById('masterControl').style.display = 'block';
-            render();
-        } else { alert("PASSWORD I GABUAR!"); }
+    function boot() {
+        if(document.getElementById('p').value === P) {
+            document.getElementById('lock').style.display = 'none';
+            document.getElementById('mainUI').style.display = 'flex';
+            load();
+        } else { alert("GABIM!"); }
     }
 
-    function render() {
-        const g1 = document.getElementById('pubGrid');
-        const g2 = document.getElementById('priGrid');
-        pubs.forEach(m => g1.innerHTML += `<div class="cell" onclick="openMod('${m[0]}','${m[1]}')"><div class="icon-circle">${m[1]}</div><div class="label">${m[0]}</div></div>`);
-        privs.forEach(d => g2.innerHTML += `<div class="cell" onclick="openMod('${d}','🛡️')"><div class="icon-circle blue-icon">🛡️</div><div class="label">${d}</div></div>`);
+    function load() {
+        const c1 = document.getElementById('g1');
+        const c2 = document.getElementById('g2');
+        m1.forEach(x => c1.innerHTML += `<div class="icon" onclick="openCH('${x[0]}','${x[1]}')"><div class="circ">${x[1]}</div><div class="label">${x[0]}</div></div>`);
+        m2.forEach(y => c2.innerHTML += `<div class="icon" onclick="openCH('${y}','🛡️')"><div class="circ blue-circ">🛡️</div><div class="label">${y}</div></div>`);
     }
 
-    function openMod(n, i) {
-        currentModule = n;
-        document.getElementById('overlay').style.display = 'flex';
-        document.getElementById('ov-title').innerText = "DREJTORIA: " + n.toUpperCase();
-        document.getElementById('page-h1').innerText = n;
-        const log = document.getElementById('chat-log');
-        log.innerHTML = `<div class="ai-msg">[BESA-AI]: Mandi, jam Chat AI Besa-Supernova. Jam lidhur me ${n}. Sistemi Deep-Logic është online. Më thuaj çfarë kërkon?</div>`;
+    function openCH(n, i) {
+        document.getElementById('chatOverlay').style.display = 'flex';
+        document.getElementById('title').innerText = "TERMINALI: " + n.toUpperCase();
+        document.getElementById('vTitle').innerText = n;
+        document.getElementById('log').innerHTML = `<div style="color:var(--term)">[BESA-AI]: Mandi, jam lidhur me qelizën ${n}. Shkruaj çfarëdo llogarie ose pyetje.</div>`;
     }
 
-    function closeMod() { document.getElementById('overlay').style.display = 'none'; }
+    function closeCH() { document.getElementById('chatOverlay').style.display = 'none'; }
 
-    function askAI() {
-        const input = document.getElementById('chat-in');
-        const log = document.getElementById('chat-log');
-        const val = input.value.trim();
+    function startAI() {
+        const box = document.getElementById('aiIn');
+        const log = document.getElementById('log');
+        const val = box.value.trim();
         if(!val) return;
 
-        log.innerHTML += `<div class="user-msg">> ${val}</div>`;
+        log.innerHTML += `<div style="color:#fff; margin-top:15px;">> ${val}</div>`;
         
         setTimeout(() => {
-            let res = "";
-            const cleanVal = val.toLowerCase();
-
-            // LOGJIKA INTELLIGENTE "SIMULUES DEEPSEEK"
+            let reply = "";
             if (/^[0-9+\-*/().\s]+$/.test(val)) {
                 try {
-                    res = "Rezultati i llogaritjes: " + Function('"use strict";return (' + val + ')')();
-                } catch(e) { res = "Llogaritje komplekse, po përdor motorin Supernova..."; }
-            } 
-            else if (cleanVal.includes("kush je") || cleanVal.includes("emri")) {
-                res = "Unë jam Besa-AI, inteligjenca jote master. Operoj nën protokollin BESA-SUPERNOVA për Mandi Jataganin.";
+                    reply = "Rezultati: " + eval(val);
+                } catch(e) { reply = "Gabim matematik."; }
+            } else {
+                reply = "Mandi, kërkesa po përpunohet në drejtorinë e Supernovës...";
             }
-            else if (cleanVal.includes("statust") || cleanVal.includes("punon")) {
-                res = `Qeliza ${currentModule} është në gjendje OPTIMALE. 33 drejtoritë janë në sinkronizim me serverin 30K.`;
-            }
-            else if (cleanVal.includes("supernova")) {
-                res = "Projekti Supernova është në fazën e fundit të Master Monitor. Fuqia aktuale: 30,000 OPS/S.";
-            }
-            else {
-                res = `Mandi, kërkesa juaj për "${val}" u mor. Duke përdorur Deep-Logic për të skanuar drejtorinë ${currentModule}. Çdo gjë është nën kontroll.`;
-            }
-
-            log.innerHTML += `<div class="ai-msg">[BESA-AI]: ${res}</div>`;
+            log.innerHTML += `<div style="color:var(--term); margin-top:8px;">[BESA-AI]: ${reply}</div>`;
             log.scrollTop = log.scrollHeight;
-        }, 500);
-        input.value = "";
+        }, 300);
+        box.value = "";
     }
 
     setInterval(() => {
-        document.getElementById('ops').innerText = (29970 + Math.floor(Math.random()*40)).toLocaleString() + " OPS/S";
-    }, 600);
+        document.getElementById('ops').innerText = (29970 + Math.floor(Math.random()*50)).toLocaleString() + " OPS/S";
+    }, 800);
 </script>
 </body>
 </html>

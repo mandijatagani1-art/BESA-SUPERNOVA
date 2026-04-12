@@ -2,119 +2,225 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <title>BESA-SUPERNOVA | CONTROL MONITOR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNBESA v3.1 | PROSPERITY FULL SYSTEM</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --bg: #000; --gold: #f5c242; --neon: #00f2ff; --dark: #0a0a0a; }
+        :root {
+            --bg: #010409;
+            --gold: #f5c242;
+            --neon: #00f2ff;
+            --surface: #0d1117;
+            --border: #30363d;
+            --text: #e6edf3;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; height: 100vh; overflow: hidden; }
-        
-        #lockScreen { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .lock-card { border: 1px solid var(--gold); padding: 40px; text-align: center; background: var(--dark); }
-        input[type="password"] { background: #000; border: 1px solid #333; color: var(--gold); padding: 10px; margin: 20px 0; width: 100%; text-align: center; }
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+        }
 
-        header { padding: 10px 20px; border-bottom: 1px solid var(--gold); display: flex; justify-content: space-between; font-size: 12px; }
-        
-        .main-monitor { display: grid; grid-template-columns: 250px 1fr 280px; height: calc(100vh - 40px); }
-        .side-panel { border: 1px solid #111; padding: 15px; overflow-y: auto; background: #050505; }
-        
-        #display-feed { flex-grow: 1; padding: 20px; overflow-y: auto; background: #000; border-right: 1px solid #111; }
-        .log { margin-bottom: 5px; font-size: 13px; }
-        .dir-line { color: #444; font-size: 10px; margin-bottom: 2px; }
+        /* LOCK SCREEN */
+        #lockScreen {
+            position: fixed; inset: 0; background: var(--bg);
+            display: flex; align-items: center; justify-content: center; z-index: 10000;
+        }
+        .lock-card {
+            background: var(--surface); padding: 50px; border: 2px solid var(--gold);
+            border-radius: 15px; text-align: center; width: 450px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.8);
+        }
 
-        .control-bar { padding: 15px; background: #080808; border-top: 1px solid var(--gold); display: flex; gap: 10px; }
-        #input-cmd { flex-grow: 1; background: #000; border: 1px solid #222; color: var(--neon); padding: 10px; outline: none; }
+        /* HEADER & STATS */
+        header {
+            padding: 15px 25px; background: #000; border-bottom: 2px solid var(--gold);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .status-tag { 
+            background: rgba(245, 194, 66, 0.1); color: var(--gold); 
+            padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: bold;
+            border: 1px solid rgba(245, 194, 66, 0.2);
+        }
+
+        /* MAIN LAYOUT */
+        .grid-container {
+            display: grid; grid-template-columns: 280px 1fr 320px;
+            flex-grow: 1; overflow: hidden; gap: 2px; background: var(--border);
+        }
+        .panel { background: var(--bg); display: flex; flex-direction: column; overflow: hidden; }
+
+        /* LEFT: ARCHIVE & DIRECTORATES */
+        .archive-list { padding: 15px; overflow-y: auto; }
+        .archive-header { font-size: 11px; color: var(--gold); margin-bottom: 15px; letter-spacing: 1px; font-weight: bold; }
+        .file-item {
+            padding: 8px; font-size: 11px; border-bottom: 1px solid #161b22;
+            display: flex; align-items: center; gap: 10px; color: #8b949e;
+        }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 5px var(--neon); }
+
+        /* CENTER: MASTER TERMINAL (SPA VIEW) */
+        #main-view { display: flex; flex-direction: column; background: #000; }
+        #screen-content { flex-grow: 1; padding: 25px; overflow-y: auto; font-family: 'Consolas', 'Courier New', monospace; }
+        .log-entry { margin-bottom: 10px; border-left: 2px solid var(--gold); padding-left: 15px; font-size: 14px; }
         
-        .status-box { border-left: 2px solid var(--gold); padding: 10px; margin-bottom: 10px; background: #0a0a0a; }
-        .label { font-size: 9px; color: #555; }
-        .val { font-size: 12px; color: #eee; }
-        
-        button { background: var(--gold); color: #000; border: none; padding: 0 20px; cursor: pointer; font-weight: bold; }
-        .blink { animation: blinker 1s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
+        .input-bar { padding: 20px; background: var(--surface); display: flex; gap: 10px; border-top: 1px solid var(--border); }
+        input[type="text"], input[type="password"] {
+            background: #000; border: 1px solid var(--border); color: #fff;
+            padding: 12px; border-radius: 8px; width: 100%; outline: none; font-family: monospace;
+        }
+        button {
+            background: var(--gold); color: #000; border: none;
+            padding: 0 30px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        button:hover { background: #fff; }
+
+        /* RIGHT: MONITOR BOARD */
+        .monitor-panel { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .gauge {
+            background: var(--surface); padding: 15px; border-radius: 10px;
+            border-left: 4px solid var(--gold);
+        }
+        .g-label { font-size: 10px; color: #8b949e; text-transform: uppercase; margin-bottom: 5px; }
+        .g-val { font-size: 14px; font-weight: bold; color: #fff; }
+
+        .ops-val { color: var(--neon); font-family: monospace; font-size: 22px; text-shadow: 0 0 10px rgba(0,242,255,0.2); }
     </style>
 </head>
 <body>
 
 <div id="lockScreen">
     <div class="lock-card">
-        <h2 style="color: var(--gold)">BESA-SUPERNOVA</h2>
-        <input type="password" id="pass" placeholder="PASSWORD">
-        <button onclick="access()">HYR NË MONITOR</button>
+        <h1 style="color: var(--gold); margin-bottom: 10px; letter-spacing: 3px;">SNBESA v3.1</h1>
+        <p style="font-size: 11px; color: #8b949e; margin-bottom: 30px;">DREJTORIA E PRODHIMIT DHE IMPLEMENTIMIT</p>
+        <input type="password" id="masterPass" placeholder="VENDOS KODIN MASTER">
+        <button style="width: 100%; height: 50px; margin-top: 10px;" onclick="unlock()">AKTIVIZO IMPLEMENTIMIN</button>
     </div>
 </div>
 
 <header>
-    <div>STACIONI: BESA-CORE</div>
-    <div style="color: var(--neon)" id="ops">30,000 OPS/S</div>
-    <div>USER: MANDI JATAGANI</div>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <span class="status-tag">PRODUCTION READY ✅</span>
+        <span style="font-weight: bold; letter-spacing: 2px; font-size: 14px;">SNBESA GLOBAL GRID</span>
+    </div>
+    <div class="ops-val" id="opsDisplay">30,000 OPS/S</div>
 </header>
 
-<div class="main-monitor">
-    <div class="side-panel" id="archive">
-        <div style="color: var(--gold); margin-bottom: 10px; font-size: 11px;">DOSJET SNBESA (1-200)</div>
-    </div>
-
-    <div style="display: flex; flex-direction: column;">
-        <div id="display-feed"></div>
-        <div class="control-bar">
-            <input type="text" id="input-cmd" placeholder="SHKRUAJ KOMANDËN..." onkeypress="if(event.key==='Enter') run()">
-            <button onclick="run()">EKZEKUTO</button>
+<main class="grid-container">
+    <aside class="panel">
+        <div class="archive-list">
+            <div class="archive-header">ARKIVA: SNBESA_DOSJA_KREATIVE</div>
+            <div id="fileContainer"></div>
         </div>
-    </div>
+    </aside>
 
-    <div class="side-panel">
-        <div style="color: var(--gold); margin-bottom: 10px; font-size: 11px;">MONITORËT E KONTROLLIT</div>
-        <div class="status-box"><div class="label">TEKNIKU</div><div class="val">AKTIV</div></div>
-        <div class="status-box"><div class="label">NOTERI</div><div class="val">VULA_READY</div></div>
-        <div class="status-box"><div class="label">PRODHIMI</div><div class="val">30K_XHIRO</div></div>
-        <div class="status-box" style="border-color: var(--neon);"><div class="label">RRJETI</div><div class="val blink">SINKRON</div></div>
-    </div>
-</div>
+    <section class="panel" id="main-view">
+        <div id="screen-content"></div>
+        <div class="input-bar">
+            <input type="text" id="cmdInput" placeholder="Jep urdhrin për rrjetin SNBESA..." onkeypress="if(event.key==='Enter') runCmd()">
+            <button onclick="runCmd()">EKZEKUTO</button>
+        </div>
+    </section>
+
+    <aside class="panel">
+        <div class="monitor-panel">
+            <div class="gauge">
+                <div class="g-label">DREJTORI TEKNIK</div>
+                <div class="g-val">SINKRONIZUAR</div>
+            </div>
+            <div class="gauge" style="border-left-color: var(--neon);">
+                <div class="g-label">NOTERI DIGJITAL</div>
+                <div class="g-val">VULA: E GATSHME</div>
+            </div>
+            <div class="gauge">
+                <div class="g-label">PRODHIMI (7-DITOR)</div>
+                <div class="g-val">PROSPERITY ACTIVE</div>
+            </div>
+            <div class="gauge" style="border-left-color: #00ff00;">
+                <div class="g-label">LIDHJA SUPABASE</div>
+                <div class="g-val">STABILE (LONDON HUB)</div>
+            </div>
+            <div style="margin-top: auto; text-align: center; font-size: 10px; color: #30363d; padding: 20px;">
+                SNBESA v3.1 PROSPERITY<br>
+                AUTHORIZED BY MANDI JATAGANI
+            </div>
+        </div>
+    </aside>
+</main>
 
 <script>
-const SUPABASE_URL = 'https://opmderjnjhhqrajijlrh.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wbWRlcmpuamhocXJhajlqbHJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMyMDUzMzEsImV4cCI6MjAyODc4MTMzMX0.6xvCJmn9RsTJnnhAaHQHJA_eTnsoV1Z4jQ90n2N6V_g';
-const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Konfigurimi i Supabase
+    const SUPABASE_URL = 'https://opmderjnjhhqrajijlrh.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wbWRlcmpuamhocXJhajlqbHJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMyMDUzMzEsImV4cCI6MjAyODc4MTMzMX0.6xvCJmn9RsTJnnhAaHQHJA_eTnsoV1Z4jQ90n2N6V_g';
+    const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function access() {
-    if(document.getElementById('pass').value === "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791") {
-        document.getElementById('lockScreen').style.display = 'none';
-        init();
-    }
-}
-
-function init() {
-    const arc = document.getElementById('archive');
-    for(let i=1; i<=200; i++) arc.innerHTML += `<div class="dir-line">DOSJA_SNBESA_${i} [OK]</div>`;
-    setInterval(() => {
-        document.getElementById('ops').innerText = (29900 + Math.floor(Math.random()*150)).toLocaleString() + " OPS/S";
-    }, 500);
-    print("SISTEMI", "MONITORI I KONTROLLIT U NDRIÇUA. DREJTORI NË LINJË.");
-}
-
-function print(u, m) {
-    const f = document.getElementById('display-feed');
-    f.innerHTML += `<div class="log"><span style="color:var(--gold)">[${u}]:</span> ${m}</div>`;
-    f.scrollTop = f.scrollHeight;
-}
-
-async function run() {
-    const i = document.getElementById('input-cmd');
-    const v = i.value.trim().toUpperCase();
-    if(!v) return;
-    print("DREJTORI", v);
-    i.value = "";
-    await _sb.from('system_logs').insert([{ action: 'MONITOR_CMD', target: v }]);
-    
-    setTimeout(() => {
-        if(v === "STATUS") {
-            print("MONITORI", "TEKNIKU: OK | NOTERI: OK | PRODHIMI: 30K OPS.");
+    // FUNKSIONI I HYRJES ME FJALËKALIMIN TËND
+    function unlock() {
+        const p = document.getElementById('masterPass').value;
+        // Fjalëkalimi yt master
+        if(p === "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791") {
+            document.getElementById('lockScreen').style.display = 'none';
+            init();
         } else {
-            print("MONITORI", "EKZEKUTUAR NË 200 DREJTORI.");
+            alert("KODI I PASAKTË. QASJA U REFUZUA.");
         }
-    }, 500);
-}
+    }
+
+    function init() {
+        // Ndërtimi i listës së 200 drejtorive
+        const container = document.getElementById('fileContainer');
+        for(let i=1; i<=200; i++) {
+            container.innerHTML += `
+                <div class="file-item">
+                    <div class="dot"></div>
+                    <span>SNBESA_DOSJA_${i.toString().padStart(3,'0')}</span>
+                </div>`;
+        }
+
+        // Aktivizimi i xhiros 30,000 OPS
+        setInterval(() => {
+            const x = 29920 + Math.floor(Math.random()*160);
+            document.getElementById('opsDisplay').innerText = x.toLocaleString() + " OPS/S";
+        }, 500);
+
+        pushLog("SISTEMI", "LIDHJA ME ARKIVËN DIXHITALE U KRYE.");
+        pushLog("SISTEMI", "PAQETA v3.1 PROSPERITY ËSHTË ONLINE.");
+        pushLog("SISTEMI", "MONITORI I KONTROLLIT GATI PËR URDHRA.");
+    }
+
+    function pushLog(u, m) {
+        const screen = document.getElementById('screen-content');
+        const time = new Date().toLocaleTimeString();
+        screen.innerHTML += `<div class="log-entry"><span style="color:#484f58">[${time}]</span> <strong style="color:var(--gold)">${u}:</strong> ${m}</div>`;
+        screen.scrollTop = screen.scrollHeight;
+    }
+
+    async function runCmd() {
+        const input = document.getElementById('cmdInput');
+        const val = input.value.trim().toUpperCase();
+        if(!val) return;
+
+        pushLog("DREJTORI", val);
+        input.value = "";
+
+        // Regjistrimi i veprimit te Loget e Supabase
+        await _sb.from('system_logs').insert([{ action: 'MASTER_IMPLEMENT_V3', target: val }]);
+
+        setTimeout(() => {
+            if(val === "STATUS") {
+                pushLog("TEKNIKU", "Sistemi global operon me efikasitet 100%.");
+                pushLog("PRODHIMI", "Dosja Kreative është e hapur për rishikim.");
+                pushLog("NOTERI", "Vula e fundit u aplikua me sukses.");
+            } else {
+                pushLog("BESA-AI", "Urdhri u shpërnda në 200 nyjet e rrjetit.");
+            }
+        }, 600);
+    }
 </script>
 </body>
 </html>

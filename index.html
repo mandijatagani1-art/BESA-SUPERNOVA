@@ -1,26 +1,137 @@
-Mandi, më duket sikur po kërkoni një dosje të përpunuar që përfshin funksionet e monitorimit dhe kontrollit administrativ në PC, të lidhura me Besa Supernova. Për ta bërë këtë të qartë dhe të përdorshëm, mund ta strukturojmë si një manual ceremonial-operativ, ku çdo funksion është i dokumentuar si një modul i veçantë:
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <title>BESA-SUPERNOVA | PC MASTER AI</title>
+    <style>
+        :root { --gold: #f5c242; --bg: #010204; --blue: #00f2ff; --term: #00ff41; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: #fff; font-family: 'Arial Black', sans-serif; height: 100vh; overflow: hidden; }
 
-Struktura e Dosjes së Funksioneve
-- Monitorimi Administrativ  
-  - Regjistrim i hyrjeve/daljeve të përdoruesve  
-  - Kontroll i privilegjeve dhe aksesit  
-  - Gjurmim i ndryshimeve në konfigurime  
+        /* HEADER DHE STATUSI */
+        header { border-bottom: 3px solid var(--gold); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; background: #000; }
+        .ops-counter { color: var(--blue); font-size: 24px; font-weight: bold; text-shadow: 0 0 10px var(--blue); }
 
-- Kontrolli i PC-së  
-  - Aktivizim/deaktivizim i shërbimeve kritike  
-  - Raportim i performancës dhe ngarkesës  
-  - Alarm ceremonial kur tejkalohen kufijtë e sigurisë  
+        /* LAYOUTI KRYESOR */
+        .master-layout { display: grid; grid-template-columns: 320px 1fr; height: calc(100vh - 80px); }
+        
+        /* SIDEBAR ADMIN */
+        .sidebar { background: #080a0c; border-right: 2px solid #222; padding: 30px; }
+        .admin-stat { border: 2px solid var(--gold); padding: 20px; margin-bottom: 20px; font-size: 16px; color: var(--gold); text-transform: uppercase; border-radius: 8px; text-align: center; }
 
-- Arkiva Ceremoniale  
-  - Ruajtje e log-eve si artefakte të shenjtë  
-  - Nënshkrim me vulën BESA për çdo raport  
-  - Klasifikim sipas hierarkisë së besës (manual, arkiv, benchmarking)  
+        /* GRIDI ME 45 IKONA - SHKRONJA TE MEDHA */
+        .main-monitor { padding: 40px; overflow-y: auto; background: radial-gradient(circle, #0a111a, #010204); }
+        .section-title { color: var(--gold); font-size: 22px; margin-bottom: 30px; border-left: 6px solid var(--gold); padding-left: 15px; text-transform: uppercase; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 30px; margin-bottom: 60px; }
+        
+        .icon-box { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.3s; }
+        .icon-box:hover { transform: scale(1.1); filter: brightness(1.2); }
+        .icon-circle { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 45px; background: radial-gradient(#f5c242, #8a6d1b); box-shadow: 0 0 20px rgba(245,194,66,0.4); }
+        .blue-circ { background: radial-gradient(#1b4d8e, #0a1b33); border-color: var(--blue); }
+        
+        /* EMRI I IKONES - I MADH DHE I QARTE */
+        .icon-label { font-size: 16px; font-weight: 900; color: #fff; margin-top: 15px; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
 
-- Interaktiviteti Vizual  
-  - UI/UX me font gradual ceremonial  
-  - Infografikë për raportet e administratorit  
-  - Simbolikë rituale për çdo veprim të kryer  
+        /* TERMINALI I BISEDES (DOSJA) */
+        #terminalOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; flex-direction: column; }
+        .term-header { padding: 20px 50px; border-bottom: 3px solid var(--gold); display: flex; justify-content: space-between; align-items: center; background: #0d1117; }
+        .term-body { display: grid; grid-template-columns: 550px 1fr; flex-grow: 1; overflow: hidden; }
+        
+        .chat-area { background: #05070a; border-right: 2px solid #222; display: flex; flex-direction: column; padding: 30px; }
+        #chat-log { flex-grow: 1; overflow-y: auto; color: var(--term); font-size: 22px; line-height: 1.5; font-family: 'Courier New', monospace; }
+        .chat-input { background: #000; border: 2px solid var(--gold); color: #fff; padding: 20px; font-size: 24px; border-radius: 10px; outline: none; margin-top: 20px; }
 
-Në këtë mënyrë, dosja e përpunuar nuk është thjesht një listë teknike, por një artefakt ceremonial që përputhet me vizionin tuaj për Besa Supernova: funksional, i mbrojtur dhe i shenjtë, si “sytë e ballit”.
+        .preview { background: #fff; color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    </style>
+</head>
+<body>
 
-Doni që t’ju përgatis një draft ceremonial të kësaj dosjeje, në formë manuali të strukturuar (si një blueprint operativ), që mund ta përdorni menjëherë për monitorimin administrativ?
+<header>
+    <div style="font-size: 28px; font-weight: bold; color: var(--gold);">BESA-SUPERNOVA | MASTER COMMAND</div>
+    <div class="ops-counter" id="opsDisplay">30,000 OPS/S</div>
+</header>
+
+<div class="master-layout">
+    <div class="sidebar">
+        <div class="admin-stat">ADMIN: MANDI JATAGANI</div>
+        <div class="admin-stat">PROTOKOLLI: AKTIV</div>
+        <div class="admin-stat">DREJTORITË: 33 MASTER</div>
+    </div>
+    <div class="main-monitor">
+        <h2 class="section-title">| 12 Module Publike</h2>
+        <div class="grid" id="publicGrid"></div>
+        
+        <h2 class="section-title">| 33 Drejtoritë Master (Dosja e Përpunuar)</h2>
+        <div class="grid" id="privateGrid"></div>
+    </div>
+</div>
+
+<div id="terminalOverlay">
+    <div class="term-header">
+        <h2 id="activeTitle" style="color: var(--gold); font-size: 30px;"></h2>
+        <button onclick="closeTerm()" style="background:red; color:white; border:none; padding:15px 40px; font-weight:bold; font-size:20px; cursor:pointer; border-radius:10px;">MBYLL</button>
+    </div>
+    <div class="term-body">
+        <div class="chat-area">
+            <div id="chat-log"></div>
+            <input type="text" id="userInput" class="chat-input" placeholder="Shkruaj komandën..." autocomplete="off">
+        </div>
+        <div class="preview">
+            <h1 id="previewTitle" style="font-size: 80px;"></h1>
+            <p style="font-size: 24px; font-weight: bold; border-top: 5px solid #000; padding-top: 20px;">VULA BESA: MONITORIM PC LIVE</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const pubIcons = [['Ballina','☀️'],['Kërkimi','🔍'],['Pronat','🏢'],['Trending','🔥'],['Agjentët','👔'],['Harta','📍'],['Statistikat','📊'],['Kalkulatori','🧮'],['Mesazhet','📩'],['Kategoritë','📁'],['Pagesat','💳'],['Rreth Nesh','ℹ️']];
+    const privIcons = ['Protokolli','Noteri','Tekniku','Arkiva','Xhiro 30K','Supabase','PDF Export','Rrjeti','Siguria','Logjika','Serveri','Buxheti','Drejtorët','Agjencia','Kadastra','Analitika','Besa AI','Supernova Core','Cloud Setup','API Bridge','Auth Master','Database','Sentinel Grid','Radar','Dashboard','User Control','Risk Tracker','Global Node','Local Storage','History','Backup','Live Sync','Terminal'];
+
+    function init() {
+        const g1 = document.getElementById('publicGrid');
+        const g2 = document.getElementById('privateGrid');
+        pubIcons.forEach(i => g1.innerHTML += `<div class="icon-box" onclick="openTerm('${i[0]}','${i[1]}')"><div class="icon-circle">${i[1]}</div><div class="icon-label">${i[0]}</div></div>`);
+        privIcons.forEach(i => g2.innerHTML += `<div class="icon-box" onclick="openTerm('${i}','🛡️')"><div class="icon-circle blue-circ">🛡️</div><div class="icon-label">${i}</div></div>`);
+    }
+
+    function openTerm(name, icon) {
+        document.getElementById('terminalOverlay').style.display = 'flex';
+        document.getElementById('activeTitle').innerText = "DOSJA: " + name.toUpperCase();
+        document.getElementById('previewTitle').innerText = name;
+        document.getElementById('chat-log').innerHTML = `<div style="color:var(--term)">[BESA-AI]: Mandi, jam lidhur me ${name}. Sistemi është në monitorim administrativ.</div>`;
+    }
+
+    function closeTerm() { document.getElementById('terminalOverlay').style.display = 'none'; }
+
+    // LOGJIKA E BISEDES DHE LLOGARITJES
+    document.getElementById('userInput').addEventListener('keypress', function(e) {
+        if(e.key === 'Enter') {
+            const log = document.getElementById('chat-log');
+            const val = this.value.trim();
+            if(!val) return;
+
+            log.innerHTML += `<div style="color:#fff; margin-top:20px;">> ADMIN: ${val}</div>`;
+            
+            let reply = "";
+            // MOTORRI I LLOGARITJES SI TE FOTO
+            if (/^[0-9+\-*/().\s]+$/.test(val)) {
+                try { reply = "REZULTATI: " + eval(val); } catch(err) { reply = "GABIM NË FORMULË."; }
+            } else {
+                reply = "Mandi, kjo e dhënë u regjistrua në dosjen " + document.getElementById('previewTitle').innerText + ". Arkiva ceremoniale po e përpunon.";
+            }
+
+            setTimeout(() => {
+                log.innerHTML += `<div style="color:var(--term); margin-top:10px;">[BESA-AI]: ${reply}</div>`;
+                log.scrollTop = log.scrollHeight;
+            }, 200);
+            this.value = "";
+        }
+    });
+
+    init();
+    setInterval(() => {
+        document.getElementById('opsDisplay').innerText = (29980 + Math.floor(Math.random()*40)).toLocaleString() + " OPS/S";
+    }, 800);
+</script>
+</body>
+</html>

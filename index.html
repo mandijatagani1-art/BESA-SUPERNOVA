@@ -2,61 +2,81 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <title>BESA-SUPERNOVA | AI INTEGRATED SYSTEM</title>
+    <title>BESA-SUPERNOVA | PC MASTER COMMAND</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --bg: #030508;
+            --bg: #020406;
             --sun-gold: #f5c242;
-            --pagan-red: #8e1b1b;
             --pagan-blue: #1b4d8e;
             --neon-blue: #00f2ff;
-            --glass: rgba(255, 255, 255, 0.03);
+            --terminal-green: #00ff41;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            font-family: 'Consolas', 'Courier New', monospace; 
+            height: 100vh; overflow: hidden; 
+        }
 
-        /* LOCK SCREEN */
+        /* LOCK SCREEN ME FUQI DIELLORE */
         #lockScreen { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .lock-card { background: #0d1117; padding: 40px; border-radius: 20px; border: 2px solid var(--sun-gold); text-align: center; width: 400px; box-shadow: 0 0 50px rgba(245, 194, 66, 0.3); }
-        input[type="password"] { width: 100%; padding: 15px; margin: 20px 0; background: #000; border: 1px solid #333; color: var(--sun-gold); text-align: center; border-radius: 8px; outline: none; }
+        .lock-card { 
+            background: #0d1117; padding: 50px; border-radius: 10px; 
+            border: 2px solid var(--sun-gold); text-align: center; width: 450px;
+            box-shadow: 0 0 70px rgba(245, 194, 66, 0.2);
+        }
 
-        /* HEADER */
-        header { padding: 15px 40px; border-bottom: 2px solid var(--sun-gold); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.9); }
-        .ops-val { color: var(--neon-blue); font-family: monospace; font-size: 20px; text-shadow: 0 0 10px var(--neon-blue); }
-
-        /* MAIN LAYOUT */
-        .layout { display: grid; grid-template-columns: 280px 1fr; flex-grow: 1; overflow: hidden; }
-        .sidebar { background: rgba(13, 17, 23, 0.95); border-right: 1px solid #222; padding: 25px; }
-        .cell-log { background: #000; border-left: 3px solid var(--sun-gold); padding: 10px; margin-bottom: 10px; font-size: 11px; color: #8b949e; }
-
-        /* PAGAN GRID */
-        .content { padding: 40px; overflow-y: auto; background: radial-gradient(circle at center, #101520, #030508); }
-        .pagan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 30px; }
-        .pagan-item { display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; transition: 0.3s; }
-        .pagan-item:hover { transform: scale(1.1); filter: drop-shadow(0 0 15px var(--sun-gold)); }
-
-        .symbol-box { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; border: 2px solid rgba(255,255,255,0.1); }
-        .symbol-name { font-size: 10px; font-weight: bold; color: var(--sun-gold); text-transform: uppercase; letter-spacing: 1px; }
-
-        /* NGJYRAT E FUQISË */
-        .gold { background: radial-gradient(#f5c242, #b8860b); }
-        .red { background: radial-gradient(#8e1b1b, #4a0d0d); }
-        .blue { background: radial-gradient(#1b4d8e, #0a2647); }
-
-        /* MODULI DHE CHAT AI */
-        #moduleOverlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; flex-direction: column; padding: 20px; }
-        .module-window { flex-grow: 1; border: 2px solid var(--sun-gold); border-radius: 20px; background: #0d1117; display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; }
+        /* MASTER MONITOR STRUCTURE */
+        #masterControl { display: none; height: 100vh; flex-direction: column; }
         
-        .mod-header { padding: 15px 30px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
-        .chat-display { padding: 30px; overflow-y: auto; font-family: 'Consolas', monospace; font-size: 14px; }
-        .chat-input-area { padding: 20px; background: #000; border-top: 1px solid #222; display: flex; gap: 15px; }
-        #user-msg { flex-grow: 1; background: #05070a; border: 1px solid var(--sun-gold); padding: 15px; color: #fff; border-radius: 10px; outline: none; }
-        .send-btn { background: var(--sun-gold); color: #000; border: none; padding: 0 30px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        header { 
+            padding: 10px 30px; border-bottom: 2px solid var(--sun-gold); 
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.9);
+        }
 
-        .ai-msg { color: var(--neon-blue); margin-bottom: 15px; }
-        .user-msg { color: var(--sun-gold); margin-bottom: 15px; text-align: right; }
+        .main-frame { display: grid; grid-template-columns: 300px 1fr; flex-grow: 1; overflow: hidden; }
+
+        /* SIDEBAR: MONITORI I QELIZAVE */
+        .sidebar { background: #080a0c; border-right: 1px solid #222; padding: 20px; }
+        .stat-card { background: #000; border: 1px solid var(--neon-blue); padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .stat-label { font-size: 10px; color: var(--neon-blue); }
+
+        /* PAGAN GRID - IKONAT E PUBLIKUT */
+        .dashboard { padding: 30px; overflow-y: auto; background: radial-gradient(circle, #0a0f1a, #020406); }
+        .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 30px; }
+        
+        .pagan-icon { 
+            display: flex; flex-direction: column; align-items: center; gap: 10px; 
+            cursor: pointer; transition: 0.3s; padding: 15px; border-radius: 10px;
+        }
+        .pagan-icon:hover { background: rgba(245, 194, 66, 0.1); transform: translateY(-5px); }
+        
+        .symbol { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; border: 1px solid var(--sun-gold); }
+        .gold { background: radial-gradient(#f5c242, #8a6d1b); }
+        .blue { background: radial-gradient(#1b4d8e, #0a1b33); }
+
+        /* FAQJA E BRENDSHME DHE CHAT AI */
+        #moduleView { 
+            display: none; position: fixed; inset: 0; background: var(--bg); 
+            z-index: 5000; flex-direction: column; 
+        }
+        .module-header { padding: 15px 30px; border-bottom: 1px solid var(--sun-gold); display: flex; justify-content: space-between; }
+        
+        .module-body { display: grid; grid-template-columns: 400px 1fr; flex-grow: 1; }
+        
+        /* CHAT AI BESA-SUPERNOVA TERMINAL */
+        .ai-terminal { background: #000; border-right: 1px solid #333; display: flex; flex-direction: column; padding: 20px; }
+        .terminal-output { flex-grow: 1; overflow-y: auto; color: var(--terminal-green); font-size: 13px; margin-bottom: 20px; }
+        .terminal-input { background: #05070a; border: 1px solid var(--sun-gold); color: #fff; padding: 12px; border-radius: 5px; outline: none; }
+
+        /* PAMJA E FAQES LIVE */
+        .live-app-frame { background: #fff; color: #000; display: flex; flex-direction: column; }
+
+        button.btn-back { background: var(--sun-gold); border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -64,244 +84,104 @@
 <div id="lockScreen">
     <div class="lock-card">
         <h1 style="color: var(--sun-gold); letter-spacing: 5px;">BESA-SUPERNOVA</h1>
-        <input type="password" id="master-key" placeholder="PASSWORDIN SIÇ E KISHIM">
-        <button onclick="boot()" style="width:100%; padding:15px; background:var(--sun-gold); border:none; border-radius:8px; font-weight:bold; cursor:pointer;">AKTIVIZO</button>
+        <p style="font-size: 10px; color: #555; margin-bottom: 20px;">PC MASTER INTERFACE - RESTRICTED</p>
+        <input type="password" id="pass" placeholder="PASSWORDIN SIÇ E KISHIM">
+        <button onclick="boot()" style="width:100%; padding:15px; background:var(--sun-gold); border:none; font-weight:bold; cursor:pointer;">EKZEKUTO</button>
     </div>
 </div>
 
-<div id="mainDashboard" style="display:none; height:100vh; flex-direction:column;">
+<div id="masterControl">
     <header>
-        <div style="font-weight:bold; letter-spacing:2px;">BESA MASTER CONTROL PANEL</div>
-        <div class="ops-val" id="ops">30,000 OPS/S</div>
+        <div style="font-weight:bold; letter-spacing:2px;">SUPERNOVA MASTER MONITOR</div>
+        <div id="ops" style="color: var(--neon-blue)">30,000 OPS/S</div>
     </header>
-    <div class="layout">
+    <div class="main-frame">
         <aside class="sidebar">
-            <h4 style="color: var(--sun-gold); font-size: 11px; margin-bottom: 20px;">PROTOKOLLI BESA</h4>
-            <div class="cell-log">DIREKTORIA: ACTIVE</div>
-            <div class="cell-log">SISTEMI: SINKRON</div>
-            <div class="cell-log">FUQIA E DIELLIT: 100%</div>
+            <div class="stat-card"><div class="stat-label">PROTOKOLLI</div><div style="font-weight:bold">BESA-SUPERNOVA ACTIVE</div></div>
+            <div class="stat-card"><div class="stat-label">DREJTORITË</div><div style="font-weight:bold">200 NYJE ONLINE</div></div>
+            <div class="stat-card" style="border-color: var(--sun-gold)"><div class="stat-label">USER</div><div style="font-weight:bold">MANDI JATAGANI</div></div>
         </aside>
-        <main class="content">
-            <div class="pagan-grid">
-                <div class="pagan-item" onclick="openAI('Ballina', '☀️', 'gold')"><div class="symbol-box gold">☀️</div><span class="symbol-name">Ballina</span></div>
-                <div class="pagan-item" onclick="openAI('Kërkimi', '🐍', 'blue')"><div class="symbol-box blue">🐍</div><span class="symbol-name">Kërkimi</span></div>
-                <div class="pagan-item" onclick="openAI('Pronat', '🌀', 'red')"><div class="symbol-box red">🌀</div><span class="symbol-name">Pronat</span></div>
-                <div class="pagan-item" onclick="openAI('Trending', '🔥', 'gold')"><div class="symbol-box gold">🔥</div><span class="symbol-name">Trending</span></div>
-                <div class="pagan-item" onclick="openAI('Agjentët', '🔱', 'blue')"><div class="symbol-box blue">🔱</div><span class="symbol-name">Agjentët</span></div>
-                <div class="pagan-item" onclick="openAI('Harta', '🛡️', 'red')"><div class="symbol-box red">🛡️</div><span class="symbol-name">Harta</span></div>
+        <main class="dashboard">
+            <div class="icon-grid">
+                <div class="pagan-icon" onclick="openModule('Ballina', '☀️', 'gold')">
+                    <div class="symbol gold">☀️</div><span style="font-size:10px;">BALLINA</span>
+                </div>
+                <div class="pagan-icon" onclick="openModule('Kërkimi', '🐍', 'blue')">
+                    <div class="symbol blue">🐍</div><span style="font-size:10px;">KËRKIMI</span>
+                </div>
+                <div class="pagan-icon" onclick="openModule('Pronat', '🌀', 'gold')">
+                    <div class="symbol gold">🌀</div><span style="font-size:10px;">PRONAT</span>
+                </div>
+                <div class="pagan-icon" onclick="openModule('Trending', '🔥', 'blue')">
+                    <div class="symbol blue">🔥</div><span style="font-size:10px;">TRENDING</span>
+                </div>
             </div>
         </main>
     </div>
 </div>
 
-<div id="moduleOverlay">
-    <div class="module-window">
-        <div class="mod-header">
-            <h2 id="mod-title" style="color: var(--sun-gold);"></h2>
-            <button onclick="closeAI()" style="background:transparent; color:red; border:1px solid red; padding:5px 15px; cursor:pointer; border-radius:5px;">MBYLL QELIZËN</button>
+<div id="moduleView">
+    <div class="module-header">
+        <h2 id="mod-title" style="color: var(--sun-gold); font-size: 16px;"></h2>
+        <button class="btn-back" onclick="closeModule()">KTHEHU NË MONITOR</button>
+    </div>
+    <div class="module-body">
+        <div class="ai-terminal">
+            <div style="font-size:10px; color:var(--sun-gold); margin-bottom:15px;">TERMINALI AI BESA-SUPERNOVA</div>
+            <div id="terminal-out" class="terminal-output"></div>
+            <input type="text" id="terminal-in" class="terminal-input" placeholder="Shkruaj pyetjen..." onkeypress="if(event.key==='Enter') sendCommand()">
         </div>
-        <div id="chat-box" class="chat-display"></div>
-        <div class="chat-input-area">
-            <input type="text" id="user-msg" placeholder="Pyet Chat AI Besa-Supernova..." onkeypress="if(event.key==='Enter') askAI()">
-            <button class="send-btn" onclick="askAI()">DERGO</button>
+        <div class="live-app-frame">
+            <div id="live-content" style="padding: 50px; text-align: center;">
+                <h1 id="page-name" style="font-size: 40px; margin-bottom: 20px;"></h1>
+                <p>Duke sinkronizuar qelizën me PC-në e Mandit...</p>
+                <div style="margin-top: 30px; height: 300px; border: 1px solid #eee; background: #fafafa;"></div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    const KEY = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
+    const P = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
 
     function boot() {
-        if(document.getElementById('master-key').value === KEY) {
+        if(document.getElementById('pass').value === P) {
             document.getElementById('lockScreen').style.display = 'none';
-            document.getElementById('mainDashboard').style.display = 'flex';
+            document.getElementById('masterControl').style.display = 'flex';
         } else { alert("KODI I GABUAR!"); }
     }
 
-    function openAI(name, symbol, color) {
+    function openModule(name, symbol, color) {
+        document.getElementById('moduleView').style.display = 'flex';
         document.getElementById('mod-title').innerText = "QELIZA: " + name.toUpperCase() + " " + symbol;
-        document.getElementById('moduleOverlay').style.display = 'flex';
-        const chat = document.getElementById('chat-box');
-        chat.innerHTML = `<div class="ai-msg"><strong>BESA-AI:</strong> Mirësevini në qelizën ${name}. Unë jam sistemi Supernova. Çfarë kërkon të dish për këtë fuqi ilire?</div>`;
-    }
-
-    function closeAI() {
-        document.getElementById('moduleOverlay').style.display = 'none';
-    }
-
-    function askAI() {
-        const input = document.getElementById('user-msg');
-        const msg = input.value.trim();
-        if(!msg) return;
-
-        const chat = document.getElementById('chat-box');
-        chat.innerHTML += `<div class="user-msg"><strong>MANDI:</strong> ${msg}</div>`;
-        input.value = "";
-
-        // REAGIMI I AI BESA-SUPERNOVA
-        setTimeout(() => {
-            chat.innerHTML += `<div class="ai-msg"><strong>BESA-AI:</strong> Po Mandi, po e analizoj urdhrin për "${msg}". Sistemi Besa-Supernova po sinkronizon drejtoritë për këtë kërkesë. Çdo gjë është nën kontrollin e Diellit.</div>`;
-            chat.scrollTop = chat.scrollHeight;
-        }, 800);
-    }
-
-    setInterval(() => {
-        const val = 29930 + Math.floor(Math.random()*150);
-        document.getElementById('ops').innerText = val.toLocaleString() + " OPS/S";
-    }, 500);
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="sq">
-<head>
-    <meta charset="UTF-8">
-    <title>BESA-SUPERNOVA | AI INTEGRATED SYSTEM</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --bg: #030508;
-            --sun-gold: #f5c242;
-            --pagan-red: #8e1b1b;
-            --pagan-blue: #1b4d8e;
-            --neon-blue: #00f2ff;
-            --glass: rgba(255, 255, 255, 0.03);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-
-        /* LOCK SCREEN */
-        #lockScreen { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .lock-card { background: #0d1117; padding: 40px; border-radius: 20px; border: 2px solid var(--sun-gold); text-align: center; width: 400px; box-shadow: 0 0 50px rgba(245, 194, 66, 0.3); }
-        input[type="password"] { width: 100%; padding: 15px; margin: 20px 0; background: #000; border: 1px solid #333; color: var(--sun-gold); text-align: center; border-radius: 8px; outline: none; }
-
-        /* HEADER */
-        header { padding: 15px 40px; border-bottom: 2px solid var(--sun-gold); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.9); }
-        .ops-val { color: var(--neon-blue); font-family: monospace; font-size: 20px; text-shadow: 0 0 10px var(--neon-blue); }
-
-        /* MAIN LAYOUT */
-        .layout { display: grid; grid-template-columns: 280px 1fr; flex-grow: 1; overflow: hidden; }
-        .sidebar { background: rgba(13, 17, 23, 0.95); border-right: 1px solid #222; padding: 25px; }
-        .cell-log { background: #000; border-left: 3px solid var(--sun-gold); padding: 10px; margin-bottom: 10px; font-size: 11px; color: #8b949e; }
-
-        /* PAGAN GRID */
-        .content { padding: 40px; overflow-y: auto; background: radial-gradient(circle at center, #101520, #030508); }
-        .pagan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 30px; }
-        .pagan-item { display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; transition: 0.3s; }
-        .pagan-item:hover { transform: scale(1.1); filter: drop-shadow(0 0 15px var(--sun-gold)); }
-
-        .symbol-box { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; border: 2px solid rgba(255,255,255,0.1); }
-        .symbol-name { font-size: 10px; font-weight: bold; color: var(--sun-gold); text-transform: uppercase; letter-spacing: 1px; }
-
-        /* NGJYRAT E FUQISË */
-        .gold { background: radial-gradient(#f5c242, #b8860b); }
-        .red { background: radial-gradient(#8e1b1b, #4a0d0d); }
-        .blue { background: radial-gradient(#1b4d8e, #0a2647); }
-
-        /* MODULI DHE CHAT AI */
-        #moduleOverlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; flex-direction: column; padding: 20px; }
-        .module-window { flex-grow: 1; border: 2px solid var(--sun-gold); border-radius: 20px; background: #0d1117; display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; }
+        document.getElementById('page-name').innerText = name;
         
-        .mod-header { padding: 15px 30px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
-        .chat-display { padding: 30px; overflow-y: auto; font-family: 'Consolas', monospace; font-size: 14px; }
-        .chat-input-area { padding: 20px; background: #000; border-top: 1px solid #222; display: flex; gap: 15px; }
-        #user-msg { flex-grow: 1; background: #05070a; border: 1px solid var(--sun-gold); padding: 15px; color: #fff; border-radius: 10px; outline: none; }
-        .send-btn { background: var(--sun-gold); color: #000; border: none; padding: 0 30px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-
-        .ai-msg { color: var(--neon-blue); margin-bottom: 15px; }
-        .user-msg { color: var(--sun-gold); margin-bottom: 15px; text-align: right; }
-    </style>
-</head>
-<body>
-
-<div id="lockScreen">
-    <div class="lock-card">
-        <h1 style="color: var(--sun-gold); letter-spacing: 5px;">BESA-SUPERNOVA</h1>
-        <input type="password" id="master-key" placeholder="PASSWORDIN SIÇ E KISHIM">
-        <button onclick="boot()" style="width:100%; padding:15px; background:var(--sun-gold); border:none; border-radius:8px; font-weight:bold; cursor:pointer;">AKTIVIZO</button>
-    </div>
-</div>
-
-<div id="mainDashboard" style="display:none; height:100vh; flex-direction:column;">
-    <header>
-        <div style="font-weight:bold; letter-spacing:2px;">BESA MASTER CONTROL PANEL</div>
-        <div class="ops-val" id="ops">30,000 OPS/S</div>
-    </header>
-    <div class="layout">
-        <aside class="sidebar">
-            <h4 style="color: var(--sun-gold); font-size: 11px; margin-bottom: 20px;">PROTOKOLLI BESA</h4>
-            <div class="cell-log">DIREKTORIA: ACTIVE</div>
-            <div class="cell-log">SISTEMI: SINKRON</div>
-            <div class="cell-log">FUQIA E DIELLIT: 100%</div>
-        </aside>
-        <main class="content">
-            <div class="pagan-grid">
-                <div class="pagan-item" onclick="openAI('Ballina', '☀️', 'gold')"><div class="symbol-box gold">☀️</div><span class="symbol-name">Ballina</span></div>
-                <div class="pagan-item" onclick="openAI('Kërkimi', '🐍', 'blue')"><div class="symbol-box blue">🐍</div><span class="symbol-name">Kërkimi</span></div>
-                <div class="pagan-item" onclick="openAI('Pronat', '🌀', 'red')"><div class="symbol-box red">🌀</div><span class="symbol-name">Pronat</span></div>
-                <div class="pagan-item" onclick="openAI('Trending', '🔥', 'gold')"><div class="symbol-box gold">🔥</div><span class="symbol-name">Trending</span></div>
-                <div class="pagan-item" onclick="openAI('Agjentët', '🔱', 'blue')"><div class="symbol-box blue">🔱</div><span class="symbol-name">Agjentët</span></div>
-                <div class="pagan-item" onclick="openAI('Harta', '🛡️', 'red')"><div class="symbol-box red">🛡️</div><span class="symbol-name">Harta</span></div>
-            </div>
-        </main>
-    </div>
-</div>
-
-<div id="moduleOverlay">
-    <div class="module-window">
-        <div class="mod-header">
-            <h2 id="mod-title" style="color: var(--sun-gold);"></h2>
-            <button onclick="closeAI()" style="background:transparent; color:red; border:1px solid red; padding:5px 15px; cursor:pointer; border-radius:5px;">MBYLL QELIZËN</button>
-        </div>
-        <div id="chat-box" class="chat-display"></div>
-        <div class="chat-input-area">
-            <input type="text" id="user-msg" placeholder="Pyet Chat AI Besa-Supernova..." onkeypress="if(event.key==='Enter') askAI()">
-            <button class="send-btn" onclick="askAI()">DERGO</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    const KEY = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
-
-    function boot() {
-        if(document.getElementById('master-key').value === KEY) {
-            document.getElementById('lockScreen').style.display = 'none';
-            document.getElementById('mainDashboard').style.display = 'flex';
-        } else { alert("KODI I GABUAR!"); }
+        const out = document.getElementById('terminal-out');
+        out.innerHTML = `<div>[SYS]: Lidhja me PC u krye.</div>`;
+        out.innerHTML += `<div>[AI]: Mandi, jam Chat AI Besa-Supernova. Çfarë kërkoni të dini për ${name}?</div>`;
     }
 
-    function openAI(name, symbol, color) {
-        document.getElementById('mod-title').innerText = "QELIZA: " + name.toUpperCase() + " " + symbol;
-        document.getElementById('moduleOverlay').style.display = 'flex';
-        const chat = document.getElementById('chat-box');
-        chat.innerHTML = `<div class="ai-msg"><strong>BESA-AI:</strong> Mirësevini në qelizën ${name}. Unë jam sistemi Supernova. Çfarë kërkon të dish për këtë fuqi ilire?</div>`;
+    function closeModule() {
+        document.getElementById('moduleView').style.display = 'none';
     }
 
-    function closeAI() {
-        document.getElementById('moduleOverlay').style.display = 'none';
-    }
+    function sendCommand() {
+        const input = document.getElementById('terminal-in');
+        const out = document.getElementById('terminal-out');
+        if(!input.value) return;
 
-    function askAI() {
-        const input = document.getElementById('user-msg');
-        const msg = input.value.trim();
-        if(!msg) return;
-
-        const chat = document.getElementById('chat-box');
-        chat.innerHTML += `<div class="user-msg"><strong>MANDI:</strong> ${msg}</div>`;
-        input.value = "";
-
-        // REAGIMI I AI BESA-SUPERNOVA
+        out.innerHTML += `<div style="color:#fff">> ${input.value}</div>`;
         setTimeout(() => {
-            chat.innerHTML += `<div class="ai-msg"><strong>BESA-AI:</strong> Po Mandi, po e analizoj urdhrin për "${msg}". Sistemi Besa-Supernova po sinkronizon drejtoritë për këtë kërkesë. Çdo gjë është nën kontrollin e Diellit.</div>`;
-            chat.scrollTop = chat.scrollHeight;
-        }, 800);
+            out.innerHTML += `<div>[AI]: Mandi, po e pasqyroj në PC të gjithë bazën e të dhënave për këtë kërkesë. Besa-Supernova është gati.</div>`;
+            out.scrollTop = out.scrollHeight;
+        }, 600);
+        input.value = "";
     }
 
     setInterval(() => {
-        const val = 29930 + Math.floor(Math.random()*150);
+        const val = 29900 + Math.floor(Math.random()*200);
         document.getElementById('ops').innerText = val.toLocaleString() + " OPS/S";
     }, 500);
 </script>
 </body>
-</html>V
+</html>

@@ -40,9 +40,9 @@
     </div>
 
     <script>
-        // DHËNAT E MANDI JATAGANIT - TË NDREQURA
+        // KONFIGURIMI I SUPABASE - PROJEKTI MANDI JATAGANI
         const SB_URL = "https://rpuqfakiocdqwkxyerrz.supabase.co";
-        const SB_KEY = "sb_publishable_7NuvtUzj7G61Q6nETWFQTg_Nolyf1mRzW937G6qY-FpYJ3M8Y_S_T-9g"; 
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwdXFmYWtpb2NkcXdreHllcnJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI5OTkwNDgsImV4cCI6MjAyODU3NTA0OH0.Nolyf1mRzW937G6qY-FpYJ3M8Y_S_T-9g";
 
         async function startBesa() {
             const code = document.getElementById('secure-code').value;
@@ -50,7 +50,6 @@
 
             try {
                 const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
-                // Marrja e të dhënave nga tabela properties
                 const { data, error } = await supabaseClient.from('properties').select('*');
                 
                 if (error) throw error;
@@ -59,7 +58,7 @@
                 document.getElementById('status-display').innerHTML = "<p class='status-on'>[ONLINE] MIRËSEVJEN MANDI JATAGANI</p>";
 
                 if (data.length === 0) {
-                    document.getElementById('property-container').innerHTML = "<p>Nuk u gjet asnjë pronë në tabelë.</p>";
+                    document.getElementById('property-container').innerHTML = "<p>Nuk u gjet asnjë pronë në databazë.</p>";
                 } else {
                     document.getElementById('property-container').innerHTML = data.map(p => `
                         <div class="card">
@@ -69,12 +68,12 @@
                     `).join('');
                 }
             } catch (e) { 
-                console.error(e);
-                alert("Lidhja dështoi! Kontrollo nëse Policy në Supabase është ACTIVE."); 
+                console.error("Gabimi:", e);
+                alert("Lidhja dështoi! Kontrollo nëse Policy (Allow public read) është aktive te Supabase."); 
             }
         }
 
-        // Globi 3D dekorativ
+        // Globi 3D SNBESA
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });

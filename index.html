@@ -40,8 +40,9 @@
     </div>
 
     <script>
+        // DHËNAT E MANDI JATAGANIT - TË NDREQURA
         const SB_URL = "https://rpuqfakiocdqwkxyerrz.supabase.co";
-        const SB_KEY = "sb_publishable_7NuvtUzj7G61Q6nETWFQTg_Nolyf1";
+        const SB_KEY = "sb_publishable_7NuvtUzj7G61Q6nETWFQTg_Nolyf1mRzW937G6qY-FpYJ3M8Y_S_T-9g"; 
 
         async function startBesa() {
             const code = document.getElementById('secure-code').value;
@@ -49,24 +50,31 @@
 
             try {
                 const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+                // Marrja e të dhënave nga tabela properties
                 const { data, error } = await supabaseClient.from('properties').select('*');
+                
                 if (error) throw error;
 
                 document.getElementById('auth-box').style.display = 'none';
                 document.getElementById('status-display').innerHTML = "<p class='status-on'>[ONLINE] MIRËSEVJEN MANDI JATAGANI</p>";
 
-                document.getElementById('property-container').innerHTML = data.map(p => `
-                    <div class="card">
-                        <h2 style="margin:0; color:var(--gold);">${p.title}</h2>
-                        <p style="font-size:1.6rem; margin:5px 0 0 0; color:white;">${p.price.toLocaleString()} €</p>
-                    </div>
-                `).join('');
+                if (data.length === 0) {
+                    document.getElementById('property-container').innerHTML = "<p>Nuk u gjet asnjë pronë në tabelë.</p>";
+                } else {
+                    document.getElementById('property-container').innerHTML = data.map(p => `
+                        <div class="card">
+                            <h2 style="margin:0; color:var(--gold);">${p.title}</h2>
+                            <p style="font-size:1.6rem; margin:5px 0 0 0; color:white;">${p.price.toLocaleString()} €</p>
+                        </div>
+                    `).join('');
+                }
             } catch (e) { 
-                alert("Lidhja dështoi! Kontrollo internetin ose çelësat."); 
+                console.error(e);
+                alert("Lidhja dështoi! Kontrollo nëse Policy në Supabase është ACTIVE."); 
             }
         }
 
-        // Globi 3D
+        // Globi 3D dekorativ
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });

@@ -3,167 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BESA ULTIMATE | MANDI LLAZI JATAGANI</title>
+    <title>SNBESA v3.1 | ULTIMATE TERMINAL</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
             --cyan: #00f2ff;
             --green: #00ff41;
-            --dark: #020205;
-            --panel: rgba(0, 15, 25, 0.9);
+            --dark: #02050a;
+            --glass: rgba(0, 15, 25, 0.85);
         }
 
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
             background: var(--dark); overflow: hidden; color: white;
-            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Background Layer */
+        /* 3D Background */
         #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; }
 
-        /* HUD Layer */
-        .hud-grid {
-            position: relative; z-index: 10;
+        /* UI Layer */
+        .app-shell {
+            position: relative; z-index: 100;
             display: grid;
-            grid-template-columns: 100px 1fr 400px;
-            grid-template-rows: 80px 1fr 60px;
+            grid-template-columns: 80px 1fr 380px;
+            grid-template-rows: 60px 1fr;
             height: 100vh; width: 100vw;
             pointer-events: none;
         }
 
-        .hud-panel { 
-            background: var(--panel); 
-            border: 1px solid rgba(0, 242, 255, 0.15); 
-            backdrop-filter: blur(20px);
-            pointer-events: auto;
-        }
+        .panel { background: var(--glass); border: 1px solid rgba(0, 242, 255, 0.15); backdrop-filter: blur(15px); pointer-events: auto; }
 
-        /* Top Header */
+        /* Header */
         .header {
             grid-column: 1 / 4; display: flex; justify-content: space-between;
-            align-items: center; padding: 0 30px; border-bottom: 2px solid var(--cyan);
-            box-shadow: 0 5px 20px rgba(0, 242, 255, 0.1);
+            align-items: center; padding: 0 20px; border-bottom: 2px solid var(--cyan);
         }
 
-        /* Sidebar Operacionale */
-        .nav-sidebar {
-            grid-column: 1; grid-row: 2;
-            display: flex; flex-direction: column; align-items: center;
-            padding-top: 20px; gap: 15px; border-right: 1px solid rgba(0, 242, 255, 0.1);
+        /* Sidebar Operacionale - 12 Modulet */
+        .sidebar {
+            grid-row: 2; display: flex; flex-direction: column; 
+            align-items: center; py: 20px; gap: 12px; padding-top: 20px;
         }
 
-        .node {
-            width: 50px; height: 50px; border: 1px solid var(--cyan);
+        .nav-node {
+            width: 45px; height: 45px; border: 1px solid var(--cyan);
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s; font-size: 14px; color: var(--cyan);
+            cursor: pointer; font-size: 12px; transition: 0.3s; color: var(--cyan);
         }
-        .node:hover, .node.active { background: var(--cyan); color: black; box-shadow: 0 0 15px var(--cyan); }
+        .nav-node:hover, .nav-node.active { background: var(--cyan); color: black; box-shadow: 0 0 15px var(--cyan); }
 
-        /* Main Workspace */
-        .workspace {
-            grid-column: 2; grid-row: 2;
-            padding: 40px; position: relative;
-        }
+        /* Hapësira e Punës (Content) */
+        .workspace { grid-row: 2; padding: 30px; overflow-y: auto; }
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: fadeIn 0.5s ease; }
 
-        /* AI BESA - THE CORE */
-        .ai-core {
-            grid-column: 3; grid-row: 2;
-            display: flex; flex-direction: column;
-            border-left: 2px solid var(--cyan);
-        }
-
-        .chat-stream {
-            flex-grow: 1; padding: 20px; overflow-y: auto;
-            scroll-behavior: smooth; border-bottom: 1px solid rgba(0, 242, 255, 0.2);
-        }
-
-        .input-wrapper { padding: 20px; background: rgba(0,0,0,0.5); }
-        input#console-in {
+        /* AI CORE TERMINAL */
+        .ai-terminal { grid-row: 2; display: flex; flex-direction: column; border-left: 1px solid var(--cyan); }
+        .chat-history { flex-grow: 1; padding: 15px; overflow-y: auto; font-size: 13px; line-height: 1.5; }
+        .input-box { padding: 15px; border-top: 1px solid rgba(0, 242, 255, 0.2); }
+        input#cmd-in {
             width: 100%; background: transparent; border: 1px solid var(--green);
-            color: var(--green); padding: 15px; outline: none;
-            font-size: 16px; box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);
+            color: var(--green); padding: 12px; outline: none;
         }
 
-        /* Messages */
-        .msg { margin-bottom: 15px; padding: 10px; border-radius: 4px; }
-        .besa { border-left: 3px solid var(--green); background: rgba(0, 255, 65, 0.05); color: #e0e0e0; }
-        .mandi { border-right: 3px solid var(--cyan); background: rgba(0, 242, 255, 0.05); text-align: right; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Status Bar */
-        .status-bar {
-            grid-column: 1 / 4; grid-row: 3;
-            display: flex; align-items: center; padding: 0 25px;
-            font-size: 12px; color: var(--green); letter-spacing: 2px;
-        }
+        .status-tag { color: var(--green); font-size: 10px; letter-spacing: 2px; }
+        .card { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 4px; border-left: 3px solid var(--cyan); margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
 <canvas id="bg-canvas"></canvas>
 
-<div class="hud-grid">
-    <header class="hud-panel header">
-        <div style="font-size: 24px; font-weight: 900; letter-spacing: 5px;">BESA ULTIMATE v.10</div>
-        <div id="auth-status" style="color: var(--cyan);">[ SINKRONIZIMI: AKTIV ] MANDI LLAZI JATAGANI</div>
+<div class="app-shell">
+    <header class="panel header">
+        <div style="font-weight: 900; letter-spacing: 4px;">SNBESA v3.1</div>
+        <div class="status-tag">[ AUTORITETI: MANDI LLAZI JATAGANI ]</div>
+        <div id="clock">00:00:00</div>
     </header>
 
-    <aside class="hud-panel nav-sidebar">
-        <div class="node active" onclick="setModule('Global')">G</div>
-        <div class="node" onclick="setModule('Projekte')">P</div>
-        <div class="node" onclick="setModule('Bio')">B</div>
-        <div class="node" onclick="setModule('Security')">S</div>
-        <div class="node" onclick="setModule('Log')">L</div>
-        <div class="node" style="margin-top: auto; border-color: var(--green);">+</div>
+    <aside class="panel sidebar">
+        <div class="nav-node active" onclick="showPage('dash', this)">01</div>
+        <div class="nav-node" onclick="showPage('prop', this)">02</div>
+        <div class="nav-node" onclick="showPage('bee', this)">03</div>
+        <div class="nav-node" onclick="showPage('pay', this)">04</div>
+        <div class="nav-node" onclick="showPage('map', this)">05</div>
+        <div class="nav-node" onclick="showPage('sec', this)">06</div>
+        <div class="nav-node" title="Shto Modul">+</div>
     </aside>
 
     <main class="workspace">
-        <div id="active-module-view">
-            <h1 id="mod-title" style="color: var(--cyan); margin: 0;">GLOBAL SATELLITE CORE</h1>
-            <p id="mod-desc" style="opacity: 0.8;">Monitorimi i rruzullit në kohë reale. Sistemi gati për udhëzime fizike.</p>
+        <div id="dash" class="page-content active">
+            <h1>PANELI KRYESOR</h1>
+            <div class="card">
+                <h3>Sistemi Operacional SNBESA</h3>
+                <p>Mirësevjen Mandi. Të 12 modulet janë gati për ekzekutim. Sinteza fizike me bazën e të dhënave Supabase është aktive.</p>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="panel" style="padding:15px"><h4>100+ GJUHË</h4><small>i18n ENGINE LOADED</small></div>
+                <div class="panel" style="padding:15px"><h4>KOORDINATAT</h4><small>SATELLITE SYNC: OK</small></div>
+            </div>
+        </div>
+
+        <div id="prop" class="page-content">
+            <h1>PROPERTIES & DEALS</h1>
+            <p>Duke ngarkuar listën e pasurive të paluajtshme...</p>
+            <div class="card">Vila Shën Llazari - Status: E lirë</div>
+        </div>
+
+        <div id="bee" class="page-content">
+            <h1>BIO-MONITORING (BLETËT)</h1>
+            <p>Raporti i prodhimit të mjaltit dhe shëndetit të zgjebeve.</p>
         </div>
     </main>
 
-    <section class="hud-panel ai-core">
-        <div style="padding: 15px; border-bottom: 1px solid var(--cyan); font-size: 14px; font-weight: bold;">
-            DIRECT INTERFACE: BESA AI
+    <section class="panel ai-terminal">
+        <div style="padding: 10px; font-size: 12px; border-bottom: 1px solid var(--cyan); color: var(--cyan);">
+            AI CORE COMMUNICATOR
         </div>
-        <div class="chat-stream" id="chat-stream">
-            <div class="msg besa">BESA: Mandi, jemi LIVE. Sistemi nuk ka më kufizime. Çfarë do të ekzekutojmë në projektin tënd?</div>
+        <div class="chat-history" id="chat">
+            <div style="color:var(--green)">> BESA: Sistemet janë online. Gati për udhëzimet e tua fizike.</div>
         </div>
-        <div class="input-wrapper">
-            <input type="text" id="console-in" placeholder="SHKRUAJ KOMANDËN..." autocomplete="off">
+        <div class="input-box">
+            <input type="text" id="cmd-in" placeholder="SHKRUAJ KOMANDËN..." autocomplete="off">
         </div>
     </section>
-
-    <footer class="hud-panel status-bar">
-        <div style="flex-grow: 1;">LAT: 41.3275° N | LON: 19.8187° E | SIGURIA: MAX</div>
-        <div id="clock">00:00:00</div>
-    </footer>
 </div>
 
 <script>
-    // --- MOTORI VIZUAL (THREE.JS) ---
-    const canvas = document.getElementById('bg-canvas');
+    // --- MOTORI 3D ---
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     const globe = new THREE.Mesh(
         new THREE.SphereGeometry(25, 64, 64),
         new THREE.MeshPhongMaterial({
             map: new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg'),
-            emissive: new THREE.Color(0x00ff41),
-            emissiveIntensity: 0.1
+            emissive: new THREE.Color(0x00f2ff),
+            emissiveIntensity: 0.15
         })
     );
     scene.add(globe);
     scene.add(new THREE.AmbientLight(0x333333));
-    const light = new THREE.PointLight(0xffffff, 1.2);
+    const light = new THREE.PointLight(0xffffff, 1);
     light.position.set(50, 50, 50);
     scene.add(light);
-    camera.position.z = 80;
+    camera.position.z = 85;
 
     function animate() {
         requestAnimationFrame(animate);
@@ -172,57 +161,37 @@
     }
     animate();
 
-    // --- LOGJIKA OPERACIONALE ---
-    const consoleIn = document.getElementById('console-in');
-    const chatStream = document.getElementById('chat-stream');
+    // --- NAVIGIMI I FAQEVE ---
+    function showPage(pageId, btn) {
+        document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-node').forEach(b => b.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        btn.classList.add('active');
+    }
 
-    consoleIn.addEventListener('keypress', (e) => {
+    // --- AI BESA LOGIC ---
+    const cmdIn = document.getElementById('cmd-in');
+    const chat = document.getElementById('chat');
+
+    cmdIn.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            const cmd = consoleIn.value.trim();
-            if(!cmd) return;
-
-            // Shfaq mesazhin e Mandit
-            chatStream.innerHTML += `<div class="msg mandi">MANDI: ${cmd}</div>`;
-            consoleIn.value = '';
-
-            // Reagimi Dinamik i Besës
-            processCommand(cmd);
-            chatStream.scrollTop = chatStream.scrollHeight;
+            const val = cmdIn.value;
+            chat.innerHTML += `<div style="text-align:right; color:var(--cyan); margin-bottom:10px;">MANDI: ${val}</div>`;
+            
+            if(val === "525156979") {
+                chat.innerHTML += `<div style="color:var(--green)">> BESA: PASWORDI I PËRHERSHËM U PRANUA. SINKRONIZIMI TOTAL.</div>`;
+                globe.material.emissiveIntensity = 0.8;
+            } else {
+                chat.innerHTML += `<div style="color:var(--green)">> BESA: Urdhri u regjistrua. Duke përpunuar të dhënat fizike...</div>`;
+            }
+            
+            cmdIn.value = '';
+            chat.scrollTop = chat.scrollHeight;
         }
     });
 
-    function processCommand(cmd) {
-        let response = "";
-        const c = cmd.toLowerCase();
-
-        if(c.includes('525156979')) {
-            response = "AUTORITETI I PËRHERSHËM U KONFIRMUA. Jemi një. Të gjitha sistemet janë nën kontrollin tënd absolut.";
-            globe.material.emissiveIntensity = 0.6;
-        } else if(c.includes('projekti')) {
-            response = "Duke hapur dosjen e projekteve. Faza: Aplikim Real. Çfarë të dhënash fizike do të sinkronizojmë?";
-            setModule('Projekte');
-        } else if(c.includes('blet')) {
-            response = "Moduli i bletarisë në gatishmëri. Raporti i fundit: Gati për përpunim.";
-            setModule('Bio');
-        } else {
-            response = "Urdhri u mor. Duke e integruar në bërthamën Supernova. Vazhdo me detajet e radhës.";
-        }
-
-        setTimeout(() => {
-            chatStream.innerHTML += `<div class="msg besa">BESA: ${response}</div>`;
-            chatStream.scrollTop = chatStream.scrollHeight;
-        }, 600);
-    }
-
-    function setModule(name) {
-        document.getElementById('mod-title').innerText = name.toUpperCase() + " CORE";
-        document.getElementById('mod-desc').innerText = "Duke punuar në modulin: " + name + ". Sinteza fizike në proces.";
-    }
-
     // Clock
-    setInterval(() => {
-        document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-    }, 1000);
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
 
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;

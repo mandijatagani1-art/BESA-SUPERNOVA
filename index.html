@@ -2,129 +2,243 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNBESA v3.1 | ULTIMATE TERMINAL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SNBESA · UNIFIED SYSTEM v3.1</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --cyan: #00f2ff;
             --green: #00ff41;
+            --gold: #D4AF37;
+            --red: #8B0000;
             --dark: #02050a;
             --glass: rgba(0, 15, 25, 0.85);
         }
 
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: var(--dark); overflow: hidden; color: white;
-            font-family: 'JetBrains Mono', monospace;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { width: 100%; height: 100%; background: var(--dark); overflow: hidden; color: white; font-family: 'Inter', sans-serif; }
 
-        /* 3D Background */
         #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; }
 
-        /* UI Layer */
         .app-shell {
             position: relative; z-index: 100;
             display: grid;
-            grid-template-columns: 80px 1fr 380px;
-            grid-template-rows: 60px 1fr;
+            grid-template-columns: 90px 1fr 380px;
+            grid-template-rows: 70px 1fr;
             height: 100vh; width: 100vw;
             pointer-events: none;
         }
 
         .panel { background: var(--glass); border: 1px solid rgba(0, 242, 255, 0.15); backdrop-filter: blur(15px); pointer-events: auto; }
 
-        /* Header */
         .header {
             grid-column: 1 / 4; display: flex; justify-content: space-between;
-            align-items: center; padding: 0 20px; border-bottom: 2px solid var(--cyan);
+            align-items: center; padding: 0 30px; border-bottom: 2px solid var(--cyan);
         }
+        .header h1 { font-weight: 900; letter-spacing: 6px; color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
+        .status-tag { color: var(--green); font-size: 12px; letter-spacing: 2px; }
 
-        /* Sidebar Operacionale - 12 Modulet */
         .sidebar {
             grid-row: 2; display: flex; flex-direction: column; 
-            align-items: center; py: 20px; gap: 12px; padding-top: 20px;
+            align-items: center; padding-top: 30px; gap: 10px; overflow-y: auto;
         }
-
         .nav-node {
-            width: 45px; height: 45px; border: 1px solid var(--cyan);
+            width: 50px; height: 50px; border: 1px solid var(--cyan);
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 12px; transition: 0.3s; color: var(--cyan);
+            cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.3s; 
+            color: var(--cyan); background: rgba(0,0,0,0.3); border-radius: 8px;
         }
-        .nav-node:hover, .nav-node.active { background: var(--cyan); color: black; box-shadow: 0 0 15px var(--cyan); }
+        .nav-node:hover, .nav-node.active { background: var(--cyan); color: black; box-shadow: 0 0 20px var(--cyan); }
 
-        /* Hapësira e Punës (Content) */
-        .workspace { grid-row: 2; padding: 30px; overflow-y: auto; }
-        .page-content { display: none; }
-        .page-content.active { display: block; animation: fadeIn 0.5s ease; }
+        .workspace { 
+            grid-row: 2; padding: 25px; overflow-y: auto; 
+            scrollbar-width: thin; scrollbar-color: var(--cyan) #001020;
+        }
+        .page-content { display: none; animation: fadeIn 0.3s ease; }
+        .page-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* AI CORE TERMINAL */
-        .ai-terminal { grid-row: 2; display: flex; flex-direction: column; border-left: 1px solid var(--cyan); }
-        .chat-history { flex-grow: 1; padding: 15px; overflow-y: auto; font-size: 13px; line-height: 1.5; }
-        .input-box { padding: 15px; border-top: 1px solid rgba(0, 242, 255, 0.2); }
-        input#cmd-in {
+        .ai-terminal { 
+            grid-row: 2; display: flex; flex-direction: column; 
+            border-left: 1px solid var(--cyan); 
+        }
+        .chat-history { flex-grow: 1; padding: 20px; overflow-y: auto; font-size: 13px; line-height: 1.6; }
+        .input-box { padding: 20px; border-top: 1px solid rgba(0, 242, 255, 0.2); }
+        #cmd-in {
             width: 100%; background: transparent; border: 1px solid var(--green);
-            color: var(--green); padding: 12px; outline: none;
+            color: var(--green); padding: 14px; outline: none; font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .status-tag { color: var(--green); font-size: 10px; letter-spacing: 2px; }
-        .card { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 4px; border-left: 3px solid var(--cyan); margin-bottom: 20px; }
+        .card { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border-left: 3px solid var(--cyan); margin-bottom: 20px; }
+        .metric-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 15px; }
+        .metric { background: #0a1a2a; padding: 15px; border-radius: 8px; }
+        .property-item, .agent-item { padding: 12px; border-bottom: 1px solid #1a3a4a; display: flex; justify-content: space-between; }
+        button { background: transparent; border: 1px solid var(--cyan); color: var(--cyan); padding: 8px 16px; cursor: pointer; transition: 0.2s; border-radius: 4px; }
+        button:hover { background: var(--cyan); color: black; }
+        input, select { background: #0a1a2a; border: 1px solid var(--cyan); color: white; padding: 10px; width: 100%; margin-bottom: 10px; }
+        h2, h3 { color: var(--cyan); margin-bottom: 15px; }
+        .config-panel { position: fixed; bottom: 20px; right: 20px; z-index: 200; background: var(--glass); padding: 15px; border-radius: 12px; border: 1px solid var(--gold); backdrop-filter: blur(20px); width: 260px; }
+        .config-panel input { margin-bottom: 8px; }
     </style>
 </head>
 <body>
 
 <canvas id="bg-canvas"></canvas>
 
+<!-- Paneli i Konfigurimit Supabase (shfaqet fillimisht) -->
+<div id="configPanel" class="config-panel">
+    <h4 style="color:var(--gold); margin-bottom:10px;">⚙️ Konfiguro Supabase</h4>
+    <input type="text" id="supabaseUrl" placeholder="Supabase URL" value="">
+    <input type="text" id="supabaseKey" placeholder="Anon Key" value="">
+    <button onclick="saveConfig()" style="width:100%; background:var(--gold); color:black;">Lidhu</button>
+    <p id="configStatus" style="font-size:12px; margin-top:8px;"></p>
+</div>
+
 <div class="app-shell">
+    <!-- HEADER -->
     <header class="panel header">
-        <div style="font-weight: 900; letter-spacing: 4px;">SNBESA v3.1</div>
-        <div class="status-tag">[ AUTORITETI: MANDI LLAZI JATAGANI ]</div>
+        <h1>SNBESA v3.1</h1>
+        <div class="status-tag"><i class="fas fa-satellite"></i> [ AUTORITETI: MANDI LLAZI JATAGANI ]</div>
         <div id="clock">00:00:00</div>
     </header>
 
+    <!-- SIDEBAR (12 Modulet) -->
     <aside class="panel sidebar">
-        <div class="nav-node active" onclick="showPage('dash', this)">01</div>
-        <div class="nav-node" onclick="showPage('prop', this)">02</div>
-        <div class="nav-node" onclick="showPage('bee', this)">03</div>
-        <div class="nav-node" onclick="showPage('pay', this)">04</div>
-        <div class="nav-node" onclick="showPage('map', this)">05</div>
-        <div class="nav-node" onclick="showPage('sec', this)">06</div>
-        <div class="nav-node" title="Shto Modul">+</div>
+        <div class="nav-node active" onclick="showPage('dash', this)">🏠</div>
+        <div class="nav-node" onclick="showPage('properties', this)">🏡</div>
+        <div class="nav-node" onclick="showPage('agents', this)">👥</div>
+        <div class="nav-node" onclick="showPage('deals', this)">💰</div>
+        <div class="nav-node" onclick="showPage('map', this)">🗺️</div>
+        <div class="nav-node" onclick="showPage('calculator', this)">🧮</div>
+        <div class="nav-node" onclick="showPage('contact', this)">📞</div>
+        <div class="nav-node" onclick="showPage('about', this)">ℹ️</div>
+        <div class="nav-node" onclick="showPage('payments', this)">💳</div>
+        <div class="nav-node" onclick="showPage('admin', this)">⚙️</div>
+        <div class="nav-node" onclick="showPage('trending', this)">📊</div>
+        <div class="nav-node" onclick="showPage('login', this)">🔐</div>
     </aside>
 
+    <!-- WORKSPACE (12 Faqet) -->
     <main class="workspace">
+        <!-- DASHBOARD -->
         <div id="dash" class="page-content active">
-            <h1>PANELI KRYESOR</h1>
+            <h2>🏛️ PANELI KRYESOR</h2>
             <div class="card">
                 <h3>Sistemi Operacional SNBESA</h3>
-                <p>Mirësevjen Mandi. Të 12 modulet janë gati për ekzekutim. Sinteza fizike me bazën e të dhënave Supabase është aktive.</p>
+                <p>Mirësevjen, Mandi. Të 12 modulet janë aktive. Sinteza me Supabase është online.</p>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div class="panel" style="padding:15px"><h4>100+ GJUHË</h4><small>i18n ENGINE LOADED</small></div>
-                <div class="panel" style="padding:15px"><h4>KOORDINATAT</h4><small>SATELLITE SYNC: OK</small></div>
+            <div class="metric-grid">
+                <div class="metric"><span>🌍 Gjuhë</span><h3>100+</h3></div>
+                <div class="metric"><span>🛰️ Satelitë</span><h3>3</h3></div>
+                <div class="metric"><span>📡 Realtime</span><h3 style="color:var(--green);">● AKTIV</h3></div>
+                <div class="metric"><span>🧠 AI BESA</span><h3>v2.4.1</h3></div>
+            </div>
+            <div id="live-stats" class="card">Duke u lidhur me Supabase...</div>
+        </div>
+
+        <!-- PROPERTIES -->
+        <div id="properties" class="page-content">
+            <h2>🏡 PRONAT</h2>
+            <div id="property-list">Duke ngarkuar...</div>
+        </div>
+
+        <!-- AGENTS -->
+        <div id="agents" class="page-content">
+            <h2>👥 AGJENTËT</h2>
+            <div id="agent-list">Duke ngarkuar...</div>
+        </div>
+
+        <!-- DEALS -->
+        <div id="deals" class="page-content">
+            <h2>💰 MARRËVESHJE</h2>
+            <div id="deal-list">Duke ngarkuar...</div>
+        </div>
+
+        <!-- MAP -->
+        <div id="map" class="page-content">
+            <h2>🗺️ HARTA</h2>
+            <div class="card">Moduli i hartës do të integrohet me Leaflet.js. Koordinatat satelitore janë gati.</div>
+        </div>
+
+        <!-- CALCULATOR -->
+        <div id="calculator" class="page-content">
+            <h2>🧮 SIMULUES PASURIE</h2>
+            <div class="card">
+                <label>Vlera e pronës (€)</label>
+                <input type="number" id="calcPrice" value="100000">
+                <label>Vite</label>
+                <input type="number" id="calcYears" value="10">
+                <button onclick="calculateWealth()">LLOGARIT</button>
+                <h3 id="calcResult" style="margin-top:20px;">€0</h3>
             </div>
         </div>
 
-        <div id="prop" class="page-content">
-            <h1>PROPERTIES & DEALS</h1>
-            <p>Duke ngarkuar listën e pasurive të paluajtshme...</p>
-            <div class="card">Vila Shën Llazari - Status: E lirë</div>
+        <!-- CONTACT -->
+        <div id="contact" class="page-content">
+            <h2>📞 KONTAKT</h2>
+            <div class="card">
+                <p><i class="fas fa-phone"></i> +355 69 123 4567</p>
+                <p><i class="fas fa-envelope"></i> mandi@snbesa.al</p>
+            </div>
         </div>
 
-        <div id="bee" class="page-content">
-            <h1>BIO-MONITORING (BLETËT)</h1>
-            <p>Raporti i prodhimit të mjaltit dhe shëndetit të zgjebeve.</p>
+        <!-- ABOUT -->
+        <div id="about" class="page-content">
+            <h2>ℹ️ RRETH NESH</h2>
+            <div class="card">SNBESA është platforma e prosperitetit, e ndërtuar mbi arkitekturë kuantike dhe AI BESA.</div>
+        </div>
+
+        <!-- PAYMENTS -->
+        <div id="payments" class="page-content">
+            <h2>💳 PAGESAT</h2>
+            <div class="card">🇦🇱 Shqipëri: AL47 2141 1009 0000 0000 1234 5678</div>
+            <div class="card">🇽🇰 Kosovë: XK05 13000 00000 00000 00001</div>
+            <div class="card">🇮🇹 Itali: IT60X0542811101000000123456</div>
+        </div>
+
+        <!-- ADMIN -->
+        <div id="admin" class="page-content">
+            <h2>⚙️ ADMINISTRIMI</h2>
+            <div class="card">
+                <h3>Shto Pronë të Re</h3>
+                <input type="text" id="newTitle" placeholder="Titulli">
+                <input type="number" id="newPrice" placeholder="Çmimi">
+                <button onclick="addProperty()">SHTO PRONËN</button>
+                <p id="adminMsg"></p>
+            </div>
+        </div>
+
+        <!-- TRENDING -->
+        <div id="trending" class="page-content">
+            <h2>📊 TRENDING</h2>
+            <div id="trending-stats">Duke analizuar të dhënat...</div>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="login" class="page-content">
+            <h2>🔐 LOGIN (MAGIC LINK)</h2>
+            <div class="card">
+                <input type="email" id="loginEmail" placeholder="Email">
+                <button onclick="sendMagicLink()">DËRGO LINK</button>
+                <p id="loginMsg"></p>
+            </div>
         </div>
     </main>
 
+    <!-- AI TERMINAL BESA -->
     <section class="panel ai-terminal">
-        <div style="padding: 10px; font-size: 12px; border-bottom: 1px solid var(--cyan); color: var(--cyan);">
-            AI CORE COMMUNICATOR
+        <div style="padding: 15px; font-size: 14px; border-bottom: 1px solid var(--cyan); color: var(--cyan);">
+            <i class="fas fa-robot"></i> BESA AI CORE
         </div>
         <div class="chat-history" id="chat">
-            <div style="color:var(--green)">> BESA: Sistemet janë online. Gati për udhëzimet e tua fizike.</div>
+            <div style="color:var(--green);">> BESA: Sistemet janë online. Gati për udhëzimet e tua, Mandi.</div>
         </div>
         <div class="input-box">
             <input type="text" id="cmd-in" placeholder="SHKRUAJ KOMANDËN..." autocomplete="off">
@@ -133,12 +247,35 @@
 </div>
 
 <script>
-    // --- MOTORI 3D ---
+    // ======================= KONFIGURIMI GLOBAL =======================
+    let supabase = null;
+    const configPanel = document.getElementById('configPanel');
+    const configStatus = document.getElementById('configStatus');
+
+    window.saveConfig = function() {
+        const url = document.getElementById('supabaseUrl').value.trim();
+        const key = document.getElementById('supabaseKey').value.trim();
+        if (!url || !key) {
+            configStatus.innerText = 'Plotëso të dy fushat!';
+            return;
+        }
+        try {
+            supabase = window.supabase.createClient(url, key);
+            configStatus.innerHTML = '<span style="color:var(--green);">✅ Lidhja u krye!</span>';
+            configPanel.style.display = 'none';
+            loadDashboardStats(); // Ngarko statistikat fillestare
+            addChatMessage('BESA', 'Lidhja me Supabase u konfigurua me sukses.');
+        } catch(e) {
+            configStatus.innerText = 'Gabim: ' + e.message;
+        }
+    };
+
+    // ======================= 3D BACKGROUND =======================
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-
+    
     const globe = new THREE.Mesh(
         new THREE.SphereGeometry(25, 64, 64),
         new THREE.MeshPhongMaterial({
@@ -148,50 +285,146 @@
         })
     );
     scene.add(globe);
-    scene.add(new THREE.AmbientLight(0x333333));
-    const light = new THREE.PointLight(0xffffff, 1);
+    scene.add(new THREE.AmbientLight(0x404060));
+    const light = new THREE.PointLight(0xffffff, 1.2);
     light.position.set(50, 50, 50);
     scene.add(light);
     camera.position.z = 85;
 
     function animate() {
         requestAnimationFrame(animate);
-        globe.rotation.y += 0.001;
+        globe.rotation.y += 0.0008;
         renderer.render(scene, camera);
     }
     animate();
 
-    // --- NAVIGIMI I FAQEVE ---
-    function showPage(pageId, btn) {
+    // ======================= NAVIGIMI =======================
+    window.showPage = function(pageId, btn) {
         document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-node').forEach(b => b.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
-        btn.classList.add('active');
+        if (btn) btn.classList.add('active');
+        
+        // Ngarko të dhënat për faqen specifike
+        if (!supabase) return;
+        if (pageId === 'properties') loadProperties();
+        if (pageId === 'agents') loadAgents();
+        if (pageId === 'deals') loadDeals();
+        if (pageId === 'trending') loadTrending();
+        if (pageId === 'dash') loadDashboardStats();
+    };
+
+    // ======================= FUNKSIONET SUPABASE =======================
+    async function loadDashboardStats() {
+        if (!supabase) return;
+        const [props, agents, deals] = await Promise.all([
+            supabase.from('properties').select('id', { count: 'exact', head: true }),
+            supabase.from('agents').select('id', { count: 'exact', head: true }),
+            supabase.from('deals').select('id', { count: 'exact', head: true })
+        ]);
+        document.getElementById('live-stats').innerHTML = `
+            <p>📦 Prona: ${props.count || 0} | 👤 Agjentë: ${agents.count || 0} | 🤝 Marrëveshje: ${deals.count || 0}</p>
+        `;
     }
 
-    // --- AI BESA LOGIC ---
+    async function loadProperties() {
+        if (!supabase) return;
+        const container = document.getElementById('property-list');
+        const { data } = await supabase.from('properties').select('*');
+        if (!data || data.length === 0) { container.innerHTML = 'Asnjë pronë.'; return; }
+        container.innerHTML = data.map(p => `<div class="property-item"><span>${p.title}</span><span>€${p.price || 0}</span></div>`).join('');
+    }
+
+    async function loadAgents() {
+        if (!supabase) return;
+        const container = document.getElementById('agent-list');
+        const { data } = await supabase.from('agents').select('*');
+        if (!data) { container.innerHTML = 'Asnjë agjent.'; return; }
+        container.innerHTML = data.map(a => `<div class="agent-item"><span>${a.name}</span><span>${a.region || ''}</span></div>`).join('');
+    }
+
+    async function loadDeals() {
+        if (!supabase) return;
+        const container = document.getElementById('deal-list');
+        const { data } = await supabase.from('deals').select('*, properties(title)');
+        if (!data) { container.innerHTML = 'Asnjë marrëveshje.'; return; }
+        container.innerHTML = data.map(d => `<div>🏷️ ${d.properties?.title || 'Pronë'} - €${d.value || 0}</div>`).join('');
+    }
+
+    async function loadTrending() {
+        if (!supabase) return;
+        const { data } = await supabase.from('deals').select('value');
+        const total = data?.reduce((acc, d) => acc + (d.value||0), 0) || 0;
+        document.getElementById('trending-stats').innerHTML = `Vlera totale e marrëveshjeve: €${total}`;
+    }
+
+    window.calculateWealth = function() {
+        const price = parseFloat(document.getElementById('calcPrice').value) || 0;
+        const years = parseFloat(document.getElementById('calcYears').value) || 0;
+        const future = price * Math.pow(1.05, years);
+        document.getElementById('calcResult').innerText = `€${future.toFixed(0)}`;
+    };
+
+    window.addProperty = async function() {
+        if (!supabase) { alert('Lidhu me Supabase fillimisht!'); return; }
+        const title = document.getElementById('newTitle').value;
+        const price = parseFloat(document.getElementById('newPrice').value);
+        const { error } = await supabase.from('properties').insert([{ title, price }]);
+        document.getElementById('adminMsg').innerText = error ? 'Gabim: ' + error.message : 'Prona u shtua!';
+        if (!error) { loadProperties(); loadDashboardStats(); }
+    };
+
+    window.sendMagicLink = async function() {
+        if (!supabase) { alert('Lidhu me Supabase!'); return; }
+        const email = document.getElementById('loginEmail').value;
+        const { error } = await supabase.auth.signInWithOtp({ email });
+        document.getElementById('loginMsg').innerText = error ? 'Gabim: ' + error.message : 'Linku u dërgua!';
+    };
+
+    // ======================= AI TERMINAL =======================
     const cmdIn = document.getElementById('cmd-in');
     const chat = document.getElementById('chat');
 
+    function addChatMessage(sender, text) {
+        const color = sender === 'MANDI' ? 'var(--cyan)' : 'var(--green)';
+        chat.innerHTML += `<div style="color:${color}; margin-bottom:10px;">${sender}: ${text}</div>`;
+        chat.scrollTop = chat.scrollHeight;
+    }
+
     cmdIn.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            const val = cmdIn.value;
-            chat.innerHTML += `<div style="text-align:right; color:var(--cyan); margin-bottom:10px;">MANDI: ${val}</div>`;
+            const val = cmdIn.value.trim();
+            if (!val) return;
+            addChatMessage('MANDI', val);
             
-            if(val === "525156979") {
-                chat.innerHTML += `<div style="color:var(--green)">> BESA: PASWORDI I PËRHERSHËM U PRANUA. SINKRONIZIMI TOTAL.</div>`;
+            let response = '';
+            if (val === '525156979') {
+                response = 'PASSWORDI I PËRHERSHËM U PRANUA. SINKRONIZIMI TOTAL.';
                 globe.material.emissiveIntensity = 0.8;
+            } else if (val.toLowerCase() === 'help') {
+                response = 'Komandat: status, properties, agents, clear, password';
+            } else if (val.toLowerCase() === 'status') {
+                response = supabase ? 'Lidhja me Supabase është aktive.' : 'Nuk ka lidhje me Supabase. Konfiguro në panelin poshtë djathtas.';
+            } else if (val.toLowerCase() === 'properties') {
+                showPage('properties', document.querySelector('.nav-node:nth-child(2)'));
+                response = 'Duke hapur modulin e pronave...';
+            } else if (val.toLowerCase() === 'clear') {
+                chat.innerHTML = '';
+                response = 'Terminali u pastrua.';
             } else {
-                chat.innerHTML += `<div style="color:var(--green)">> BESA: Urdhri u regjistrua. Duke përpunuar të dhënat fizike...</div>`;
+                response = `Urdhri "${val}" u regjistrua.`;
             }
             
+            addChatMessage('BESA', response);
             cmdIn.value = '';
-            chat.scrollTop = chat.scrollHeight;
         }
     });
 
-    // Clock
-    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+    // ======================= INICIALIZIMI =======================
+    window.onload = () => {
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+        // Nëse dëshiron të fshehësh panelin e konfigurimit nëse tashmë ke kredenciale të ruajtura, shto këtu
+    };
 
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;

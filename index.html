@@ -2,185 +2,216 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BESA | Portali i Arkitektit</title>
+    <title>BESA | PORTALI INTEGRUAR</title>
     <style>
-        :root {
-            --bg: #f0f4f8;
-            --glass: rgba(255, 255, 255, 0.8);
-            --accent: #6c8ea4; /* Ngjyrë qetësuese blu-hiri */
-            --text: #2d3436;
-            --gold: #d4af37;
-        }
+        :root { --accent: #6c8ea4; --gold: #d4af37; --bg: #f4f7f9; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); overflow: hidden; }
+        
+        /* --- HYRJA --- */
+        #gate { position: fixed; inset: 0; background: #fff; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s; }
+        .auth-input { border: none; border-bottom: 2px solid #eee; padding: 10px; width: 300px; text-align: center; font-size: 1.1rem; outline: none; letter-spacing: 2px; }
 
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
+        /* --- DASHBOARD --- */
+        #dashboard { display: none; padding: 50px; height: 100vh; box-sizing: border-box; }
+        .welcome { text-align: center; margin-bottom: 50px; animation: fadeIn 1s; }
+        .welcome h1 { font-weight: 200; letter-spacing: 15px; color: var(--gold); }
 
-        /* --- HYRJA (WELCOME) --- */
-        #gate {
-            position: fixed;
-            inset: 0;
-            background: white;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 1s ease;
-        }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; max-width: 1200px; margin: 0 auto; }
+        .card { background: #fff; padding: 40px; border-radius: 25px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-decoration: none; color: inherit; }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .card i { font-size: 3rem; display: block; margin-bottom: 15px; }
 
-        .welcome-card {
-            text-align: center;
-            animation: fadeIn 2s ease;
-        }
+        /* --- MODULES (HIDDEN INITIALLY) --- */
+        .module { display: none; position: fixed; inset: 50px; background: #fff; border-radius: 30px; padding: 40px; box-shadow: 0 0 100px rgba(0,0,0,0.1); z-index: 50; animation: slideUp 0.5s; }
+        .close-btn { position: absolute; top: 20px; right: 30px; font-size: 2rem; cursor: pointer; color: #ccc; }
 
-        .welcome-card h1 {
-            font-weight: 300;
-            letter-spacing: 15px;
-            color: var(--gold);
-            margin-bottom: 30px;
-        }
-
-        .input-zen {
-            border: none;
-            border-bottom: 1px solid #ddd;
-            padding: 10px;
-            width: 300px;
-            text-align: center;
-            font-size: 1rem;
-            outline: none;
-            transition: border 0.3s;
-        }
-
-        .input-zen:focus { border-bottom: 1px solid var(--accent); }
-
-        /* --- DASHBOARD-I ME IKONA --- */
-        #dashboard {
-            display: none;
-            width: 90%;
-            max-width: 1000px;
-            text-align: center;
-            animation: slideUp 1s ease;
-        }
-
-        .nav-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
-        }
-
-        .nav-item {
-            background: var(--glass);
-            padding: 40px 20px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            text-decoration: none;
-            color: var(--text);
-        }
-
-        .nav-item:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-        }
-
-        .icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .nav-item h3 {
-            margin: 0;
-            font-weight: 400;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-        }
-
-        /* --- ANIMACIONET --- */
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        .footer-note {
-            position: absolute;
-            bottom: 30px;
-            font-size: 0.8rem;
-            opacity: 0.5;
-            letter-spacing: 2px;
-        }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div id="gate">
-        <div class="welcome-card">
-            <h1>BESA</h1>
-            <p style="opacity: 0.6; font-weight: 300;">Mirëseerdhe në hapësirën tënde, Arkitekt.</p>
-            <input type="password" id="p" class="input-zen" placeholder="Kodi i qetësisë...">
-            <br><br>
-            <button onclick="enter()" style="background: none; border: 1px solid #ddd; padding: 10px 30px; cursor: pointer; color: #888;">Hyr</button>
-        </div>
+        <h1 style="font-weight: 200; letter-spacing: 10px; color: var(--gold);">BESA</h1>
+        <input type="password" id="p" class="auth-input" placeholder="KODI I ARKITEKTIT" onkeypress="check(event)">
     </div>
 
     <div id="dashboard">
-        <h2 style="font-weight: 300; letter-spacing: 5px; color: var(--accent);">KU DËSHIRONI TË SHKONI?</h2>
-        
-        <div class="nav-grid">
-            <a href="#" class="nav-item">
-                <span class="icon">📂</span>
-                <h3>PROJEKTET</h3>
-            </a>
-
-            <a href="#" class="nav-item">
-                <span class="icon">🌐</span>
-                <h3>RRJETI</h3>
-            </a>
-
-            <a href="#" class="nav-item">
-                <span class="icon">📊</span>
-                <h3>RAPORTET</h3>
-            </a>
-
-            <a href="#" class="nav-item">
-                <span class="icon">🤝</span>
-                <h3>VAZHDIMËSIA</h3>
-            </a>
+        <div class="welcome">
+            <h1>BESA</h1>
+            <p style="color: #999; letter-spacing: 3px;">MANDI JATAGANI | PORTALI SUPREM</p>
         </div>
 
-        <div class="footer-note">MANDI JATAGANI | 100 VITE PARA</div>
+        <div class="grid">
+            <div class="card" onclick="openMod('m1')"><i>🖥️</i><span>PROJEKTET</span></div>
+            <div class="card" onclick="openMod('m2')"><i>📊</i><span>BLETARIA</span></div>
+            <div class="card" onclick="openMod('m3')"><i>📡</i><span>RRJETI</span></div>
+            <div class="card" onclick="openMod('m4')"><i>⚖️</i><span>VAZHDIMËSIA</span></div>
+        </div>
+    </div>
+
+    <div id="m1" class="module">
+        <span class="close-btn" onclick="closeMod()">×</span>
+        <h2>PROJEKTET ACTIVE</h2>
+        <hr>
+        <p>> JATAGANI PROTOCOL: Sentinel Grid (Në proces)</p>
+        <p>> Protokolli Besa: Aktiv</p>
+    </div>
+
+    <div id="m2" class="module">
+        <span class="close-btn" onclick="closeMod()">×</span>
+        <h2>RAPORTI BLETARISË</h2>
+        <hr>
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 15px;">
+            <p>Gjendja e zgjeve: Optimale</p>
+            <p>Prodhimi i parashikuar: +25%</p>
+        </div>
+    </div>
+
+    <div id="m3" class="module">
+        <span class="close-btn" onclick="closeMod()">×</span>
+        <h2>MONITORIMI I RRJETIT</h2>
+        <hr>
+        <p>Vodafone_AL Node: <span style="color: green;">STABLE</span></p>
+        <p>Sinkronizimi Global: 100%</p>
+    </div>
+
+    <div id="m4" class="module">
+        <span class="close-btn" onclick="closeMod()">×</span>
+        <h2>PROTOKOLLI I TRASHGIMISË</h2>
+        <hr>
+        <p>Pasuesi i Emëruar: <strong>JERA</strong></p>
+        <p>Koha e kalimit: 30 ditë pa login të Arkitektit.</p>
     </div>
 
     <script>
         const K = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
 
-        function enter() {
-            const input = document.getElementById('p').value;
-            if(input === K) {
-                document.getElementById('gate').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('gate').style.display = 'none';
-                    document.getElementById('dashboard').style.display = 'block';
-                }, 1000);
-            } else {
-                document.getElementById('p').value = "";
+        function check(e) {
+            if(e.key === 'Enter') {
+                if(document.getElementById('p').value === K) {
+                    document.getElementById('gate').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('gate').style.display = 'none';
+                        document.getElementById('dashboard').style.display = 'block';
+                    }, 800);
+                } else { document.getElementById('p').value = ""; }
             }
         }
 
-        // Lejo Enter
-        document.getElementById('p').addEventListener('keypress', (e) => { if(e.key === 'Enter') enter(); });
+        function openMod(id) { document.getElementById(id).style.display = 'block'; }
+        function closeMod() { 
+            const mods = document.getElementsByClassName('module');
+            for(let m of mods) m.style.display = 'none';
+        }
     </script>
 </body>
-</html>
+</html><!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <title>BESA | PORTALI INTEGRUAR</title>
+    <style>
+        :root { --accent: #6c8ea4; --gold: #d4af37; --bg: #f4f7f9; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); overflow: hidden; }
+        
+        /* --- HYRJA --- */
+        #gate { position: fixed; inset: 0; background: #fff; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s; }
+        .auth-input { border: none; border-bottom: 2px solid #eee; padding: 10px; width: 300px; text-align: center; font-size: 1.1rem; outline: none; letter-spacing: 2px; }
+
+        /* --- DASHBOARD --- */
+        #dashboard { display: none; padding: 50px; height: 100vh; box-sizing: border-box; }
+        .welcome { text-align: center; margin-bottom: 50px; animation: fadeIn 1s; }
+        .welcome h1 { font-weight: 200; letter-spacing: 15px; color: var(--gold); }
+
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; max-width: 1200px; margin: 0 auto; }
+        .card { background: #fff; padding: 40px; border-radius: 25px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-decoration: none; color: inherit; }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .card i { font-size: 3rem; display: block; margin-bottom: 15px; }
+
+        /* --- MODULES (HIDDEN INITIALLY) --- */
+        .module { display: none; position: fixed; inset: 50px; background: #fff; border-radius: 30px; padding: 40px; box-shadow: 0 0 100px rgba(0,0,0,0.1); z-index: 50; animation: slideUp 0.5s; }
+        .close-btn { position: absolute; top: 20px; right: 30px; font-size: 2rem; cursor: pointer; color: #ccc; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="gate">
+        <h1 style="font-weight: 200; letter-spacing: 10px; color: var(--gold);">BESA</h1>
+        <input type="password" id="p" class="auth-input" placeholder="KODI I ARKITEKTIT" onkeypress="check(event)">
+    </div>
+
+    <div id="dashboard">
+        <div class="welcome">
+            <h1>BESA</h1>
+            <p style="color: #999; letter-spacing: 3px;">MANDI JATAGANI | PORTALI SUPREM</p>
+        </div>
+
+        <div class="grid">
+            <div class="card" onclick="openMod('m1')"><i>🖥️</i><span>PROJEKTET</span></div>
+            <div class="card" onclick="openMod('m2')"><i>📊</i><span>BLETARIA</span></div>
+            <div class="card" onclick="openMod('m3')"><i>📡</i><span>RRJETI</span></div>
+            <div class="card" onclick="openMod('m4')"><i>⚖️</i><span>VAZHDIMËSIA</span></div>
+        </div>
+    </div>
+
+    <div id="m1" class="module">
+        <span class="close-btn" onclick="closeMod()">×</span>
+        <h2>PROJEKTET ACTIVE</h2>
+        <hr>
+        <p>> JATAGANI PROTOCOL: Sentinel Grid (Në proces)</p>
+        <p>> Protokolli Besa: Aktiv</p>
+    </div>
+
+    <div id="m2" class="module">
+        <span class="close-btn" onclick="closeMod()">×</span>
+        <h2>RAPORTI BLETARISË</h2>
+        <hr>
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 15px;">
+            <p>Gjendja e zgjeve: Optimale</p>
+            <p>Prodhimi i parashikuar: +25%</p>
+        </div>
+    </div>
+
+    <div id="m3" class="module">
+        <span class="close-btn" onclick="closeMod()">×</span>
+        <h2>MONITORIMI I RRJETIT</h2>
+        <hr>
+        <p>Vodafone_AL Node: <span style="color: green;">STABLE</span></p>
+        <p>Sinkronizimi Global: 100%</p>
+    </div>
+
+    <div id="m4" class="module">
+        <span class="close-btn" onclick="closeMod()">×</span>
+        <h2>PROTOKOLLI I TRASHGIMISË</h2>
+        <hr>
+        <p>Pasuesi i Emëruar: <strong>JERA</strong></p>
+        <p>Koha e kalimit: 30 ditë pa login të Arkitektit.</p>
+    </div>
+
+    <script>
+        const K = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
+
+        function check(e) {
+            if(e.key === 'Enter') {
+                if(document.getElementById('p').value === K) {
+                    document.getElementById('gate').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('gate').style.display = 'none';
+                        document.getElementById('dashboard').style.display = 'block';
+                    }, 800);
+                } else { document.getElementById('p').value = ""; }
+            }
+        }
+
+        function openMod(id) { document.getElementById(id).style.display = 'block'; }
+        function closeMod() { 
+            const mods = document.getElementsByClassName('module');
+            for(let m of mods) m.style.display = 'none';
+        }
+    </script>
+</body>
+</html>VV

@@ -2,98 +2,83 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNBESA - UNIFIED SYSTEM v3.1</title>
-    
+    <title>SNBESA v3.1 - AUTORITETI MANDI JATAGANI</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
     <style>
-        :root { --cyan: #00f2ff; --green: #00ff41; --gold: #d4af37; --dark: #050505; --glass: rgba(0, 15, 25, 0.85); }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--dark); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+        :root { --cyan: #00f2ff; --gold: #d4af37; --dark: #050505; }
+        body { background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; margin: 0; }
         #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; }
-        .app-shell { position: relative; z-index: 100; display: grid; grid-template-columns: 80px 1fr 350px; grid-template-rows: 70px 1fr; height: 100vh; }
-        .header { grid-column: 1 / 4; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; border-bottom: 2px solid var(--cyan); background: var(--glass); backdrop-filter: blur(10px); }
-        .sidebar { grid-column: 1; border-right: 1px solid rgba(0, 242, 255, 0.2); background: var(--glass); display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
-        .main-content { grid-column: 2; padding: 30px; }
-        .terminal-panel { grid-column: 3; border-left: 1px solid rgba(0, 242, 255, 0.2); background: rgba(0, 5, 10, 0.9); padding: 20px; font-family: 'monospace'; }
-        .config-card { background: var(--glass); border: 1px solid var(--gold); padding: 20px; border-radius: 5px; margin-top: 20px; }
-        input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--cyan); color: white; padding: 10px; margin: 10px 0; }
-        button { width: 100%; padding: 12px; background: var(--gold); border: none; font-weight: bold; cursor: pointer; }
-        .log-entry { margin-bottom: 10px; font-size: 0.8rem; border-left: 2px solid var(--cyan); padding-left: 10px; }
+        .ui { position: relative; z-index: 10; padding: 30px; display: grid; grid-template-columns: 1fr 380px; height: 100vh; gap: 20px; }
+        .list { background: rgba(0, 10, 20, 0.6); padding: 20px; border: 1px solid rgba(0, 242, 255, 0.2); overflow-y: auto; }
+        .panel { background: rgba(0, 20, 30, 0.9); border-left: 3px solid var(--gold); padding: 25px; backdrop-filter: blur(15px); }
+        .card { border-left: 4px solid var(--cyan); padding: 15px; margin-bottom: 15px; background: rgba(255, 255, 255, 0.05); transition: 0.3s; }
+        .card:hover { background: rgba(0, 242, 255, 0.1); }
+        .btn { background: var(--gold); color: black; border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        input { width: 100%; padding: 12px; margin: 15px 0; background: #000; border: 1px solid var(--cyan); color: white; text-align: center; font-size: 1.2rem; }
+        .status-on { color: #00ff41; font-weight: bold; text-shadow: 0 0 10px #00ff41; }
     </style>
 </head>
 <body>
-
-<canvas id="bg-canvas"></canvas>
-
-<div class="app-shell">
-    <header class="header">
-        <h1 style="color: var(--cyan);">SNBESA v3.1</h1>
-        <div style="color: var(--green);">[ AUTORITETI: MANDI LLAZI JATAGANI ]</div>
-    </header>
-
-    <aside class="sidebar">
-        <div style="color: var(--cyan);"><i class="fas fa-shield-alt fa-2x"></i></div>
-    </aside>
-
-    <main class="main-content">
-        <h2 id="title-status" style="color: var(--cyan);">Sistemi në pritje...</h2>
-        <div id="data-display" style="margin-top: 20px;"></div>
-    </main>
-
-    <section class="terminal-panel">
-        <div id="terminal-logs"><div class="log-entry">Gati për aktivizim...</div></div>
-        <div class="config-card" id="config-box">
-            <input type="text" id="db-url" placeholder="Supabase URL">
-            <input type="password" id="db-key" placeholder="Anon Key">
-            <input type="number" id="security-code" placeholder="Kodi (13)">
-            <button onclick="connectSystem()">AKTIVIZO SUPERNOVËN</button>
+    <canvas id="bg-canvas"></canvas>
+    <div class="ui">
+        <div class="list">
+            <h1 style="color: var(--cyan); border-bottom: 1px solid var(--cyan); padding-bottom: 10px;">PRONAT E NGARKUARA</h1>
+            <div id="property-container">
+                <p>Sistemi në pritje të autorizimit...</p>
+            </div>
         </div>
-    </section>
-</div>
+        <div class="panel">
+            <h2 style="color: var(--gold);">KONTROLLI BESA</h2>
+            <div id="auth-box">
+                <p>Shkruaj kodin e sigurisë për t'u lidhur me Supabase:</p>
+                <input type="number" id="secure-code" placeholder="KODI (13)">
+                <button class="btn" onclick="startBesa()">AKTIVIZO PROTOKOLLIN</button>
+            </div>
+            <div id="status-display" style="margin-top: 20px; font-family: monospace;"></div>
+        </div>
+    </div>
 
-<script>
-    async function connectSystem() {
-        const url = document.getElementById('db-url').value.trim();
-        const key = document.getElementById('db-key').value.trim();
-        const code = document.getElementById('security-code').value;
+    <script>
+        const SB_URL = "https://rpuqfakiocdqwkxyerrz.supabase.co";
+        const SB_KEY = "sb_publishable_7NuvtUzj7G61Q6nETWFQTg_Nolyf1";
 
-        if (code !== "13") { alert("Kodi i gabuar!"); return; }
+        async function startBesa() {
+            const code = document.getElementById('secure-code').value;
+            if(code !== "13") { alert("KOD I GABUAR!"); return; }
 
-        try {
-            const client = supabase.createClient(url, key);
-            const { data, error } = await client.from('properties').select('*');
-            
-            if (error) throw error;
+            try {
+                const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+                const { data, error } = await supabaseClient.from('properties').select('*');
+                if (error) throw error;
 
-            document.getElementById('terminal-logs').innerHTML = '<div style="color: #00ff41;">[ONLINE] BESA SUPERNOVA U AKTIVIZUA!</div>';
-            document.getElementById('config-box').style.display = 'none';
-            document.getElementById('title-status').innerText = "SISTEMI LIVE - PRONAT U NGARKUAN";
-            
-            document.getElementById('data-display').innerHTML = data.map(p => `
-                <div style="padding:10px; border:1px solid var(--gold); margin-bottom:10px;">
-                    ${p.title} - <span style="color:var(--green)">${p.price} €</span>
-                </div>
-            `).join('');
+                document.getElementById('auth-box').style.display = 'none';
+                document.getElementById('status-display').innerHTML = "<p class='status-on'>[ONLINE] MIRËSEVJEN MANDI JATAGANI</p>";
 
-        } catch (err) {
-            alert("Gabim lidhjeje: " + err.message);
+                document.getElementById('property-container').innerHTML = data.map(p => `
+                    <div class="card">
+                        <h2 style="margin:0; color:var(--gold);">${p.title}</h2>
+                        <p style="font-size:1.6rem; margin:5px 0 0 0; color:white;">${p.price.toLocaleString()} €</p>
+                    </div>
+                `).join('');
+            } catch (e) { 
+                alert("Lidhja dështoi! Kontrollo internetin ose çelësat."); 
+            }
         }
-    }
 
-    // BG Effect
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    const sphere = new THREE.Mesh(new THREE.IcosahedronGeometry(20, 1), new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, opacity: 0.1, transparent: true }));
-    scene.add(sphere);
-    camera.position.z = 50;
-    function animate() { requestAnimationFrame(animate); sphere.rotation.y += 0.002; renderer.render(scene, camera); }
-    animate();
-</script>
+        // Globi 3D
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        const sphere = new THREE.Mesh(
+            new THREE.IcosahedronGeometry(22, 1), 
+            new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.15 })
+        );
+        scene.add(sphere);
+        camera.position.z = 55;
+        function animate() { requestAnimationFrame(animate); sphere.rotation.y += 0.002; sphere.rotation.x += 0.001; renderer.render(scene, camera); }
+        animate();
+    </script>
 </body>
 </html>

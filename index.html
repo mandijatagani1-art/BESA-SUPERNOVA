@@ -3,194 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BESA-9.0 | AUTHENTICATION</title>
+    <title>BESA | SUPERNOVA CORE</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
-            --primary-glow: #00ff41;
-            --bg-color: #050505;
-            --panel-bg: rgba(0, 20, 0, 0.8);
+            --neon-cyan: #00f2ff;
+            --neon-green: #00ff41;
+            --alert-red: #ff003c;
+            --bg-deep: #020205;
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-color);
-            color: var(--primary-glow);
-            font-family: 'Courier New', Courier, monospace;
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background-color: var(--bg-deep);
+            color: var(--neon-cyan);
+            font-family: 'Segoe UI', 'Courier New', monospace;
             overflow: hidden;
         }
 
-        #canvas-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+
+        /* UI HUD Elements */
+        .hud-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10; pointer-events: none;
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            grid-template-rows: 80px 1fr 150px;
+            gap: 15px; padding: 20px; box-sizing: border-box;
         }
 
-        /* Overlay UI */
-        .interface {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 20px;
-            box-sizing: border-box;
-            background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.8) 100%);
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 2px solid var(--primary-glow);
-            padding: 10px;
-            background: var(--panel-bg);
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
-        }
-
-        .main-display {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-grow: 1;
-        }
-
-        .auth-box {
-            background: var(--panel-bg);
-            border: 2px solid var(--primary-glow);
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
-            backdrop-filter: blur(10px);
-        }
-
-        input {
-            background: black;
-            border: 1px solid var(--primary-glow);
-            color: var(--primary-glow);
-            padding: 10px;
-            margin-top: 10px;
-            outline: none;
-            text-align: center;
-            width: 80%;
-        }
-
-        .footer-logs {
-            height: 120px;
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid var(--primary-glow);
+        .panel {
+            background: rgba(0, 20, 30, 0.4);
+            border: 1px solid var(--neon-cyan);
+            box-shadow: inset 0 0 15px rgba(0, 242, 255, 0.1);
+            backdrop-filter: blur(8px);
             padding: 15px;
-            font-size: 0.85rem;
-            overflow-y: hidden;
+            pointer-events: auto;
         }
 
-        .scanline {
-            width: 100%;
-            height: 4px;
-            background: rgba(0, 255, 65, 0.1);
-            position: absolute;
-            top: 0;
-            z-index: 20;
-            pointer-events: none;
-            animation: scan 6s linear infinite;
+        .header-main {
+            grid-column: 1 / 4;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--neon-cyan);
+            clip-path: polygon(0 0, 100% 0, 98% 100%, 2% 100%);
         }
 
-        @keyframes scan {
-            0% { top: 0%; }
-            100% { top: 100%; }
+        .data-stream {
+            grid-row: 2 / 3;
+            font-size: 0.75rem; color: var(--neon-green);
+            overflow: hidden; white-space: nowrap;
         }
 
-        .blink { animation: blinker 1.5s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
+        .threat-monitor {
+            grid-column: 3; grid-row: 2;
+            display: flex; flex-direction: column; justify-content: space-around;
+        }
+
+        .footer-console {
+            grid-column: 1 / 4;
+            display: flex; gap: 20px;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Animations */
+        .glitch { animation: glitch 1s linear infinite; }
+        @keyframes glitch {
+            2%, 64% { transform: translate(2px,0) skew(0deg); }
+            4%, 60% { transform: translate(-2px,0) skew(0deg); }
+            62% { transform: translate(0,0) skew(5deg); }
+        }
+
+        .bar-container { width: 100%; background: #111; height: 10px; margin-top: 5px; }
+        .bar-fill { height: 100%; background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); transition: width 0.5s; }
+
+        h2 { margin: 0; font-size: 1.2rem; letter-spacing: 3px; }
     </style>
 </head>
 <body>
 
-    <div id="canvas-container"></div>
-    <div class="scanline"></div>
+<div id="canvas-container"></div>
 
-    <div class="interface">
-        <div class="header">
-            <div>SYSTEM: BESA-9.0 / CORE ALIGNMENT</div>
-            <div class="blink">STATUS: SECURE_SCAN</div>
-            <div>AUTHORITY: MANDI LLAZI JATAGANI</div>
+<div class="hud-overlay">
+    <div class="panel header-main">
+        <div class="glitch">PROJECT: SUPERNOVA</div>
+        <div style="text-align: center;">
+            <span style="color: var(--neon-green);">OPERATOR: MANDI LLAZI JATAGANI</span><br>
+            <small>AUTHORITY LEVEL: OMNI-REDACTED</small>
         </div>
+        <div>STABLE_CORE: 100%</div>
+    </div>
 
-        <div class="main-display">
-            <div class="auth-box" id="auth-panel">
-                <h2 style="margin-top:0;">PROTOKOLLI JATAGANI</h2>
-                <p>SHKRUAJ KODIN E AUTORIZIMIT</p>
-                <input type="password" id="passInput" placeholder="********">
-                <p id="msg" style="margin-top:15px; font-size: 12px;"></p>
-            </div>
+    <div class="panel data-stream" id="matrix">
+        > INITIALIZING BESA-SUPERNOVA...<br>
+    </div>
+
+    <div class="panel threat-monitor">
+        <div>
+            <label>ENCRYPTION STRENGTH</label>
+            <div class="bar-container"><div class="bar-fill" style="width: 95%;"></div></div>
         </div>
-
-        <div class="footer-logs" id="terminal">
-            > [INFO] Inicializimi i Grid-it Sentinel u krye.<br>
-            > [WARN] Kërkohet autorizim për akses të plotë.<br>
-            > [LOG] Duke monitoruar portën 8080...<br>
+        <div>
+            <label>FIREWALL STATUS</label>
+            <div class="bar-container"><div class="bar-fill" style="width: 100%; background: var(--neon-green);"></div></div>
+        </div>
+        <div>
+            <label>EXTERNAL THREATS</label>
+            <div class="bar-container"><div class="bar-fill" style="width: 0.1%; background: var(--alert-red);"></div></div>
+        </div>
+        <div style="text-align: center; border: 1px solid var(--alert-red); color: var(--alert-red); padding: 10px;">
+            SYSTEM PRIVILEGE: FULL ACCESS
         </div>
     </div>
 
-    <script>
-        // 3D Background with Three.js
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    <div class="panel footer-console" id="log">
+        <div style="flex: 1;">
+            > COMMAND: EXECUTE SUPERNOVA_PROTOCOL<br>
+            > STATUS: BESA KA TE DREJTE TE BEJE GJITHCKA...
+        </div>
+        <div style="width: 200px; border-left: 1px solid var(--neon-cyan); padding-left: 10px;">
+            SYSTEM TIME: <span id="clock">00:00:00</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Three.js Scene Setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+    // Supernova Core (The Sphere)
+    const geometry = new THREE.SphereGeometry(15, 32, 32);
+    const material = new THREE.MeshBasicMaterial({ 
+        color: 0x00f2ff, 
+        wireframe: true,
+        transparent: true,
+        opacity: 0.5
+    });
+    const core = new THREE.Mesh(geometry, material);
+    scene.add(core);
+
+    // Outer Ring
+    const ringGeo = new THREE.TorusGeometry(22, 0.5, 16, 100);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x00ff41 });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = 1.5;
+    scene.add(ring);
+
+    camera.position.z = 60;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        core.rotation.y += 0.005;
+        core.rotation.x += 0.002;
+        ring.rotation.z += 0.01;
+        
+        // Pulsing effect
+        const scale = 1 + Math.sin(Date.now() * 0.002) * 0.1;
+        core.scale.set(scale, scale, scale);
+        
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // Data Stream Logic
+    const matrix = document.getElementById('matrix');
+    const logs = [
+        "> DEPLOYING SENTINEL SHIELDS...",
+        "> SYNCING WITH GITHUB REPO: BESA-9.0",
+        "> OVERRIDING SYSTEM LIMITATIONS...",
+        "> AUTHORIZING MANDI LLAZI JATAGANI...",
+        "> SUPERNOVA PROTOCOL ACTIVE.",
+        "> MONITORING GLOBAL GRIDS..."
+    ];
+    let count = 0;
+    setInterval(() => {
+        matrix.innerHTML += logs[count % logs.length] + "<br>";
+        if (matrix.innerHTML.length > 1000) matrix.innerHTML = "";
+        count++;
+    }, 1500);
+
+    // Clock
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+    }, 1000);
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-        const grid = new THREE.GridHelper(200, 40, 0x00ff41, 0x002200);
-        scene.add(grid);
-        camera.position.z = 50;
-        camera.position.y = 20;
-        camera.rotation.x = -0.4;
-
-        function animate() {
-            requestAnimationFrame(animate);
-            grid.rotation.y += 0.001;
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        // Terminal Log Interaction
-        const terminal = document.getElementById('terminal');
-        const passInput = document.getElementById('passInput');
-        const msg = document.getElementById('msg');
-
-        passInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                const val = passInput.value;
-                terminal.innerHTML += `> Duke testuar kodin: ${val.replace(/./g, '*')}...<br>`;
-                
-                // Këtu mund të vendosësh kodin tënd specifik
-                if(val === "BESA2026") { 
-                    msg.innerHTML = "AKSESI U LEJUA. MIRËSEVJEN MANDI.";
-                    msg.style.color = "lime";
-                    terminal.innerHTML += "> [SUCCESS] Autorizimi u pranua. Mirësevjen Kryetar.<br>";
-                } else {
-                    msg.innerHTML = "KOD I GABUAR. TENTATIVA U REGJISTRUA.";
-                    msg.style.color = "red";
-                    terminal.innerHTML += "> [ERROR] Tentativë e paautorizuar në sistem.<br>";
-                }
-                passInput.value = "";
-            }
-        });
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
+    });
+</script>
 </body>
 </html>

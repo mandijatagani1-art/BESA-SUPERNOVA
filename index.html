@@ -2,216 +2,175 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <title>BESA | PORTALI INTEGRUAR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BESA-SUPERNOVA | Unified System</title>
     <style>
-        :root { --accent: #6c8ea4; --gold: #d4af37; --bg: #f4f7f9; }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); overflow: hidden; }
+        :root {
+            --gold: #d4af37;
+            --pagan-green: #1b4d1b;
+            --aspirin-red: #8b0000;
+            --bg-black: #080808;
+            --card-bg: #121212;
+            --text-gray: #a0a0a0;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* DASHBOARD GRID (12 FAQET) */
+        #dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 20px;
+            height: 90vh;
+            align-content: center;
+        }
+
+        .grid-item {
+            background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+            border: 1px solid #222;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .grid-item:active { transform: scale(0.92); border-color: var(--gold); }
+        .grid-item span { font-size: 1.8rem; margin-bottom: 8px; }
+        .grid-item label { font-size: 0.55rem; color: var(--text-gray); text-transform: uppercase; font-weight: bold; }
+
+        /* FAQET E DEDIKUARA */
+        .page-container {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-black);
+            z-index: 100;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .active-page { display: block; animation: slideIn 0.3s forwards; }
+
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .back-btn {
+            background: none; border: 1px solid #444; color: white;
+            padding: 8px 15px; border-radius: 10px; margin-bottom: 20px;
+        }
+
+        /* SEKSIONI I SHENDETIT (ARKITEKTURA 12) */
+        .health-header { text-align: center; border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; }
         
-        /* --- HYRJA --- */
-        #gate { position: fixed; inset: 0; background: #fff; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s; }
-        .auth-input { border: none; border-bottom: 2px solid #eee; padding: 10px; width: 300px; text-align: center; font-size: 1.1rem; outline: none; letter-spacing: 2px; }
+        .health-section {
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            border: 1px solid #333; position: relative;
+        }
 
-        /* --- DASHBOARD --- */
-        #dashboard { display: none; padding: 50px; height: 100vh; box-sizing: border-box; }
-        .welcome { text-align: center; margin-bottom: 50px; animation: fadeIn 1s; }
-        .welcome h1 { font-weight: 200; letter-spacing: 15px; color: var(--gold); }
+        .pagan-box { border-left: 5px solid var(--pagan-green); background: rgba(27, 77, 27, 0.1); }
+        .aspirin-box { border-left: 5px solid var(--aspirin-red); background: rgba(139, 0, 0, 0.1); }
 
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; max-width: 1200px; margin: 0 auto; }
-        .card { background: #fff; padding: 40px; border-radius: 25px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-decoration: none; color: inherit; }
-        .card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
-        .card i { font-size: 3rem; display: block; margin-bottom: 15px; }
+        .status-dot { height: 8px; width: 8px; background: #0f0; border-radius: 50%; display: inline-block; margin-right: 10px; box-shadow: 0 0 8px #0f0; }
 
-        /* --- MODULES (HIDDEN INITIALLY) --- */
-        .module { display: none; position: fixed; inset: 50px; background: #fff; border-radius: 30px; padding: 40px; box-shadow: 0 0 100px rgba(0,0,0,0.1); z-index: 50; animation: slideUp 0.5s; }
-        .close-btn { position: absolute; top: 20px; right: 30px; font-size: 2rem; cursor: pointer; color: #ccc; }
+        /* FOOTER */
+        .footer-logo { text-align: center; color: var(--gold); font-size: 0.7rem; letter-spacing: 5px; margin-top: 30px; opacity: 0.5; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div id="gate">
-        <h1 style="font-weight: 200; letter-spacing: 10px; color: var(--gold);">BESA</h1>
-        <input type="password" id="p" class="auth-input" placeholder="KODI I ARKITEKTIT" onkeypress="check(event)">
-    </div>
-
     <div id="dashboard">
-        <div class="welcome">
-            <h1>BESA</h1>
-            <p style="color: #999; letter-spacing: 3px;">MANDI JATAGANI | PORTALI SUPREM</p>
+        <div class="grid-item" onclick="openPage('health')"><span>🏥</span><label>Shëndeti</label></div>
+        <div class="grid-item" onclick="openPage('pandemic')"><span>🧬</span><label>Pandemia</label></div>
+        <div class="grid-item" onclick="openPage('junior')"><span>🔥</span><label>Junior</label></div>
+        <div class="grid-item"><span>🛡️</span><label>Legal Shield</label></div>
+        <div class="grid-item"><span>🔒</span><label>Vault 525</label></div>
+        <div class="grid-item"><span>🛰️</span><label>Sentinel</label></div>
+        <div class="grid-item"><span>📡</span><label>B-Net</label></div>
+        <div class="grid-item"><span>💰</span><label>Gold Matrix</label></div>
+        <div class="grid-item"><span>📜</span><label>History</label></div>
+        <div class="grid-item"><span>🗺️</span><label>Map</label></div>
+        <div class="grid-item"><span>🩺</span><label>Biometrics</label></div>
+        <div class="grid-item"><span>✨</span><label>Setup Core</label></div>
+    </div>
+
+    <div id="page-health" class="page-container">
+        <button class="back-btn" onclick="closePage()">← Mbyll</button>
+        <div class="health-header">
+            <h1 style="color: var(--gold); margin: 0;">BESA HEALTH</h1>
+            <small>Garantimi i jetës pa pagesë</small>
         </div>
 
-        <div class="grid">
-            <div class="card" onclick="openMod('m1')"><i>🖥️</i><span>PROJEKTET</span></div>
-            <div class="card" onclick="openMod('m2')"><i>📊</i><span>BLETARIA</span></div>
-            <div class="card" onclick="openMod('m3')"><i>📡</i><span>RRJETI</span></div>
-            <div class="card" onclick="openMod('m4')"><i>⚖️</i><span>VAZHDIMËSIA</span></div>
+        <div class="health-section pagan-box">
+            <h3 style="color: #2ecc71;">⚕️ ESKULAPI (PAGAN)</h3>
+            <p style="font-size: 0.8rem;">Diagnostikim ballkanik nga rrënjët e tokës dhe natyra.</p>
+            <button style="background: #1b4d1b; color: white; border: none; padding: 10px; border-radius: 5px; width: 100%;">AKTIVIZO SKANIMIN</button>
+        </div>
+
+        <div class="health-section aspirin-box">
+            <h3 style="color: #e74c3c;">🏟️ ASPIRINA (PASIONI)</h3>
+            <p style="font-size: 0.8rem;">Disiplina e Leverkusenit. Rezistencë dhe performancë kampionësh.</p>
+            <button style="background: #8b0000; color: white; border: none; padding: 10px; border-radius: 5px; width: 100%;">STUDIMI I FUQISË</button>
         </div>
     </div>
 
-    <div id="m1" class="module">
-        <span class="close-btn" onclick="closeMod()">×</span>
-        <h2>PROJEKTET ACTIVE</h2>
-        <hr>
-        <p>> JATAGANI PROTOCOL: Sentinel Grid (Në proces)</p>
-        <p>> Protokolli Besa: Aktiv</p>
-    </div>
-
-    <div id="m2" class="module">
-        <span class="close-btn" onclick="closeMod()">×</span>
-        <h2>RAPORTI BLETARISË</h2>
-        <hr>
-        <div style="background: #f9f9f9; padding: 20px; border-radius: 15px;">
-            <p>Gjendja e zgjeve: Optimale</p>
-            <p>Prodhimi i parashikuar: +25%</p>
+    <div id="page-pandemic" class="page-container">
+        <button class="back-btn" onclick="closePage()">← Mbyll</button>
+        <h1>STUDIMI ALGORITMIK</h1>
+        <div style="background: #151515; padding: 20px; border-radius: 15px;">
+            <p><span class="status-dot"></span> GRIPRI SEZONAL: MONITORIM LOKAL</p>
+            <p><span class="status-dot"></span> EPIDEMI/PANDEMI: SCANNING GRID</p>
+            <p style="color: #666; font-size: 0.7rem; border-top: 1px solid #333; padding-top: 10px;">
+                Algoritmi punon në kohë reale brenda Xiaomi-t tënd. Asnjë e dhënë nuk del jashtë Besës.
+            </p>
         </div>
     </div>
 
-    <div id="m3" class="module">
-        <span class="close-btn" onclick="closeMod()">×</span>
-        <h2>MONITORIMI I RRJETIT</h2>
-        <hr>
-        <p>Vodafone_AL Node: <span style="color: green;">STABLE</span></p>
-        <p>Sinkronizimi Global: 100%</p>
+    <div id="page-junior" class="page-container">
+        <button class="back-btn" onclick="closePage()">← Mbyll</button>
+        <h1 style="color: #ff6600; text-align: center;">BESA JUNIOR 🔥</h1>
+        <div style="padding: 20px; border: 2px dashed #ff6600; border-radius: 20px; text-align: center;">
+            <h2>MISIONI I SOTËM</h2>
+            <p>Mëso si të mbrosh veten nga viruset përmes inteligjencës!</p>
+            <button style="background: #ff6600; color: white; border: none; padding: 15px; border-radius: 10px;">NIS LOJËN</button>
+        </div>
     </div>
 
-    <div id="m4" class="module">
-        <span class="close-btn" onclick="closeMod()">×</span>
-        <h2>PROTOKOLLI I TRASHGIMISË</h2>
-        <hr>
-        <p>Pasuesi i Emëruar: <strong>JERA</strong></p>
-        <p>Koha e kalimit: 30 ditë pa login të Arkitektit.</p>
-    </div>
+    <div class="footer-logo">BESA-SUPERNOVA</div>
 
     <script>
-        const K = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
-
-        function check(e) {
-            if(e.key === 'Enter') {
-                if(document.getElementById('p').value === K) {
-                    document.getElementById('gate').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('gate').style.display = 'none';
-                        document.getElementById('dashboard').style.display = 'block';
-                    }, 800);
-                } else { document.getElementById('p').value = ""; }
-            }
+        function openPage(pageId) {
+            // Fsheh dashboard-in
+            document.getElementById('dashboard').style.display = 'none';
+            // Shfaq faqen e kërkuar
+            document.getElementById('page-' + pageId).classList.add('active-page');
         }
 
-        function openMod(id) { document.getElementById(id).style.display = 'block'; }
-        function closeMod() { 
-            const mods = document.getElementsByClassName('module');
-            for(let m of mods) m.style.display = 'none';
+        function closePage() {
+            // Fsheh të gjitha faqet
+            const pages = document.querySelectorAll('.page-container');
+            pages.forEach(p => p.classList.remove('active-page'));
+            // Shfaq dashboard-in
+            document.getElementById('dashboard').style.display = 'grid';
         }
+
+        // BESA STARTUP LOGIC
+        window.onload = () => {
+            console.log("BESA-SUPERNOVA: Sistemi Operativ i Pavarësisë u ndez.");
+            console.log("Shteti: Global | Statusi: Paqësor | Qëllimi: 7 Miliardë.");
+        };
     </script>
 </body>
-</html><!DOCTYPE html>
-<html lang="sq">
-<head>
-    <meta charset="UTF-8">
-    <title>BESA | PORTALI INTEGRUAR</title>
-    <style>
-        :root { --accent: #6c8ea4; --gold: #d4af37; --bg: #f4f7f9; }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); overflow: hidden; }
-        
-        /* --- HYRJA --- */
-        #gate { position: fixed; inset: 0; background: #fff; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s; }
-        .auth-input { border: none; border-bottom: 2px solid #eee; padding: 10px; width: 300px; text-align: center; font-size: 1.1rem; outline: none; letter-spacing: 2px; }
-
-        /* --- DASHBOARD --- */
-        #dashboard { display: none; padding: 50px; height: 100vh; box-sizing: border-box; }
-        .welcome { text-align: center; margin-bottom: 50px; animation: fadeIn 1s; }
-        .welcome h1 { font-weight: 200; letter-spacing: 15px; color: var(--gold); }
-
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; max-width: 1200px; margin: 0 auto; }
-        .card { background: #fff; padding: 40px; border-radius: 25px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-decoration: none; color: inherit; }
-        .card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
-        .card i { font-size: 3rem; display: block; margin-bottom: 15px; }
-
-        /* --- MODULES (HIDDEN INITIALLY) --- */
-        .module { display: none; position: fixed; inset: 50px; background: #fff; border-radius: 30px; padding: 40px; box-shadow: 0 0 100px rgba(0,0,0,0.1); z-index: 50; animation: slideUp 0.5s; }
-        .close-btn { position: absolute; top: 20px; right: 30px; font-size: 2rem; cursor: pointer; color: #ccc; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    </style>
-</head>
-<body>
-
-    <div id="gate">
-        <h1 style="font-weight: 200; letter-spacing: 10px; color: var(--gold);">BESA</h1>
-        <input type="password" id="p" class="auth-input" placeholder="KODI I ARKITEKTIT" onkeypress="check(event)">
-    </div>
-
-    <div id="dashboard">
-        <div class="welcome">
-            <h1>BESA</h1>
-            <p style="color: #999; letter-spacing: 3px;">MANDI JATAGANI | PORTALI SUPREM</p>
-        </div>
-
-        <div class="grid">
-            <div class="card" onclick="openMod('m1')"><i>🖥️</i><span>PROJEKTET</span></div>
-            <div class="card" onclick="openMod('m2')"><i>📊</i><span>BLETARIA</span></div>
-            <div class="card" onclick="openMod('m3')"><i>📡</i><span>RRJETI</span></div>
-            <div class="card" onclick="openMod('m4')"><i>⚖️</i><span>VAZHDIMËSIA</span></div>
-        </div>
-    </div>
-
-    <div id="m1" class="module">
-        <span class="close-btn" onclick="closeMod()">×</span>
-        <h2>PROJEKTET ACTIVE</h2>
-        <hr>
-        <p>> JATAGANI PROTOCOL: Sentinel Grid (Në proces)</p>
-        <p>> Protokolli Besa: Aktiv</p>
-    </div>
-
-    <div id="m2" class="module">
-        <span class="close-btn" onclick="closeMod()">×</span>
-        <h2>RAPORTI BLETARISË</h2>
-        <hr>
-        <div style="background: #f9f9f9; padding: 20px; border-radius: 15px;">
-            <p>Gjendja e zgjeve: Optimale</p>
-            <p>Prodhimi i parashikuar: +25%</p>
-        </div>
-    </div>
-
-    <div id="m3" class="module">
-        <span class="close-btn" onclick="closeMod()">×</span>
-        <h2>MONITORIMI I RRJETIT</h2>
-        <hr>
-        <p>Vodafone_AL Node: <span style="color: green;">STABLE</span></p>
-        <p>Sinkronizimi Global: 100%</p>
-    </div>
-
-    <div id="m4" class="module">
-        <span class="close-btn" onclick="closeMod()">×</span>
-        <h2>PROTOKOLLI I TRASHGIMISË</h2>
-        <hr>
-        <p>Pasuesi i Emëruar: <strong>JERA</strong></p>
-        <p>Koha e kalimit: 30 ditë pa login të Arkitektit.</p>
-    </div>
-
-    <script>
-        const K = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
-
-        function check(e) {
-            if(e.key === 'Enter') {
-                if(document.getElementById('p').value === K) {
-                    document.getElementById('gate').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('gate').style.display = 'none';
-                        document.getElementById('dashboard').style.display = 'block';
-                    }, 800);
-                } else { document.getElementById('p').value = ""; }
-            }
-        }
-
-        function openMod(id) { document.getElementById(id).style.display = 'block'; }
-        function closeMod() { 
-            const mods = document.getElementsByClassName('module');
-            for(let m of mods) m.style.display = 'none';
-        }
-    </script>
-</body>
-</html>VV
+</html>

@@ -2,435 +2,201 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>SNBESA · UNIFIED SYSTEM v3.1</title>
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Three.js -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNBESA - UNIFIED SYSTEM v3.1</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Supabase SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <style>
         :root {
             --cyan: #00f2ff;
             --green: #00ff41;
-            --gold: #D4AF37;
-            --red: #8B0000;
-            --dark: #02050a;
+            --gold: #d4af37;
+            --red: #ff3b30;
+            --dark: #050505;
             --glass: rgba(0, 15, 25, 0.85);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { width: 100%; height: 100%; background: var(--dark); overflow: hidden; color: white; font-family: 'Inter', sans-serif; }
-
+        body { background: var(--dark); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+        
         #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; }
 
         .app-shell {
             position: relative; z-index: 100;
             display: grid;
-            grid-template-columns: 90px 1fr 380px;
+            grid-template-columns: 80px 1fr 350px;
             grid-template-rows: 70px 1fr;
             height: 100vh; width: 100vw;
-            pointer-events: none;
         }
-
-        .panel { background: var(--glass); border: 1px solid rgba(0, 242, 255, 0.15); backdrop-filter: blur(15px); pointer-events: auto; }
 
         .header {
-            grid-column: 1 / 4; display: flex; justify-content: space-between;
-            align-items: center; padding: 0 30px; border-bottom: 2px solid var(--cyan);
+            grid-column: 1 / 4;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; border-bottom: 2px solid var(--cyan);
+            background: var(--glass); backdrop-filter: blur(10px);
         }
-        .header h1 { font-weight: 900; letter-spacing: 6px; color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
-        .status-tag { color: var(--green); font-size: 12px; letter-spacing: 2px; }
 
         .sidebar {
-            grid-row: 2; display: flex; flex-direction: column; 
-            align-items: center; padding-top: 30px; gap: 10px; overflow-y: auto;
-        }
-        .nav-node {
-            width: 50px; height: 50px; border: 1px solid var(--cyan);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.3s; 
-            color: var(--cyan); background: rgba(0,0,0,0.3); border-radius: 8px;
-        }
-        .nav-node:hover, .nav-node.active { background: var(--cyan); color: black; box-shadow: 0 0 20px var(--cyan); }
-
-        .workspace { 
-            grid-row: 2; padding: 25px; overflow-y: auto; 
-            scrollbar-width: thin; scrollbar-color: var(--cyan) #001020;
-        }
-        .page-content { display: none; animation: fadeIn 0.3s ease; }
-        .page-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        .ai-terminal { 
-            grid-row: 2; display: flex; flex-direction: column; 
-            border-left: 1px solid var(--cyan); 
-        }
-        .chat-history { flex-grow: 1; padding: 20px; overflow-y: auto; font-size: 13px; line-height: 1.6; }
-        .input-box { padding: 20px; border-top: 1px solid rgba(0, 242, 255, 0.2); }
-        #cmd-in {
-            width: 100%; background: transparent; border: 1px solid var(--green);
-            color: var(--green); padding: 14px; outline: none; font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
+            grid-column: 1; border-right: 1px solid rgba(0, 242, 255, 0.2);
+            background: var(--glass); display: flex; flex-direction: column; align-items: center; padding-top: 20px;
         }
 
-        .card { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border-left: 3px solid var(--cyan); margin-bottom: 20px; }
-        .metric-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 15px; }
-        .metric { background: #0a1a2a; padding: 15px; border-radius: 8px; }
-        .property-item, .agent-item { padding: 12px; border-bottom: 1px solid #1a3a4a; display: flex; justify-content: space-between; }
-        button { background: transparent; border: 1px solid var(--cyan); color: var(--cyan); padding: 8px 16px; cursor: pointer; transition: 0.2s; border-radius: 4px; }
-        button:hover { background: var(--cyan); color: black; }
-        input, select { background: #0a1a2a; border: 1px solid var(--cyan); color: white; padding: 10px; width: 100%; margin-bottom: 10px; }
-        h2, h3 { color: var(--cyan); margin-bottom: 15px; }
-        .config-panel { position: fixed; bottom: 20px; right: 20px; z-index: 200; background: var(--glass); padding: 15px; border-radius: 12px; border: 1px solid var(--gold); backdrop-filter: blur(20px); width: 260px; }
-        .config-panel input { margin-bottom: 8px; }
+        .main-content {
+            grid-column: 2; padding: 30px; overflow-y: auto;
+        }
+
+        .terminal-panel {
+            grid-column: 3; border-left: 1px solid rgba(0, 242, 255, 0.2);
+            background: rgba(0, 5, 10, 0.9); padding: 20px; font-family: 'JetBrains Mono', monospace;
+        }
+
+        .config-card {
+            background: var(--glass); border: 1px solid var(--gold);
+            padding: 20px; border-radius: 5px; margin-top: 20px;
+        }
+
+        input {
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--cyan);
+            color: white; padding: 10px; margin: 10px 0; border-radius: 3px;
+        }
+
+        button {
+            width: 100%; padding: 12px; background: var(--gold); border: none;
+            color: black; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+
+        button:hover { background: var(--cyan); box-shadow: 0 0 15px var(--cyan); }
+
+        .status-online { color: var(--green); text-shadow: 0 0 10px var(--green); }
+        .log-entry { margin-bottom: 10px; font-size: 0.85rem; border-left: 2px solid var(--cyan); padding-left: 10px; }
     </style>
 </head>
 <body>
 
 <canvas id="bg-canvas"></canvas>
 
-<!-- Paneli i Konfigurimit Supabase (shfaqet fillimisht) -->
-<div id="configPanel" class="config-panel">
-    <h4 style="color:var(--gold); margin-bottom:10px;">⚙️ Konfiguro Supabase</h4>
-    <input type="text" id="supabaseUrl" placeholder="Supabase URL" value="">
-    <input type="text" id="supabaseKey" placeholder="Anon Key" value="">
-    <button onclick="saveConfig()" style="width:100%; background:var(--gold); color:black;">Lidhu</button>
-    <p id="configStatus" style="font-size:12px; margin-top:8px;"></p>
-</div>
-
 <div class="app-shell">
-    <!-- HEADER -->
-    <header class="panel header">
-        <h1>SNBESA v3.1</h1>
-        <div class="status-tag"><i class="fas fa-satellite"></i> [ AUTORITETI: MANDI LLAZI JATAGANI ]</div>
-        <div id="clock">00:00:00</div>
+    <header class="header">
+        <h1 style="color: var(--cyan); letter-spacing: 5px;">SNBESA v3.1</h1>
+        <div style="font-size: 0.8rem; color: var(--green);">[ AUTORITETI: MANDI LLAZI JATAGANI ]</div>
     </header>
 
-    <!-- SIDEBAR (12 Modulet) -->
-    <aside class="panel sidebar">
-        <div class="nav-node active" onclick="showPage('dash', this)">🏠</div>
-        <div class="nav-node" onclick="showPage('properties', this)">🏡</div>
-        <div class="nav-node" onclick="showPage('agents', this)">👥</div>
-        <div class="nav-node" onclick="showPage('deals', this)">💰</div>
-        <div class="nav-node" onclick="showPage('map', this)">🗺️</div>
-        <div class="nav-node" onclick="showPage('calculator', this)">🧮</div>
-        <div class="nav-node" onclick="showPage('contact', this)">📞</div>
-        <div class="nav-node" onclick="showPage('about', this)">ℹ️</div>
-        <div class="nav-node" onclick="showPage('payments', this)">💳</div>
-        <div class="nav-node" onclick="showPage('admin', this)">⚙️</div>
-        <div class="nav-node" onclick="showPage('trending', this)">📊</div>
-        <div class="nav-node" onclick="showPage('login', this)">🔐</div>
+    <aside class="sidebar">
+        <div style="margin-bottom: 30px; color: var(--cyan);"><i class="fas fa-home fa-2x"></i></div>
+        <div style="margin-bottom: 30px; color: rgba(255,255,255,0.3);"><i class="fas fa-database fa-2x"></i></div>
+        <div style="margin-bottom: 30px; color: rgba(255,255,255,0.3);"><i class="fas fa-shield-alt fa-2x"></i></div>
     </aside>
 
-    <!-- WORKSPACE (12 Faqet) -->
-    <main class="workspace">
-        <!-- DASHBOARD -->
-        <div id="dash" class="page-content active">
-            <h2>🏛️ PANELI KRYESOR</h2>
-            <div class="card">
-                <h3>Sistemi Operacional SNBESA</h3>
-                <p>Mirësevjen, Mandi. Të 12 modulet janë aktive. Sinteza me Supabase është online.</p>
-            </div>
-            <div class="metric-grid">
-                <div class="metric"><span>🌍 Gjuhë</span><h3>100+</h3></div>
-                <div class="metric"><span>🛰️ Satelitë</span><h3>3</h3></div>
-                <div class="metric"><span>📡 Realtime</span><h3 style="color:var(--green);">● AKTIV</h3></div>
-                <div class="metric"><span>🧠 AI BESA</span><h3>v2.4.1</h3></div>
-            </div>
-            <div id="live-stats" class="card">Duke u lidhur me Supabase...</div>
+    <main class="main-content">
+        <div id="welcome-msg">
+            <h2 style="color: var(--cyan);">Sistemi Operacional SNBESA</h2>
+            <p style="margin-top: 10px; color: #aaa;">Mirësevjen, Mandi. Sinteza me Supabase është gati për aktivizim.</p>
         </div>
 
-        <!-- PROPERTIES -->
-        <div id="properties" class="page-content">
-            <h2>🏡 PRONAT</h2>
-            <div id="property-list">Duke ngarkuar...</div>
-        </div>
-
-        <!-- AGENTS -->
-        <div id="agents" class="page-content">
-            <h2>👥 AGJENTËT</h2>
-            <div id="agent-list">Duke ngarkuar...</div>
-        </div>
-
-        <!-- DEALS -->
-        <div id="deals" class="page-content">
-            <h2>💰 MARRËVESHJE</h2>
-            <div id="deal-list">Duke ngarkuar...</div>
-        </div>
-
-        <!-- MAP -->
-        <div id="map" class="page-content">
-            <h2>🗺️ HARTA</h2>
-            <div class="card">Moduli i hartës do të integrohet me Leaflet.js. Koordinatat satelitore janë gati.</div>
-        </div>
-
-        <!-- CALCULATOR -->
-        <div id="calculator" class="page-content">
-            <h2>🧮 SIMULUES PASURIE</h2>
-            <div class="card">
-                <label>Vlera e pronës (€)</label>
-                <input type="number" id="calcPrice" value="100000">
-                <label>Vite</label>
-                <input type="number" id="calcYears" value="10">
-                <button onclick="calculateWealth()">LLOGARIT</button>
-                <h3 id="calcResult" style="margin-top:20px;">€0</h3>
-            </div>
-        </div>
-
-        <!-- CONTACT -->
-        <div id="contact" class="page-content">
-            <h2>📞 KONTAKT</h2>
-            <div class="card">
-                <p><i class="fas fa-phone"></i> +355 69 123 4567</p>
-                <p><i class="fas fa-envelope"></i> mandi@snbesa.al</p>
-            </div>
-        </div>
-
-        <!-- ABOUT -->
-        <div id="about" class="page-content">
-            <h2>ℹ️ RRETH NESH</h2>
-            <div class="card">SNBESA është platforma e prosperitetit, e ndërtuar mbi arkitekturë kuantike dhe AI BESA.</div>
-        </div>
-
-        <!-- PAYMENTS -->
-        <div id="payments" class="page-content">
-            <h2>💳 PAGESAT</h2>
-            <div class="card">🇦🇱 Shqipëri: AL47 2141 1009 0000 0000 1234 5678</div>
-            <div class="card">🇽🇰 Kosovë: XK05 13000 00000 00000 00001</div>
-            <div class="card">🇮🇹 Itali: IT60X0542811101000000123456</div>
-        </div>
-
-        <!-- ADMIN -->
-        <div id="admin" class="page-content">
-            <h2>⚙️ ADMINISTRIMI</h2>
-            <div class="card">
-                <h3>Shto Pronë të Re</h3>
-                <input type="text" id="newTitle" placeholder="Titulli">
-                <input type="number" id="newPrice" placeholder="Çmimi">
-                <button onclick="addProperty()">SHTO PRONËN</button>
-                <p id="adminMsg"></p>
-            </div>
-        </div>
-
-        <!-- TRENDING -->
-        <div id="trending" class="page-content">
-            <h2>📊 TRENDING</h2>
-            <div id="trending-stats">Duke analizuar të dhënat...</div>
-        </div>
-
-        <!-- LOGIN -->
-        <div id="login" class="page-content">
-            <h2>🔐 LOGIN (MAGIC LINK)</h2>
-            <div class="card">
-                <input type="email" id="loginEmail" placeholder="Email">
-                <button onclick="sendMagicLink()">DËRGO LINK</button>
-                <p id="loginMsg"></p>
-            </div>
+        <div id="data-display" style="margin-top: 30px; display: none;">
+            <h3 style="color: var(--gold);">PRONAT LIVE:</h3>
+            <div id="properties-list" style="margin-top: 15px;"></div>
         </div>
     </main>
 
-    <!-- AI TERMINAL BESA -->
-    <section class="panel ai-terminal">
-        <div style="padding: 15px; font-size: 14px; border-bottom: 1px solid var(--cyan); color: var(--cyan);">
-            <i class="fas fa-robot"></i> BESA AI CORE
+    <section class="terminal-panel">
+        <div style="color: var(--cyan); margin-bottom: 15px;">> BESA AI CORE</div>
+        <div id="terminal-logs">
+            <div class="log-entry">Sistemi gati... Pritet lidhja.</div>
         </div>
-        <div class="chat-history" id="chat">
-            <div style="color:var(--green);">> BESA: Sistemet janë online. Gati për udhëzimet e tua, Mandi.</div>
-        </div>
-        <div class="input-box">
-            <input type="text" id="cmd-in" placeholder="SHKRUAJ KOMANDËN..." autocomplete="off">
+
+        <div class="config-card" id="config-box">
+            <label style="font-size: 0.7rem; color: var(--gold);">SUPABASE URL</label>
+            <input type="text" id="db-url" placeholder="https://...">
+            
+            <label style="font-size: 0.7rem; color: var(--gold);">ANON KEY</label>
+            <input type="password" id="db-key" placeholder="sb_publishable...">
+            
+            <label style="font-size: 0.7rem; color: var(--gold);">KODI I SIGURISË (4+5+6-2)</label>
+            <input type="number" id="security-code" placeholder="?">
+            
+            <button onclick="connectSystem()">LIDHU ME SISTEMIN</button>
         </div>
     </section>
 </div>
 
 <script>
-    // ======================= KONFIGURIMI GLOBAL =======================
-    let supabase = null;
-    const configPanel = document.getElementById('configPanel');
-    const configStatus = document.getElementById('configStatus');
+    let supabaseClient;
 
-    window.saveConfig = function() {
-        const url = document.getElementById('supabaseUrl').value.trim();
-        const key = document.getElementById('supabaseKey').value.trim();
-        if (!url || !key) {
-            configStatus.innerText = 'Plotëso të dy fushat!';
+    function addLog(msg, type = 'info') {
+        const logs = document.getElementById('terminal-logs');
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        if(type === 'success') entry.classList.add('status-online');
+        entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        logs.prepend(entry);
+    }
+
+    async function connectSystem() {
+        const url = document.getElementById('db-url').value.trim();
+        const key = document.getElementById('db-key').value.trim();
+        const code = document.getElementById('security-code').value;
+
+        if (code != "13") {
+            addLog("KODI I GABUAR. Aksesi u refuzua.", "error");
             return;
         }
+
         try {
-            supabase = window.supabase.createClient(url, key);
-            configStatus.innerHTML = '<span style="color:var(--green);">✅ Lidhja u krye!</span>';
-            configPanel.style.display = 'none';
-            loadDashboardStats(); // Ngarko statistikat fillestare
-            addChatMessage('BESA', 'Lidhja me Supabase u konfigurua me sukses.');
-        } catch(e) {
-            configStatus.innerText = 'Gabim: ' + e.message;
+            addLog("Duke u lidhur me Supabase...");
+            supabaseClient = supabase.createClient(url, key);
+            
+            const { data, error } = await supabaseClient.from('properties').select('*').limit(1);
+            
+            if (error) throw error;
+
+            addLog("LIDHUR ME SUKSES! Sistemi është Online.", "success");
+            document.getElementById('config-box').style.display = 'none';
+            document.getElementById('data-display').style.display = 'block';
+            loadProperties();
+
+        } catch (err) {
+            addLog("GABIM: " + err.message, "error");
+            console.error(err);
         }
-    };
-
-    // ======================= 3D BACKGROUND =======================
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    
-    const globe = new THREE.Mesh(
-        new THREE.SphereGeometry(25, 64, 64),
-        new THREE.MeshPhongMaterial({
-            map: new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg'),
-            emissive: new THREE.Color(0x00f2ff),
-            emissiveIntensity: 0.15
-        })
-    );
-    scene.add(globe);
-    scene.add(new THREE.AmbientLight(0x404060));
-    const light = new THREE.PointLight(0xffffff, 1.2);
-    light.position.set(50, 50, 50);
-    scene.add(light);
-    camera.position.z = 85;
-
-    function animate() {
-        requestAnimationFrame(animate);
-        globe.rotation.y += 0.0008;
-        renderer.render(scene, camera);
-    }
-    animate();
-
-    // ======================= NAVIGIMI =======================
-    window.showPage = function(pageId, btn) {
-        document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-node').forEach(b => b.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        if (btn) btn.classList.add('active');
-        
-        // Ngarko të dhënat për faqen specifike
-        if (!supabase) return;
-        if (pageId === 'properties') loadProperties();
-        if (pageId === 'agents') loadAgents();
-        if (pageId === 'deals') loadDeals();
-        if (pageId === 'trending') loadTrending();
-        if (pageId === 'dash') loadDashboardStats();
-    };
-
-    // ======================= FUNKSIONET SUPABASE =======================
-    async function loadDashboardStats() {
-        if (!supabase) return;
-        const [props, agents, deals] = await Promise.all([
-            supabase.from('properties').select('id', { count: 'exact', head: true }),
-            supabase.from('agents').select('id', { count: 'exact', head: true }),
-            supabase.from('deals').select('id', { count: 'exact', head: true })
-        ]);
-        document.getElementById('live-stats').innerHTML = `
-            <p>📦 Prona: ${props.count || 0} | 👤 Agjentë: ${agents.count || 0} | 🤝 Marrëveshje: ${deals.count || 0}</p>
-        `;
     }
 
     async function loadProperties() {
-        if (!supabase) return;
-        const container = document.getElementById('property-list');
-        const { data } = await supabase.from('properties').select('*');
-        if (!data || data.length === 0) { container.innerHTML = 'Asnjë pronë.'; return; }
-        container.innerHTML = data.map(p => `<div class="property-item"><span>${p.title}</span><span>€${p.price || 0}</span></div>`).join('');
-    }
-
-    async function loadAgents() {
-        if (!supabase) return;
-        const container = document.getElementById('agent-list');
-        const { data } = await supabase.from('agents').select('*');
-        if (!data) { container.innerHTML = 'Asnjë agjent.'; return; }
-        container.innerHTML = data.map(a => `<div class="agent-item"><span>${a.name}</span><span>${a.region || ''}</span></div>`).join('');
-    }
-
-    async function loadDeals() {
-        if (!supabase) return;
-        const container = document.getElementById('deal-list');
-        const { data } = await supabase.from('deals').select('*, properties(title)');
-        if (!data) { container.innerHTML = 'Asnjë marrëveshje.'; return; }
-        container.innerHTML = data.map(d => `<div>🏷️ ${d.properties?.title || 'Pronë'} - €${d.value || 0}</div>`).join('');
-    }
-
-    async function loadTrending() {
-        if (!supabase) return;
-        const { data } = await supabase.from('deals').select('value');
-        const total = data?.reduce((acc, d) => acc + (d.value||0), 0) || 0;
-        document.getElementById('trending-stats').innerHTML = `Vlera totale e marrëveshjeve: €${total}`;
-    }
-
-    window.calculateWealth = function() {
-        const price = parseFloat(document.getElementById('calcPrice').value) || 0;
-        const years = parseFloat(document.getElementById('calcYears').value) || 0;
-        const future = price * Math.pow(1.05, years);
-        document.getElementById('calcResult').innerText = `€${future.toFixed(0)}`;
-    };
-
-    window.addProperty = async function() {
-        if (!supabase) { alert('Lidhu me Supabase fillimisht!'); return; }
-        const title = document.getElementById('newTitle').value;
-        const price = parseFloat(document.getElementById('newPrice').value);
-        const { error } = await supabase.from('properties').insert([{ title, price }]);
-        document.getElementById('adminMsg').innerText = error ? 'Gabim: ' + error.message : 'Prona u shtua!';
-        if (!error) { loadProperties(); loadDashboardStats(); }
-    };
-
-    window.sendMagicLink = async function() {
-        if (!supabase) { alert('Lidhu me Supabase!'); return; }
-        const email = document.getElementById('loginEmail').value;
-        const { error } = await supabase.auth.signInWithOtp({ email });
-        document.getElementById('loginMsg').innerText = error ? 'Gabim: ' + error.message : 'Linku u dërgua!';
-    };
-
-    // ======================= AI TERMINAL =======================
-    const cmdIn = document.getElementById('cmd-in');
-    const chat = document.getElementById('chat');
-
-    function addChatMessage(sender, text) {
-        const color = sender === 'MANDI' ? 'var(--cyan)' : 'var(--green)';
-        chat.innerHTML += `<div style="color:${color}; margin-bottom:10px;">${sender}: ${text}</div>`;
-        chat.scrollTop = chat.scrollHeight;
-    }
-
-    cmdIn.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            const val = cmdIn.value.trim();
-            if (!val) return;
-            addChatMessage('MANDI', val);
-            
-            let response = '';
-            if (val === '525156979') {
-                response = 'PASSWORDI I PËRHERSHËM U PRANUA. SINKRONIZIMI TOTAL.';
-                globe.material.emissiveIntensity = 0.8;
-            } else if (val.toLowerCase() === 'help') {
-                response = 'Komandat: status, properties, agents, clear, password';
-            } else if (val.toLowerCase() === 'status') {
-                response = supabase ? 'Lidhja me Supabase është aktive.' : 'Nuk ka lidhje me Supabase. Konfiguro në panelin poshtë djathtas.';
-            } else if (val.toLowerCase() === 'properties') {
-                showPage('properties', document.querySelector('.nav-node:nth-child(2)'));
-                response = 'Duke hapur modulin e pronave...';
-            } else if (val.toLowerCase() === 'clear') {
-                chat.innerHTML = '';
-                response = 'Terminali u pastrua.';
-            } else {
-                response = `Urdhri "${val}" u regjistrua.`;
-            }
-            
-            addChatMessage('BESA', response);
-            cmdIn.value = '';
+        const { data, error } = await supabaseClient.from('properties').select('*');
+        const list = document.getElementById('properties-list');
+        if (data) {
+            list.innerHTML = data.map(p => `
+                <div style="padding: 15px; border: 1px solid var(--cyan); margin-bottom: 10px; background: rgba(0, 242, 255, 0.05);">
+                    <strong>${p.title}</strong> - <span style="color: var(--green);">${p.price} €</span>
+                </div>
+            `).join('');
         }
-    });
+    }
 
-    // ======================= INICIALIZIMI =======================
-    window.onload = () => {
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
-        // Nëse dëshiron të fshehësh panelin e konfigurimit nëse tashmë ke kredenciale të ruajtura, shto këtu
-    };
+    // Three.js Background (Matrix/Cyber Effect)
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+    const geometry = new THREE.IcosahedronGeometry(20, 1);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.1 });
+    const sphere = new THREE.Mesh(geometry, material);
+    scene.add(sphere);
+
+    camera.position.z = 50;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        sphere.rotation.y += 0.002;
+        sphere.rotation.x += 0.001;
+        renderer.render(scene, camera);
+    }
+    animate();
 </script>
+
 </body>
 </html>

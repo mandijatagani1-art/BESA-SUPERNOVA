@@ -3,101 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BESA | QENDRA E KOMANDËS</title>
+    <title>BESA | MANDI LLAZI JATAGANI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --bg: #000; --terminal: #00ff00; --red: #ff3333; }
-        body { background: var(--bg); color: white; font-family: 'Courier New', monospace; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; }
-        
-        #auth-gate { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #000; position: fixed; width: 100%; z-index: 9999; }
-        .auth-input { background: #0a0a0a; border: 1px solid var(--gold); color: var(--gold); padding: 15px; width: 85%; max-width: 350px; text-align: center; border-radius: 8px; margin-bottom: 20px; font-size: 1rem; outline: none; }
-        .auth-btn { background: var(--gold); border: none; padding: 15px 50px; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; }
+        :root {
+            --gold: #D4AF37;
+            --red: #8B0000;
+            --bg: #000;
+            --terminal: #00ff00;
+            --card-bg: #0a0a0a;
+        }
 
-        #command-center { display: none; flex-direction: column; height: 100vh; width: 100%; }
-        
-        #terminal { background: #050505; border-bottom: 2px solid #222; height: 35%; padding: 15px; font-size: 0.85rem; color: var(--terminal); overflow-y: auto; border-left: 4px solid var(--gold); box-sizing: border-box; }
-        
-        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; flex-grow: 1; overflow-y: auto; padding-bottom: 30px; }
-        
-        /* Përshtatja për telefona */
-        @media (max-width: 400px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: var(--bg); 
+            color: white; 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden; 
+            height: 100vh; 
+        }
 
-        .module-box { background: #111; border: 1px solid #333; padding: 20px 5px; text-align: center; cursor: pointer; border-radius: 12px; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .module-box:active { background: #222; border-color: var(--gold); transform: scale(0.92); }
-        .module-box span { font-size: 2rem; margin-bottom: 8px; }
-        .module-box label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
-        .status { font-size: 0.55rem; font-weight: bold; margin-top: 6px; }
-        .on { color: var(--terminal); }
+        /* PORTA E SIGURISË JATAGANI */
+        #auth-gate {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
+            z-index: 10000;
+            position: fixed;
+            width: 100%;
+            border: 4px solid var(--gold);
+        }
 
-        #overlay-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; padding: 25px; box-sizing: border-box; overflow-y: auto; }
-        .close-btn { background: #222; color: var(--gold); border: 1px solid var(--gold); padding: 12px 25px; border-radius: 8px; margin-bottom: 30px; cursor: pointer; font-weight: bold; }
-        .mod-header { color: var(--gold); border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; letter-spacing: 2px; }
+        .auth-logo {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            letter-spacing: 8px;
+            text-align: center;
+        }
+
+        .auth-subtitle {
+            color: var(--red);
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .auth-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 15px;
+            width: 85%;
+            max-width: 400px;
+            text-align: center;
+            border-radius: 0;
+            margin-bottom: 20px;
+            font-family: monospace;
+            outline: none;
+        }
+
+        .auth-btn {
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 15px 60px;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+
+        /* DASHBOARD KRYESOR */
+        #main-ui { display: none; flex-direction: column; height: 100vh; }
+
+        #terminal {
+            background: #000;
+            border-bottom: 2px solid var(--gold);
+            height: 25%;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--terminal);
+            overflow-y: auto;
+            border-left: 5px solid var(--red);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 600px) {
+            .grid-container { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .module {
+            background: var(--card-bg);
+            border: 1px solid #1a1a1a;
+            padding: 25px 10px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .module:active { background: #111; border-color: var(--gold); }
+        .module span { font-size: 2rem; display: block; margin-bottom: 10px; }
+        .module label { font-size: 0.75rem; font-weight: bold; color: var(--gold); letter-spacing: 1px; }
+
+        /* VIEWER */
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg);
+            z-index: 20000;
+            padding: 40px 20px;
+        }
+
+        .close-btn { color: var(--red); font-weight: bold; cursor: pointer; margin-bottom: 30px; display: block; }
     </style>
 </head>
 <body>
 
     <div id="auth-gate">
-        <div style="color: var(--gold); font-size: 0.7rem; margin-bottom: 20px; letter-spacing: 3px;">BESA CORE: SECURED</div>
-        <input type="password" id="passkey" class="auth-input" placeholder="VËRTETO BETIMIN E PLOTË">
-        <button class="auth-btn" onclick="activate()">AKTIVIZO</button>
+        <div class="auth-logo">JATAGANI</div>
+        <div class="auth-subtitle">PROTOKOLLI BESA 2026</div>
+        <input type="password" id="masterkey" class="auth-input" placeholder="SHKRUAJ KODIN E MBROJTJES">
+        <button class="auth-btn" onclick="login()">HYR NË SISTEM</button>
     </div>
 
-    <div id="command-center">
+    <div id="main-ui">
         <div id="terminal">
-            > SISTEMI BESA: ONLINE...<br>
-            > MONITORI I KONTROLLIT: GATI.<br>
+            > SISTEMI JATAGANI AKTIV...<br>
+            > PRITET AUTORIZIMI I ARKITEKTIT...<br>
         </div>
 
         <div class="grid-container">
-            <div class="module-box" onclick="openMod('SHËNDETI', '⚕️ ESKULAPI & 🏟️ ASPIRINA: Shërbim shëndetësor falas. Statusi: Aktiv.')"><span>🏥</span><label>Shëndeti</label><div class="status on">AKTIV</div></div>
-            <div class="module-box" onclick="openMod('PANDEMIA', 'ALGORITMI PANDEMIK: Skanim i vazhdueshëm për rreziqe biokimike.')"><span>🧬</span><label>Pandemia</label><div class="status on">SCANNING</div></div>
-            <div class="module-box" onclick="openMod('JUNIOR', 'ZJARRI JUNIOR: Aktivizimi i brezit të ri.')"><span>🔥</span><label>Junior</label><div class="status on">FIRE</div></div>
-            <div class="module-box" onclick="openMod('LIGJI', 'MBUROJA LIGJORE: Drejtësi për 7 miliardë.')"><span>🛡️</span><label>Ligji</label><div class="status on">SECURE</div></div>
-            <div class="module-box" onclick="openMod('VAULT', 'VAULT 525: Dokumentat strategjike.')"><span>🔒</span><label>Vault</label><div class="status on">LOCKED</div></div>
-            <div class="module-box" onclick="openMod('SENTINEL', 'SENTINEL GRID: Mbikëqyrje globale.')"><span>🛰️</span><label>Sentinel</label><div class="status on">WATCHING</div></div>
-            <div class="module-box" onclick="openMod('GOLD', 'GOLD MATRIX: Pavarësia financiare.')"><span>💰</span><label>Gold</label><div class="status on">RESERVE</div></div>
-            <div class="module-box" onclick="openMod('B-NET', 'B-NET: Rrjet i enkriptuar.')"><span>📡</span><label>B-Net</label><div class="status on">ONLINE</div></div>
-            <div class="module-box" onclick="openMod('HISTORIA', 'ARKIVA: Memorja e njerëzimit.')"><span>📜</span><label>Historia</label><div class="status on">SYNC</div></div>
-            <div class="module-box" onclick="openMod('HARTA', 'MAPS: Pikat e komandës botërore.')"><span>🗺️</span><label>Harta</label><div class="status on">READY</div></div>
-            <div class="module-box" onclick="openMod('BIO', 'BIOMETRICS: Skanimi i jetës.')"><span>🩺</span><label>Bio</label><div class="status on">LIVE</div></div>
-            <div class="module-box" onclick="location.reload()"><span>✨</span><label>LOGOUT</label><div style="color:var(--red); font-size:0.5rem;">SHKYÇ</div></div>
+            <div class="module" onclick="openMod('SHËNDETI', 'Statusi: Mbrojtje maksimale për stafin dhe familjet.')"><span>🏥</span><label>Shëndeti</label></div>
+            <div class="module" onclick="openMod('LIGJI', 'Garda Ligjore: Çdo kontratë është e blinduar.')"><span>🛡️</span><label>Ligji</label></div>
+            <div class="module" onclick="openMod('PRONAT', 'Portofoli i pasurive të paluajtshme: Gati.')"><span>🏢</span><label>Pronat</label></div>
+            <div class="module" onclick="openMod('JUNIOR', 'Zjarri Junior: Edukimi i brezave të rinj.')"><span>🔥</span><label>Junior</label></div>
+            <div class="module" onclick="openMod('FINANCA', 'Matrica e Prosperitetit: Bilanci aktiv.')"><span>📊</span><label>Financa</label></div>
+            <div class="module" onclick="openMod('ARKIVA', 'Dosjet e SNBESA: Të dhënat janë të siguruara.')"><span>📁</span><label>Arkiva</label></div>
+            <div class="module" onclick="openMod('SENTINEL', 'Vëzhgimi 24/7: Sistemi i rrjetit.')"><span>🛰️</span><label>Sentinel</label></div>
+            <div class="module" onclick="location.reload()"><span>🔒</span><label>DIL</label></div>
         </div>
     </div>
 
-    <div id="overlay-page">
-        <button class="close-btn" onclick="closeMod()">← KTHEHU</button>
-        <h2 id="m-title" class="mod-header"></h2>
-        <div id="m-content" style="font-size: 1rem; line-height: 1.6; color: #ddd;"></div>
+    <div id="overlay">
+        <span class="close-btn" onclick="closeMod()">[ MBYLL MODULIN ]</span>
+        <h1 id="mod-title" style="color: var(--gold); font-family: 'Playfair Display', serif; margin-bottom: 20px; font-size: 2.5rem;"></h1>
+        <p id="mod-body" style="line-height: 1.8; color: #eee; font-size: 1.1rem; border-left: 2px solid var(--gold); padding-left: 20px;"></p>
     </div>
 
     <script>
         const MASTER = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-525156979";
 
-        function activate() {
-            const val = document.getElementById('passkey').value;
-            if (val === MASTER) {
+        function login() {
+            const val = document.getElementById('masterkey').value;
+            if(val === MASTER) {
                 document.getElementById('auth-gate').style.display = 'none';
-                document.getElementById('command-center').style.display = 'flex';
-                writeLog("ARKITEKTI U VERIFIKUA. KONTROLLI TOTAL I NDAL.");
+                document.getElementById('main-ui').style.display = 'flex';
+                log("SISTEMI U ZGJUA.");
+                log("MIRËSEVJEN, Z. MANDI LLAZI JATAGANI.");
+                log("AUTORITETI: ARKITEKT I SISTEMIT.");
             } else {
-                alert("QASJA U REFUZUA.");
+                alert("KOD I GABUAR. AKSESI U REFUZUA.");
             }
         }
 
-        function writeLog(msg) {
+        function log(msg) {
             const t = document.getElementById('terminal');
             t.innerHTML += `> [${new Date().toLocaleTimeString()}] ${msg}<br>`;
             t.scrollTop = t.scrollHeight;
         }
 
-        function openMod(title, content) {
-            document.getElementById('m-title').innerText = title;
-            document.getElementById('m-content').innerText = content;
-            document.getElementById('overlay-page').style.display = 'block';
-            writeLog(`MODULI [${title}] U AKTIVIZUA.`);
+        function openMod(t, b) {
+            document.getElementById('mod-title').innerText = t;
+            document.getElementById('mod-body').innerText = b;
+            document.getElementById('overlay').style.display = 'block';
+            log("MODULI U HAP: " + t);
         }
 
         function closeMod() {
-            document.getElementById('overlay-page').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+            log("KTHIM NË DASHBOARD.");
         }
     </script>
 </body>

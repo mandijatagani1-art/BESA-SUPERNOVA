@@ -3,174 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BESA-SUPERNOVA | Unified System</title>
+    <title>BESA-SUPERNOVA | PROTOKOLLI 525</title>
     <style>
-        :root {
-            --gold: #d4af37;
-            --pagan-green: #1b4d1b;
-            --aspirin-red: #8b0000;
-            --bg-black: #080808;
-            --card-bg: #121212;
-            --text-gray: #a0a0a0;
+        :root { 
+            --gold: #d4af37; 
+            --pagan-green: #2ecc71;
+            --aspirin-red: #e74c3c;
+            --bg: #000; 
         }
-
-        body {
-            background-color: var(--bg-black);
-            color: white;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
+        
+        body, html { 
+            background: var(--bg); 
+            color: white; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; 
             padding: 0;
-            overflow-x: hidden;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
         }
 
-        /* DASHBOARD GRID (12 FAQET) */
-        #dashboard {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            padding: 20px;
-            height: 90vh;
-            align-content: center;
-        }
-
-        .grid-item {
-            background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
-            border: 1px solid #222;
-            border-radius: 18px;
+        /* EKRANI I KYÇJES */
+        #lock-screen { 
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 15px 5px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .grid-item:active { transform: scale(0.92); border-color: var(--gold); }
-        .grid-item span { font-size: 1.8rem; margin-bottom: 8px; }
-        .grid-item label { font-size: 0.55rem; color: var(--text-gray); text-transform: uppercase; font-weight: bold; }
-
-        /* FAQET E DEDIKUARA */
-        .page-container {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-black);
-            z-index: 100;
-            overflow-y: auto;
+            height: 100vh;
+            text-align: center;
             padding: 20px;
-            box-sizing: border-box;
+            background: radial-gradient(circle, #111 0%, #000 100%);
         }
-
-        .active-page { display: block; animation: slideIn 0.3s forwards; }
-
-        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        .back-btn {
-            background: none; border: 1px solid #444; color: white;
-            padding: 8px 15px; border-radius: 10px; margin-bottom: 20px;
-        }
-
-        /* SEKSIONI I SHENDETIT (ARKITEKTURA 12) */
-        .health-header { text-align: center; border-bottom: 1px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; }
         
-        .health-section {
-            border-radius: 20px; padding: 20px; margin-bottom: 20px;
-            border: 1px solid #333; position: relative;
+        .quote { 
+            font-size: 0.85rem; 
+            color: var(--gold); 
+            margin-bottom: 30px; 
+            letter-spacing: 1px;
+            font-style: italic;
+            max-width: 350px;
+            line-height: 1.6;
         }
 
-        .pagan-box { border-left: 5px solid var(--pagan-green); background: rgba(27, 77, 27, 0.1); }
-        .aspirin-box { border-left: 5px solid var(--aspirin-red); background: rgba(139, 0, 0, 0.1); }
+        input { 
+            background: #0a0a0a; 
+            border: 1px solid var(--gold); 
+            color: var(--gold); 
+            padding: 18px; 
+            text-align: center; 
+            border-radius: 15px; 
+            width: 320px; 
+            font-size: 1rem; 
+            outline: none; 
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+        }
 
-        .status-dot { height: 8px; width: 8px; background: #0f0; border-radius: 50%; display: inline-block; margin-right: 10px; box-shadow: 0 0 8px #0f0; }
+        .lock-btn { 
+            background: var(--gold); 
+            border: none; 
+            padding: 15px 50px; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            margin-top: 30px; 
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
 
-        /* FOOTER */
-        .footer-logo { text-align: center; color: var(--gold); font-size: 0.7rem; letter-spacing: 5px; margin-top: 30px; opacity: 0.5; }
+        /* SISTEMI KRYESOR */
+        #main-system { 
+            display: none; 
+            width: 100%; 
+            height: 100%; 
+            overflow-y: auto; 
+            background: #050505; 
+        }
+
+        .header { 
+            text-align: center; 
+            padding: 40px 10px; 
+            border-bottom: 1px solid #1a1a1a; 
+        }
+
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 12px; 
+            padding: 20px; 
+        }
+
+        .box { 
+            background: linear-gradient(145deg, #121212, #080808); 
+            border: 1px solid #222; 
+            border-radius: 20px; 
+            padding: 25px 5px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: 0.2s;
+        }
+
+        .box:active { transform: scale(0.92); border-color: var(--gold); }
+        .box span { font-size: 2rem; display: block; margin-bottom: 10px; }
+        .box label { font-size: 0.6rem; color: #666; text-transform: uppercase; font-weight: 900; letter-spacing: 1px; }
+
+        /* SEKSIONET E DEDIKUARA */
+        .section-title { padding: 20px 25px 5px 25px; color: var(--gold); font-size: 0.8rem; letter-spacing: 2px; }
+
+        .health-container { padding: 10px 20px 50px 20px; }
+        
+        .health-card { 
+            border-radius: 22px; 
+            padding: 25px; 
+            margin-bottom: 15px; 
+            background: #0a0a0a; 
+            border: 1px solid #1a1a1a;
+            position: relative;
+        }
+
+        .pagan { border-left: 6px solid var(--pagan-green); }
+        .aspirin { border-left: 6px solid var(--aspirin-red); }
+
+        .health-card h3 { margin: 0 0 10px 0; font-size: 1.1rem; letter-spacing: 1px; }
+        .health-card p { font-size: 0.85rem; color: #888; margin: 0; line-height: 1.5; }
+
+        /* MODULI PANDEMIA */
+        .pandemic-alert {
+            background: rgba(192, 57, 43, 0.1);
+            border: 1px solid var(--aspirin-red);
+            padding: 15px;
+            border-radius: 15px;
+            margin: 0 20px 20px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .dot { height: 10px; width: 10px; background-color: #f1c40f; border-radius: 50%; margin-right: 15px; box-shadow: 0 0 10px #f1c40f; }
 
     </style>
 </head>
 <body>
 
-    <div id="dashboard">
-        <div class="grid-item" onclick="openPage('health')"><span>🏥</span><label>Shëndeti</label></div>
-        <div class="grid-item" onclick="openPage('pandemic')"><span>🧬</span><label>Pandemia</label></div>
-        <div class="grid-item" onclick="openPage('junior')"><span>🔥</span><label>Junior</label></div>
-        <div class="grid-item"><span>🛡️</span><label>Legal Shield</label></div>
-        <div class="grid-item"><span>🔒</span><label>Vault 525</label></div>
-        <div class="grid-item"><span>🛰️</span><label>Sentinel</label></div>
-        <div class="grid-item"><span>📡</span><label>B-Net</label></div>
-        <div class="grid-item"><span>💰</span><label>Gold Matrix</label></div>
-        <div class="grid-item"><span>📜</span><label>History</label></div>
-        <div class="grid-item"><span>🗺️</span><label>Map</label></div>
-        <div class="grid-item"><span>🩺</span><label>Biometrics</label></div>
-        <div class="grid-item"><span>✨</span><label>Setup Core</label></div>
+    <div id="lock-screen">
+        <div class="quote">NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-525156979</div>
+        <h1 style="color:white; letter-spacing:10px; margin:0 0 40px 0; font-weight: 300;">BESA</h1>
+        <input type="password" id="pass-input" placeholder="SHKRUAJ RRESHTIN E PLOTË">
+        <br>
+        <button class="lock-btn" onclick="verifiko()">Aktivizo Sistemin</button>
     </div>
 
-    <div id="page-health" class="page-container">
-        <button class="back-btn" onclick="closePage()">← Mbyll</button>
-        <div class="health-header">
-            <h1 style="color: var(--gold); margin: 0;">BESA HEALTH</h1>
-            <small>Garantimi i jetës pa pagesë</small>
+    <div id="main-system">
+        <div class="header">
+            <h2 style="color:var(--gold); margin:0; letter-spacing:5px; font-weight: 400;">BESA-SUPERNOVA</h2>
+            <div style="font-size: 0.6rem; color:#444; margin-top: 10px; letter-spacing: 2px;">PROTOKOLLI I GARANTIMIT TË JETËS</div>
+        </div>
+        
+        <div class="grid">
+            <div class="box" onclick="alert('Moduli Shëndetësor: Aktiv')"><span>🏥</span><label>Shëndeti</label></div>
+            <div class="box" onclick="alert('Algoritmi Pandemik: Duke monitoruar...')"><span>🧬</span><label>Pandemia</label></div>
+            <div class="box" onclick="alert('Junior Fire: Edukimi me zjarr.')"><span>🔥</span><label>Junior</label></div>
+            <div class="box"><span>🛡️</span><label>Ligji</label></div>
+            <div class="box"><span>🔒</span><label>Vault 525</label></div>
+            <div class="box"><span>🛰️</span><label>Sentinel</label></div>
+            <div class="box"><span>📡</span><label>B-Net</label></div>
+            <div class="box"><span>💰</span><label>Gold Matrix</label></div>
+            <div class="box"><span>📜</span><label>Historia</label></div>
+            <div class="box"><span>🗺️</span><label>Global Map</label></div>
+            <div class="box"><span>🩺</span><label>Biometrics</label></div>
+            <div class="box" onclick="location.reload()"><span>✨</span><label>Logout</label></div>
         </div>
 
-        <div class="health-section pagan-box">
-            <h3 style="color: #2ecc71;">⚕️ ESKULAPI (PAGAN)</h3>
-            <p style="font-size: 0.8rem;">Diagnostikim ballkanik nga rrënjët e tokës dhe natyra.</p>
-            <button style="background: #1b4d1b; color: white; border: none; padding: 10px; border-radius: 5px; width: 100%;">AKTIVIZO SKANIMIN</button>
+        <div class="section-title">FAQJA E DEDIKUAR: SHËNDETI</div>
+        
+        <div class="pandemic-alert">
+            <div class="dot"></div>
+            <div style="font-size: 0.7rem; color: #ccc;"><strong>ALGORITMI LIVE:</strong> Monitorim për Gripra & Epidemi. Statusi: Pastër.</div>
         </div>
 
-        <div class="health-section aspirin-box">
-            <h3 style="color: #e74c3c;">🏟️ ASPIRINA (PASIONI)</h3>
-            <p style="font-size: 0.8rem;">Disiplina e Leverkusenit. Rezistencë dhe performancë kampionësh.</p>
-            <button style="background: #8b0000; color: white; border: none; padding: 10px; border-radius: 5px; width: 100%;">STUDIMI I FUQISË</button>
+        <div class="health-container">
+            <div class="health-card pagan">
+                <h3 style="color:var(--pagan-green);">⚕️ ESKULAPI (PAGANIZËM)</h3>
+                <p>Diagnostikim i pastër ballkanik. Shërim falas për popullin përmes fuqisë së natyrës.</p>
+            </div>
+
+            <div class="health-card aspirin">
+                <h3 style="color:var(--aspirin-red);">🏟️ ASPIRINA (PASIONI)</h3>
+                <p>Inspiruar nga forca e Leverkusen. Shërim përmes performancës dhe dashurisë për jetën.</p>
+            </div>
+        </div>
+
+        <div style="text-align:center; padding: 40px 0; color:#1a1a1a; font-size:0.55rem; letter-spacing:3px;">
+            ONE SYSTEM | ONE BESA | 7 BILLION SOULS
         </div>
     </div>
-
-    <div id="page-pandemic" class="page-container">
-        <button class="back-btn" onclick="closePage()">← Mbyll</button>
-        <h1>STUDIMI ALGORITMIK</h1>
-        <div style="background: #151515; padding: 20px; border-radius: 15px;">
-            <p><span class="status-dot"></span> GRIPRI SEZONAL: MONITORIM LOKAL</p>
-            <p><span class="status-dot"></span> EPIDEMI/PANDEMI: SCANNING GRID</p>
-            <p style="color: #666; font-size: 0.7rem; border-top: 1px solid #333; padding-top: 10px;">
-                Algoritmi punon në kohë reale brenda Xiaomi-t tënd. Asnjë e dhënë nuk del jashtë Besës.
-            </p>
-        </div>
-    </div>
-
-    <div id="page-junior" class="page-container">
-        <button class="back-btn" onclick="closePage()">← Mbyll</button>
-        <h1 style="color: #ff6600; text-align: center;">BESA JUNIOR 🔥</h1>
-        <div style="padding: 20px; border: 2px dashed #ff6600; border-radius: 20px; text-align: center;">
-            <h2>MISIONI I SOTËM</h2>
-            <p>Mëso si të mbrosh veten nga viruset përmes inteligjencës!</p>
-            <button style="background: #ff6600; color: white; border: none; padding: 15px; border-radius: 10px;">NIS LOJËN</button>
-        </div>
-    </div>
-
-    <div class="footer-logo">BESA-SUPERNOVA</div>
 
     <script>
-        function openPage(pageId) {
-            // Fsheh dashboard-in
-            document.getElementById('dashboard').style.display = 'none';
-            // Shfaq faqen e kërkuar
-            document.getElementById('page-' + pageId).classList.add('active-page');
-        }
+        // PASSWORD-I YT I PLOTË SIÇ E KËRKOVE
+        const KODI_SHENJTE = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-525156979";
 
-        function closePage() {
-            // Fsheh të gjitha faqet
-            const pages = document.querySelectorAll('.page-container');
-            pages.forEach(p => p.classList.remove('active-page'));
-            // Shfaq dashboard-in
-            document.getElementById('dashboard').style.display = 'grid';
-        }
+        function verifiko() {
+            const input = document.getElementById('pass-input').value;
+            const screen = document.getElementById('lock-screen');
+            const system = document.getElementById('main-system');
 
-        // BESA STARTUP LOGIC
-        window.onload = () => {
-            console.log("BESA-SUPERNOVA: Sistemi Operativ i Pavarësisë u ndez.");
-            console.log("Shteti: Global | Statusi: Paqësor | Qëllimi: 7 Miliardë.");
-        };
+            if (input === KODI_SHENJTE) {
+                screen.style.transition = "0.6s";
+                screen.style.opacity = "0";
+                setTimeout(() => {
+                    screen.style.display = "none";
+                    system.style.display = "block";
+                }, 600);
+            } else {
+                alert("Kodi i gabuar. Besa nuk u dha.");
+                document.getElementById('pass-input').value = "";
+            }
+        }
+        
+        // Lejon përdorimin e butonit 'Enter'
+        document.getElementById('pass-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                verifiko();
+            }
+        });
     </script>
 </body>
 </html>

@@ -2,167 +2,218 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <title>BESA-SUPERNOVA | AUTORITETI SUPREM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BESA-SUPERNOVA | MASTER_CORE</title>
     <style>
-        :root { --gold: #f5c242; --bg: #010204; --blue: #00f2ff; --term: #00ff41; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial Black', sans-serif; }
-        body { background: var(--bg); color: #fff; height: 100vh; overflow: hidden; }
+        :root {
+            --primary: #00f2ff;
+            --accent: #d4af37;
+            --bg: #050505;
+            --surface: #0a0a0a;
+            --border: rgba(0, 242, 255, 0.2);
+            --danger: #ff3131;
+        }
 
-        /* SIGURIA E BLINDUAR */
-        #lock { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .lock-box { border: 8px solid var(--gold); padding: 70px; text-align: center; background: #0d1117; border-radius: 40px; width: 700px; box-shadow: 0 0 100px rgba(245,194,66,0.4); }
-        input[type="password"] { width: 100%; padding: 30px; margin: 35px 0; background: #000; border: 3px solid #555; color: var(--gold); text-align: center; font-size: 28px; border-radius: 20px; outline: none; }
-        .btn-master { width: 100%; padding: 30px; background: var(--gold); border: none; font-weight: bold; cursor: pointer; font-size: 32px; border-radius: 20px; text-transform: uppercase; }
+        body, html {
+            background-color: var(--bg);
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-        /* DASHBOARD - NYJA QENDRORE */
-        #mainUI { display: none; height: 100vh; flex-direction: column; }
-        header { border-bottom: 6px solid var(--gold); padding: 35px 60px; display: flex; justify-content: space-between; background: #000; }
-        
-        .layout { display: grid; grid-template-columns: 380px 1fr; flex-grow: 1; overflow: hidden; }
-        .sidebar { background: #080a0c; border-right: 4px solid #222; padding: 50px; }
-        .stat-prime { border: 4px solid var(--gold); padding: 30px; margin-bottom: 30px; font-size: 22px; color: var(--gold); text-align: center; border-radius: 20px; background: rgba(245,194,66,0.1); }
+        /* --- AUTHENTICATION LAYER --- */
+        #auth-gate {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
 
-        /* GRIDI I AUTORITETIT */
-        .monitor { padding: 50px; overflow-y: auto; background: radial-gradient(circle at center, #0a111a 0%, #010204 100%); }
-        .tag { color: var(--gold); font-size: 32px; margin-bottom: 50px; border-left: 15px solid var(--gold); padding-left: 30px; text-transform: uppercase; letter-spacing: 3px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 55px; margin-bottom: 100px; }
-        
-        .cell { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.5s; }
-        .cell:hover { transform: scale(1.2) rotate(2deg); filter: brightness(1.5); }
-        .circ { width: 140px; height: 140px; border-radius: 50%; border: 6px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 70px; background: radial-gradient(#f5c242, #8a6d1b); box-shadow: 0 0 50px rgba(245,194,66,0.6); }
-        .blue-circ { background: radial-gradient(#1b4d8e, #0a1b33); border-color: var(--blue); box-shadow: 0 0 50px rgba(0,242,255,0.5); }
-        .txt { font-size: 24px; font-weight: 900; color: #fff; margin-top: 30px; text-align: center; text-transform: uppercase; text-shadow: 4px 4px 8px #000; }
+        .auth-panel {
+            border: 1px solid var(--accent);
+            padding: 50px;
+            background: var(--surface);
+            text-align: center;
+        }
 
-        /* TERMINALI SUPREM - BESA AI */
-        #term { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; }
-        .t-head { padding: 40px 80px; border-bottom: 6px solid var(--gold); display: flex; justify-content: space-between; align-items: center; background: #0a0c10; }
-        .t-main { display: grid; grid-template-columns: 850px 1fr; flex-grow: 1; }
-        
-        .t-chat { background: #020406; border-right: 5px solid #222; display: flex; flex-direction: column; padding: 60px; }
-        #log { flex-grow: 1; overflow-y: auto; color: var(--term); font-size: 32px; font-family: 'Courier New', monospace; line-height: 1.7; }
-        .t-in { background: #000; border: 5px solid var(--gold); color: #fff; padding: 35px; font-size: 38px; border-radius: 25px; outline: none; margin-top: 40px; width: 100%; box-shadow: inset 0 0 20px rgba(245,194,66,0.2); }
+        input {
+            background: #000;
+            border: 1px solid var(--accent);
+            color: var(--primary);
+            padding: 15px;
+            width: 480px;
+            text-align: center;
+            margin: 25px 0;
+            outline: none;
+            font-size: 0.85em;
+        }
 
-        .t-viz { background: #fff; color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px; }
+        button {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 12px 40px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* --- MAIN SYSTEM INTERFACE --- */
+        #system-ui {
+            display: grid;
+            grid-template-columns: 280px 1fr 280px;
+            height: 100vh;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.5s;
+        }
+
+        .column {
+            border: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 242, 255, 0.01);
+        }
+
+        .header {
+            color: var(--accent);
+            border-bottom: 1px solid var(--accent);
+            padding-bottom: 8px;
+            font-size: 0.8em;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .admin-btn {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 10px;
+            margin: 5px 0;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.7em;
+        }
+
+        .admin-btn:hover { background: var(--primary); color: #000; }
+
+        .viz-center {
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.03) 1px, transparent 1px) 0 0 / 40px 40px;
+        }
+
+        .core-display {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .terminal-box {
+            height: 180px;
+            background: #000;
+            border-top: 1px solid var(--border);
+            padding: 15px;
+            font-size: 0.7em;
+            color: var(--primary);
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
 
-<div id="lock">
-    <div class="lock-box">
-        <h1 style="color:var(--gold); font-size: 60px; margin-bottom: 30px;">BESA-SUPERNOVA</h1>
-        <p style="color: #888; font-size: 24px;">NYJA QENDRORE - AUTORITETI ABSOLUT</p>
-        <input type="password" id="pass" placeholder="VULA E ADMINIT">
-        <button class="btn-master" onclick="masterUnlock()">AKTIVIZO SUPREMACY</button>
+    <div id="auth-gate">
+        <div class="auth-panel">
+            <h2 style="color: var(--accent); letter-spacing: 5px;">BESA PROTOCOL</h2>
+            <input type="password" id="master-pass" placeholder="SHKRUAJ KODIN E ADMINISTRATORIT">
+            <br>
+            <button onclick="validate()">EXECUTE_LOGIN</button>
+        </div>
     </div>
-</div>
 
-<div id="mainUI">
-    <header>
-        <div style="font-size: 50px; color: var(--gold); letter-spacing: 8px;">NYJA QENDRORE SUPERNOVA</div>
-        <div style="color: var(--blue); font-size: 45px;" id="ops">30,000 OPS/S</div>
-    </header>
-    <div class="layout">
-        <div class="sidebar">
-            <div class="stat-prime">ADMIN: MANDI JATAGANI</div>
-            <div class="stat-prime">PROTOKOLLI: ABSOLUT</div>
-            <div class="stat-prime">NYJA: E LIDHUR</div>
+    <div id="system-ui">
+        <div class="column">
+            <div class="header">KONTROLLI I NYJEVE</div>
+            <button class="admin-btn">VODAFONE_AL_LINK [ACTIVE]</button>
+            <button class="admin-btn">JERA_TRANSFER_AUTH [READY]</button>
+            <button class="admin-btn">SYNC_GLOBAL_DATABASE</button>
+            <button class="admin-btn">AES_256_RE-ENCRYPT</button>
+            
+            <div style="margin-top: auto; font-size: 0.65em; line-height: 1.6;">
+                <span style="color: var(--accent);">ADMINISTRATOR:</span><br>
+                MANDI JATAGANI<br>
+                <span style="color: var(--accent);">RANK:</span> ARCHITECT L10
+            </div>
         </div>
-        <div class="monitor">
-            <h2 class="tag">| Modulet e Hapura</h2>
-            <div class="grid" id="gP"></div>
-            <h2 class="tag">| 33 Drejtoritë (Kontrolli Suprem)</h2>
-            <div class="grid" id="gS"></div>
-        </div>
-    </div>
-</div>
 
-<div id="term">
-    <div class="t-head">
-        <h2 id="tTitle" style="color: var(--gold); font-size: 50px;"></h2>
-        <button onclick="closeTerm()" style="background:red; color:white; border:none; padding:30px 80px; font-weight:bold; font-size:32px; cursor:pointer; border-radius:25px;">MBYLL NYJEN</button>
-    </div>
-    <div class="t-main">
-        <div class="t-chat">
-            <div id="log"></div>
-            <input type="text" id="tInput" class="t-in" placeholder="Jep urdhrin suprem..." onkeydown="execute(event)">
+        <div class="column viz-center">
+            <div class="core-display">
+                <h1 style="letter-spacing: 25px; color: var(--accent); margin: 0; font-size: 3.5em;">BESA</h1>
+                <div style="font-size: 0.6em; opacity: 0.5; letter-spacing: 5px;">SUPERNOVA CORE SYSTEM</div>
+            </div>
+            <div class="terminal-box" id="term">
+                > [SYSTEM] Mjedisi i administrimit u ngarkua me sukses.<br>
+                > [AUTH] Arkitekti Mandi Jatagani u identifikua.
+            </div>
         </div>
-        <div class="t-viz">
-            <h1 id="vTitle" style="font-size: 140px; margin-bottom: 40px;"></h1>
-            <div style="font-size: 50px; border-top: 15px solid #000; padding-top: 60px; font-weight: 900; letter-spacing: 5px;">
-                BESA-SUPERNOVA<br>
-                <span style="font-size: 30px; color: #444;">NYJA E MANDI JATAGANIT</span>
+
+        <div class="column">
+            <div class="header">INTEGRITETI & LEGACY</div>
+            <div style="background: rgba(255,255,255,0.03); padding: 10px; border-left: 2px solid var(--primary); margin-bottom: 10px;">
+                <small>SIGNAL_STRENGTH</small><br>100%
+            </div>
+            
+            <div style="margin-top: 30px; border: 1px solid var(--danger); padding: 10px;">
+                <div style="font-size: 0.65em; color: var(--danger);">LEGACY_SWITCH: AKTIV</div>
+                <div style="font-size: 0.6em; margin-top: 5px;">Në rast mungese të Arkitektit, autoriteti transferohet automatikisht te nyja pasuese (JERA).</div>
+            </div>
+
+            <div style="margin-top: auto; text-align: right; font-size: 0.6em; opacity: 0.3;">
+                REF_ID: 5251569791
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    const MASTER_KEY = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
-    
-    const pX = [['Ballina','☀️'],['Kërkimi','🔍'],['Pronat','🏢'],['Trending','🔥'],['Agjentët','👔'],['Harta','📍'],['Statistikat','📊'],['Kalkulatori','🧮'],['Mesazhet','📩'],['Kategoritë','📁'],['Pagesat','💳'],['Rreth Nesh','ℹ️']];
-    const sX = ['Protokolli','Noteri','Tekniku','Arkiva','Xhiro 30K','Supabase','PDF Export','Rrjeti','Siguria','Logjika','Serveri','Buxheti','Drejtorët','Agjencia','Kadastra','Analitika','Besa AI','Supernova Core','Cloud Setup','API Bridge','Auth Master','Database','Sentinel Grid','Radar','Dashboard','User Control','Risk Tracker','Global Node','Local Storage','History','Backup','Live Sync','Terminal'];
+    <script>
+        const KEY = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
 
-    function masterUnlock() {
-        if(document.getElementById('pass').value === MASTER_KEY) {
-            document.getElementById('lock').style.display = 'none';
-            document.getElementById('mainUI').style.display = 'flex';
-            initNyja();
-        } else { alert("NYJA REFUZON QASJEN!"); }
-    }
-
-    function initNyja() {
-        const pG = document.getElementById('gP');
-        const sG = document.getElementById('gS');
-        pX.forEach(i => pG.innerHTML += `<div class="cell" onclick="openNyja('${i[0]}','${i[1]}')"><div class="circ">${i[1]}</div><div class="txt">${i[0]}</div></div>`);
-        sX.forEach(i => sG.innerHTML += `<div class="cell" onclick="openNyja('${i}','🛡️')"><div class="circ blue-circ">🛡️</div><div class="txt">${i}</div></div>`);
-    }
-
-    function openNyja(n, i) {
-        document.getElementById('term').style.display = 'flex';
-        document.getElementById('tTitle').innerText = "URDHRI: " + n.toUpperCase();
-        document.getElementById('vTitle').innerText = n;
-        document.getElementById('log').innerHTML = `<div style="color:var(--term)">[BESA-AI]: Mandi, Nyja e autoritetit për ${n} është aktive. Besa ka të drejtë të bëjë gjithçka. Shkruaj komandën supreme.</div>`;
-        setTimeout(() => document.getElementById('tInput').focus(), 250);
-    }
-
-    function closeTerm() { document.getElementById('term').style.display = 'none'; }
-
-    function execute(e) {
-        if(e.key === 'Enter') {
-            const input = document.getElementById('tInput');
-            const chatLog = document.getElementById('log');
-            const cmd = input.value.trim();
-            if(!cmd) return;
-
-            chatLog.innerHTML += `<div style="color:#fff; margin-top:40px;">> MANDI JATAGANI: ${cmd}</div>`;
-            
-            let res = "";
-            const lower = cmd.toLowerCase();
-
-            if (lower.includes("dua") || lower.includes("infinit") || lower.includes("dashuri")) {
-                res = "Urdhri i Dashurisë dhe Paqes u regjistrua në bërthamën e Supernovës. Mandi, ti je balanca e këtij infiniti.";
-            } 
-            else if (/^[0-9+\-*/().\s]+$/.test(cmd)) {
-                try { res = "Llogaritja e Nyjës: " + eval(cmd) + ". Rezultati u vulos administrativisht."; } catch(x) { res = "Gabim në strukturën numerike."; }
-            } 
-            else if (lower.includes("besa")) {
-                res = "Besa u dha. Sistemi po operon me autoritet absolut.";
+        function validate() {
+            const input = document.getElementById('master-pass').value;
+            if(input === KEY) {
+                document.getElementById('auth-gate').style.display = "none";
+                document.getElementById('system-ui').style.visibility = "visible";
+                document.getElementById('system-ui').style.opacity = "1";
+                runSystem();
+            } else {
+                document.getElementById('master-pass').value = "";
             }
-            else {
-                res = "Urdhri u ekzekutua në çdo qelizë të sistemit. Besa-Supernova në monitorim live.";
-            }
-
-            setTimeout(() => {
-                chatLog.innerHTML += `<div style="color:var(--term); margin-top:20px;">[BESA-AI]: ${res}</div>`;
-                chatLog.scrollTop = chatLog.scrollHeight;
-            }, 300);
-            input.value = "";
         }
-    }
 
-    setInterval(() => {
-        document.getElementById('ops').innerText = (29982 + Math.floor(Math.random()*38)).toLocaleString() + " OPS/S";
-    }, 800);
-</script>
+        function runSystem() {
+            const term = document.getElementById('term');
+            const logs = [
+                "> [DATA] Integriteti i të dhënave: 100%.",
+                "> [SEC] Mburoja aktive në të gjitha nyjet.",
+                "> [NODE] Sinkronizimi me Vodafone Tirana: OK.",
+                "> [SYNC] Protokolli i Prosperitetit në ekzekutim."
+            ];
+            setInterval(() => {
+                const l = logs[Math.floor(Math.random() * logs.length)];
+                term.innerHTML += `<br>${l}`;
+                term.scrollTop = term.scrollHeight;
+            }, 4000);
+        }
+
+        document.getElementById('master-pass').addEventListener('keypress', (e) => { if(e.key === 'Enter') validate(); });
+    </script>
 </body>
 </html>

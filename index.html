@@ -3,217 +3,396 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BESA-SUPERNOVA | MASTER_CORE</title>
+    <title>BESA-SUPERNOVA | INFINITY_CORE_v3</title>
     <style>
         :root {
-            --primary: #00f2ff;
-            --accent: #d4af37;
-            --bg: #050505;
-            --surface: #0a0a0a;
-            --border: rgba(0, 242, 255, 0.2);
-            --danger: #ff3131;
+            --hologram-cyan: #00f2ff;
+            --hologram-cyan-op: rgba(0, 242, 255, 0.1);
+            --besa-gold: #d4af37;
+            --besa-gold-op: rgba(212, 175, 55, 0.15);
+            --deep-space: #010101;
+            --terminal-green: #00ff00;
+            --alert-red: #ff3131;
+            --grid-line: rgba(0, 242, 255, 0.03);
+            --font-main: 'OCR A Extended', 'Courier New', monospace;
         }
 
+        * { box-sizing: border-box; outline: none; }
+
         body, html {
-            background-color: var(--bg);
+            background-color: var(--deep-space);
             color: #ffffff;
-            font-family: 'Courier New', monospace;
+            font-family: var(--font-main);
             margin: 0;
             height: 100vh;
             overflow: hidden;
+            font-size: 13px; /* Madhësi teknike, jo për të verbër */
+            letter-spacing: 1px;
         }
 
-        /* --- AUTHENTICATION LAYER --- */
-        #auth-gate {
+        /* --- SHTRESA E SIGURISË KIBERNETIKE (GATEKEEPER) --- */
+        #gatekeeper {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
+            background: radial-gradient(circle, #0a0a0a 0%, #000 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 10000;
+            background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 50px 50px;
         }
 
-        .auth-panel {
-            border: 1px solid var(--accent);
-            padding: 50px;
-            background: var(--surface);
+        .auth-vault {
+            border: 1px solid var(--besa-gold);
+            padding: 60px;
             text-align: center;
+            background: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 0 100px rgba(212, 175, 55, 0.1);
+            position: relative;
         }
 
-        input {
-            background: #000;
-            border: 1px solid var(--accent);
-            color: var(--primary);
-            padding: 15px;
-            width: 480px;
-            text-align: center;
-            margin: 25px 0;
-            outline: none;
-            font-size: 0.85em;
-        }
-
-        button {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 12px 40px;
-            cursor: pointer;
-            font-weight: bold;
+        .auth-vault h1 {
+            color: var(--besa-gold);
+            font-size: 2em;
+            letter-spacing: 15px;
+            margin: 0;
             text-transform: uppercase;
+            font-weight: 300;
         }
 
-        /* --- MAIN SYSTEM INTERFACE --- */
-        #system-ui {
+        .pass-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--besa-gold);
+            color: var(--hologram-cyan);
+            font-size: 1.2em;
+            width: 480px;
+            padding: 15px;
+            text-align: center;
+            margin: 40px 0;
+            font-family: var(--font-main);
+            letter-spacing: 5px;
+        }
+
+        .pass-input::placeholder {
+            color: rgba(212, 175, 55, 0.4);
+            letter-spacing: 2px;
+            font-size: 0.8em;
+        }
+
+        .btn-auth {
+            background: transparent;
+            border: 1px solid var(--besa-gold);
+            color: var(--besa-gold);
+            padding: 15px 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: 0.4s;
+            letter-spacing: 3px;
+        }
+
+        .btn-auth:hover {
+            background: var(--besa-gold);
+            color: black;
+            box-shadow: 0 0 30px var(--besa-gold);
+        }
+
+        /* --- NDËRFAQJA INFINITY CORE (v3) --- */
+        #core-interface {
             display: grid;
-            grid-template-columns: 280px 1fr 280px;
+            grid-template-columns: 320px 1fr 320px;
+            grid-template-rows: 60px 1fr 200px;
             height: 100vh;
             visibility: hidden;
             opacity: 0;
-            transition: 0.5s;
+            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .column {
-            border: 1px solid var(--border);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            background: rgba(0, 242, 255, 0.01);
-        }
-
+        /* HEADER */
         .header {
-            color: var(--accent);
-            border-bottom: 1px solid var(--accent);
-            padding-bottom: 8px;
-            font-size: 0.8em;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
+            grid-column: 1 / -1;
+            border-bottom: 1px solid var(--grid-line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background: rgba(0, 242, 255, 0.02);
         }
 
-        .admin-btn {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 10px;
-            margin: 5px 0;
-            cursor: pointer;
-            text-align: left;
-            font-size: 0.7em;
-        }
+        .header-title { color: var(--besa-gold); letter-spacing: 5px; font-size: 1.1em; }
+        .header-stats { color: var(--hologram-cyan); opacity: 0.7; font-size: 0.8em; }
 
-        .admin-btn:hover { background: var(--primary); color: #000; }
-
-        .viz-center {
+        /* PANELET E ANËSISHME (COLUMNS) */
+        .panel {
+            border: 1px solid var(--grid-line);
+            padding: 20px;
+            background: rgba(0, 242, 255, 0.01);
             display: flex;
             flex-direction: column;
-            background: radial-gradient(circle, rgba(0, 242, 255, 0.03) 1px, transparent 1px) 0 0 / 40px 40px;
+            gap: 10px;
         }
 
-        .core-display {
-            flex-grow: 1;
+        .panel-left { border-left: none; border-top: none; }
+        .panel-right { border-right: none; border-top: none; }
+
+        .panel-header {
+            color: var(--besa-gold);
+            border-bottom: 1px solid var(--besa-gold-op);
+            padding-bottom: 8px;
+            font-size: 0.9em;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        /* ELEMENTET E TË DHËNAVE */
+        .data-block {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(0, 242, 255, 0.05);
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-label { color: rgba(255,255,255,0.5); font-size: 0.8em; }
+        .data-value { color: var(--hologram-cyan); font-weight: bold; }
+        .status-up { color: var(--terminal-green); text-shadow: 0 0 5px var(--terminal-green); }
+
+        /* BUTONAT E ADMINISTRIMIT */
+        .action-btn {
+            background: transparent;
+            border: 1px solid var(--hologram-cyan-op);
+            color: rgba(0, 242, 255, 0.6);
+            padding: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+            font-family: var(--font-main);
+            font-size: 0.8em;
+            letter-spacing: 1px;
+        }
+
+        .action-btn:hover {
+            border-color: var(--hologram-cyan);
+            color: var(--hologram-cyan);
+            background: rgba(0, 242, 255, 0.03);
+            box-shadow: 0 0 10px var(--hologram-cyan-op);
+        }
+
+        /* VIEWPORT QENDROR */
+        .viewport {
+            grid-column: 2;
+            grid-row: 2;
+            border: 1px solid var(--grid-line);
+            border-top: none;
+            border-bottom: none;
+            position: relative;
+            background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            text-align: center;
         }
 
-        .terminal-box {
-            height: 180px;
-            background: #000;
-            border-top: 1px solid var(--border);
-            padding: 15px;
-            font-size: 0.7em;
-            color: var(--primary);
-            overflow-y: auto;
+        /* VIZUALIZIMI I SHKËLQIMIT GOLD (BESA CORE) */
+        .besa-core-glow {
+            position: absolute;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, var(--besa-gold-op) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(20px);
+            animation: core-pulse 4s infinite;
         }
+
+        .besa-title-visual {
+            font-size: 6em;
+            letter-spacing: 40px;
+            color: var(--besa-gold);
+            margin: 0;
+            font-weight: 300;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            margin-right: -40px; /* Korrigjim për letter-spacing */
+        }
+
+        /* TERMINALI I LOGEVE (v3) */
+        .terminal {
+            grid-column: 1 / -1;
+            grid-row: 3;
+            border-top: 1px solid var(--grid-line);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .terminal-header {
+            color: var(--besa-gold);
+            font-size: 0.8em;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--besa-gold-op);
+        }
+
+        .terminal-window {
+            flex-grow: 1;
+            overflow-y: auto;
+            color: var(--terminal-green);
+            font-size: 0.8em;
+            line-height: 1.5;
+            scrollbar-width: thin;
+            scrollbar-color: var(--besa-gold-op) transparent;
+        }
+
+        /* ANIMACIONET */
+        @keyframes core-pulse {
+            0% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 0.4; }
+        }
+
+        /* PËRTSHTATJA E SCROLLBAR-IT (WEBKIT) */
+        .terminal-window::-webkit-scrollbar { width: 4px; }
+        .terminal-window::-webkit-scrollbar-track { background: transparent; }
+        .terminal-window::-webkit-scrollbar-thumb { background-color: var(--besa-gold-op); }
     </style>
 </head>
 <body>
 
-    <div id="auth-gate">
-        <div class="auth-panel">
-            <h2 style="color: var(--accent); letter-spacing: 5px;">BESA PROTOCOL</h2>
-            <input type="password" id="master-pass" placeholder="SHKRUAJ KODIN E ADMINISTRATORIT">
+    <div id="gatekeeper">
+        <div class="auth-vault">
+            <div style="font-size: 0.7em; color: rgba(255,255,255,0.5); letter-spacing: 3px; margin-bottom: 10px;">SYSTEM_ACCESS_PROTOCOL</div>
+            <h1>BESA</h1>
+            <input type="password" id="master-pass" class="pass-input" placeholder="SHKRUAJ KODIN E PLOTË TË ARKITEKTIT" autocomplete="off">
             <br>
-            <button onclick="validate()">EXECUTE_LOGIN</button>
+            <button onclick="validate()" class="btn-auth">EXECUTE_LOGIN_SEQUENCE</button>
+            <div id="auth-error" style="color: var(--alert-red); margin-top: 20px; font-size: 0.8em; display: none;">ACCESS_DENIED :: INVALID_CREDENTIALS</div>
         </div>
     </div>
 
-    <div id="system-ui">
-        <div class="column">
-            <div class="header">KONTROLLI I NYJEVE</div>
-            <button class="admin-btn">VODAFONE_AL_LINK [ACTIVE]</button>
-            <button class="admin-btn">JERA_TRANSFER_AUTH [READY]</button>
-            <button class="admin-btn">SYNC_GLOBAL_DATABASE</button>
-            <button class="admin-btn">AES_256_RE-ENCRYPT</button>
+    <div id="core-interface">
+        
+        <div class="header">
+            <div class="header-title">BESA-SUPERNOVA // SYSTEM_CORE</div>
+            <div class="header-stats">GRID_STATUS: <span class="status-up">STABLE</span> // LATENCY: 14ms // LOC: TIRANA_AL</div>
+        </div>
+
+        <div class="panel panel-left">
+            <div class="panel-header">NETWORK_NODES</div>
             
-            <div style="margin-top: auto; font-size: 0.65em; line-height: 1.6;">
-                <span style="color: var(--accent);">ADMINISTRATOR:</span><br>
-                MANDI JATAGANI<br>
-                <span style="color: var(--accent);">RANK:</span> ARCHITECT L10
+            <div class="data-block">
+                <span class="data-label">VODAFONE_AL_LINK</span>
+                <span class="data-value status-up">ONLINE</span>
+            </div>
+            <div class="data-block">
+                <span class="data-label">JERA_CORE_SYNC</span>
+                <span class="data-value status-up">READY</span>
+            </div>
+            <div class="data-block">
+                <span class="data-label">GLOBAL_DB_ACCESS</span>
+                <span class="data-value status-up">ACTIVE</span>
+            </div>
+            <div class="data-block">
+                <span class="data-label">ENCRYPTION_LAYER</span>
+                <span class="data-value">AES-256</span>
+            </div>
+
+            <div style="margin-top: auto; border: 1px solid var(--grid-line); padding: 15px; background: rgba(212, 175, 55, 0.02);">
+                <div style="font-size: 0.7em; color: var(--besa-gold); letter-spacing: 2px;">AUTHORITY_PROFILE:</div>
+                <div style="font-size: 1.1em; color: #ffffff; margin-top: 5px;">MANDI JATAGANI</div>
+                <div style="font-size: 0.7em; color: var(--hologram-cyan); margin-top: 3px;">RANK: ARCHITECT (L10)</div>
+                <div style="font-size: 0.6em; opacity: 0.4; font-family: monospace; margin-top: 10px;">ID: 5251569791</div>
             </div>
         </div>
 
-        <div class="column viz-center">
-            <div class="core-display">
-                <h1 style="letter-spacing: 25px; color: var(--accent); margin: 0; font-size: 3.5em;">BESA</h1>
-                <div style="font-size: 0.6em; opacity: 0.5; letter-spacing: 5px;">SUPERNOVA CORE SYSTEM</div>
-            </div>
-            <div class="terminal-box" id="term">
-                > [SYSTEM] Mjedisi i administrimit u ngarkua me sukses.<br>
-                > [AUTH] Arkitekti Mandi Jatagani u identifikua.
-            </div>
+        <div class="viewport">
+            <div class="besa-core-glow"></div>
+            <h1 class="besa-title-visual">BESA</h1>
+            <div style="font-size: 0.7em; color: var(--besa-gold); letter-spacing: 10px; opacity: 0.7; position: relative; z-index: 1;">INFINITE_PROSPERITY_PROTOCOL</div>
         </div>
 
-        <div class="column">
-            <div class="header">INTEGRITETI & LEGACY</div>
-            <div style="background: rgba(255,255,255,0.03); padding: 10px; border-left: 2px solid var(--primary); margin-bottom: 10px;">
-                <small>SIGNAL_STRENGTH</small><br>100%
-            </div>
+        <div class="panel panel-right">
+            <div class="panel-header">CONTROL_PANEL</div>
             
-            <div style="margin-top: 30px; border: 1px solid var(--danger); padding: 10px;">
-                <div style="font-size: 0.65em; color: var(--danger);">LEGACY_SWITCH: AKTIV</div>
-                <div style="font-size: 0.6em; margin-top: 5px;">Në rast mungese të Arkitektit, autoriteti transferohet automatikisht te nyja pasuese (JERA).</div>
-            </div>
+            <button class="action-btn">> INITIALIZE_GLOBAL_SYNC</button>
+            <button class="action-btn">> DEPLOY_PROSPERITY_UPDATE</button>
+            <button class="action-btn">> RE-ROUTE_TRAFFIC (VODAFONE)</button>
+            <button class="action-btn">> EXECUTE_DB_BACKUP</button>
+            <button class="action-btn">> JERA_AUTHORITY_TRANSFER (LEGACY)</button>
+            
+            <button class="action-btn" style="border-color: rgba(255, 49, 49, 0.2); color: rgba(255, 49, 49, 0.6); margin-top: 20px;">> EMERGENCY_CORE_SHUTDOWN</button>
+        </div>
 
-            <div style="margin-top: auto; text-align: right; font-size: 0.6em; opacity: 0.3;">
-                REF_ID: 5251569791
+        <div class="terminal">
+            <div class="terminal-header">LIVE_SYSTEM_STREAM</div>
+            <div class="terminal-window" id="term-stream">
+                [SYS_INIT] Duke ngarkuar mjedisin holografik...<br>
+                [AUTH] Handshake me nyjen qendrore: SUCCESS.<br>
+                [ADMIN] Mirëseerdhët, Mandi Jatagani. Sistemi është nën kontrollin tuaj të plotë.
             </div>
         </div>
+
     </div>
 
     <script>
-        const KEY = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
+        // KODI I PLOTË I ARKITEKTIT (CHIP-I I SIGURISË)
+        const MASTER_KEY = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791";
 
         function validate() {
             const input = document.getElementById('master-pass').value;
-            if(input === KEY) {
-                document.getElementById('auth-gate').style.display = "none";
-                document.getElementById('system-ui').style.visibility = "visible";
-                document.getElementById('system-ui').style.opacity = "1";
-                runSystem();
+            const gate = document.getElementById('gatekeeper');
+            const core = document.getElementById('core-interface');
+            const error = document.getElementById('auth-error');
+
+            if(input === MASTER_KEY) {
+                // Sekuenca e hapjes së portës
+                error.style.display = "none";
+                gate.style.transition = "transform 1s cubic-bezier(0.85, 0, 0.15, 1)";
+                gate.style.transform = "translateY(-100%)";
+                
+                core.style.visibility = "visible";
+                core.style.opacity = "1";
+                
+                startLiveUpdates();
             } else {
+                // Refuzimi
+                error.style.display = "block";
                 document.getElementById('master-pass').value = "";
             }
         }
 
-        function runSystem() {
-            const term = document.getElementById('term');
+        // SIMULIMI I TË DHËNAVE LIVE NË TERMINAL
+        function startLiveUpdates() {
+            const stream = document.getElementById('term-stream');
             const logs = [
-                "> [DATA] Integriteti i të dhënave: 100%.",
-                "> [SEC] Mburoja aktive në të gjitha nyjet.",
-                "> [NODE] Sinkronizimi me Vodafone Tirana: OK.",
-                "> [SYNC] Protokolli i Prosperitetit në ekzekutim."
+                "[DATA] Integriteti i nyjes Vodafone Tirana: 100% VERIFIED.",
+                "[SEC] Mburoja ADN kiberenetike aktive: ID_5251569791.",
+                "[SYNC] Duke shpërndarë Kreditet e Prosperitetit te nyjet e trojeve...",
+                "[INFO] Llozhat u bllokuan në rrethin e jashtëm (Layer 7 Filter).",
+                "[SYS] Besa-Supernova: Sistemi operon 100 vite para dynjasë."
             ];
+
             setInterval(() => {
                 const l = logs[Math.floor(Math.random() * logs.length)];
-                term.innerHTML += `<br>${l}`;
-                term.scrollTop = term.scrollHeight;
-            }, 4000);
+                const time = new Date().toLocaleTimeString();
+                stream.innerHTML += `<br>[${time}] ${l}`;
+                stream.scrollTop = stream.scrollHeight;
+            }, 4500);
         }
 
-        document.getElementById('master-pass').addEventListener('keypress', (e) => { if(e.key === 'Enter') validate(); });
+        // Lejo shtypjen e 'Enter' për ekzekutim
+        document.getElementById('master-pass').addEventListener('keypress', (e) => { 
+            if(e.key === 'Enter') validate(); 
+        });
     </script>
 </body>
 </html>

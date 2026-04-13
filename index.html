@@ -3,205 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BESA | MANDI LLAZI JATAGANI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <title>BESA-9.0 | AUTHENTICATION</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
-            --gold: #D4AF37;
-            --red: #8B0000;
-            --bg: #000;
-            --terminal: #00ff00;
-            --card-bg: #0a0a0a;
+            --primary-glow: #00ff41;
+            --bg-color: #050505;
+            --panel-bg: rgba(0, 20, 0, 0.8);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: var(--bg); 
-            color: white; 
-            font-family: 'Inter', sans-serif; 
-            overflow: hidden; 
-            height: 100vh; 
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            color: var(--primary-glow);
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
         }
 
-        /* PORTA E SIGURISË JATAGANI */
-        #auth-gate {
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Overlay UI */
+        .interface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
-            z-index: 10000;
-            position: fixed;
-            width: 100%;
-            border: 4px solid var(--gold);
-        }
-
-        .auth-logo {
-            font-family: 'Playfair Display', serif;
-            color: var(--gold);
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            letter-spacing: 8px;
-            text-align: center;
-        }
-
-        .auth-subtitle {
-            color: var(--red);
-            font-size: 0.8rem;
-            letter-spacing: 3px;
-            margin-bottom: 30px;
-            font-weight: bold;
-        }
-
-        .auth-input {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            padding: 15px;
-            width: 85%;
-            max-width: 400px;
-            text-align: center;
-            border-radius: 0;
-            margin-bottom: 20px;
-            font-family: monospace;
-            outline: none;
-        }
-
-        .auth-btn {
-            background: var(--gold);
-            color: black;
-            border: none;
-            padding: 15px 60px;
-            font-weight: 900;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: 0.3s;
-        }
-
-        /* DASHBOARD KRYESOR */
-        #main-ui { display: none; flex-direction: column; height: 100vh; }
-
-        #terminal {
-            background: #000;
-            border-bottom: 2px solid var(--gold);
-            height: 25%;
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            color: var(--terminal);
-            overflow-y: auto;
-            border-left: 5px solid var(--red);
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            justify-content: space-between;
             padding: 20px;
-            overflow-y: auto;
+            box-sizing: border-box;
+            background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.8) 100%);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--primary-glow);
+            padding: 10px;
+            background: var(--panel-bg);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+        }
+
+        .main-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             flex-grow: 1;
         }
 
-        @media (max-width: 600px) {
-            .grid-container { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        .module {
-            background: var(--card-bg);
-            border: 1px solid #1a1a1a;
-            padding: 25px 10px;
+        .auth-box {
+            background: var(--panel-bg);
+            border: 2px solid var(--primary-glow);
+            padding: 30px;
             text-align: center;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.2s;
-            position: relative;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+            backdrop-filter: blur(10px);
         }
 
-        .module:active { background: #111; border-color: var(--gold); }
-        .module span { font-size: 2rem; display: block; margin-bottom: 10px; }
-        .module label { font-size: 0.75rem; font-weight: bold; color: var(--gold); letter-spacing: 1px; }
-
-        /* VIEWER */
-        #overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg);
-            z-index: 20000;
-            padding: 40px 20px;
+        input {
+            background: black;
+            border: 1px solid var(--primary-glow);
+            color: var(--primary-glow);
+            padding: 10px;
+            margin-top: 10px;
+            outline: none;
+            text-align: center;
+            width: 80%;
         }
 
-        .close-btn { color: var(--red); font-weight: bold; cursor: pointer; margin-bottom: 30px; display: block; }
+        .footer-logs {
+            height: 120px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--primary-glow);
+            padding: 15px;
+            font-size: 0.85rem;
+            overflow-y: hidden;
+        }
+
+        .scanline {
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 255, 65, 0.1);
+            position: absolute;
+            top: 0;
+            z-index: 20;
+            pointer-events: none;
+            animation: scan 6s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        .blink { animation: blinker 1.5s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="auth-gate">
-        <div class="auth-logo">JATAGANI</div>
-        <div class="auth-subtitle">PROTOKOLLI BESA 2026</div>
-        <input type="password" id="masterkey" class="auth-input" placeholder="SHKRUAJ KODIN E MBROJTJES">
-        <button class="auth-btn" onclick="login()">HYR NË SISTEM</button>
-    </div>
+    <div id="canvas-container"></div>
+    <div class="scanline"></div>
 
-    <div id="main-ui">
-        <div id="terminal">
-            > SISTEMI JATAGANI AKTIV...<br>
-            > PRITET AUTORIZIMI I ARKITEKTIT...<br>
+    <div class="interface">
+        <div class="header">
+            <div>SYSTEM: BESA-9.0 / CORE ALIGNMENT</div>
+            <div class="blink">STATUS: SECURE_SCAN</div>
+            <div>AUTHORITY: MANDI LLAZI JATAGANI</div>
         </div>
 
-        <div class="grid-container">
-            <div class="module" onclick="openMod('SHËNDETI', 'Statusi: Mbrojtje maksimale për stafin dhe familjet.')"><span>🏥</span><label>Shëndeti</label></div>
-            <div class="module" onclick="openMod('LIGJI', 'Garda Ligjore: Çdo kontratë është e blinduar.')"><span>🛡️</span><label>Ligji</label></div>
-            <div class="module" onclick="openMod('PRONAT', 'Portofoli i pasurive të paluajtshme: Gati.')"><span>🏢</span><label>Pronat</label></div>
-            <div class="module" onclick="openMod('JUNIOR', 'Zjarri Junior: Edukimi i brezave të rinj.')"><span>🔥</span><label>Junior</label></div>
-            <div class="module" onclick="openMod('FINANCA', 'Matrica e Prosperitetit: Bilanci aktiv.')"><span>📊</span><label>Financa</label></div>
-            <div class="module" onclick="openMod('ARKIVA', 'Dosjet e SNBESA: Të dhënat janë të siguruara.')"><span>📁</span><label>Arkiva</label></div>
-            <div class="module" onclick="openMod('SENTINEL', 'Vëzhgimi 24/7: Sistemi i rrjetit.')"><span>🛰️</span><label>Sentinel</label></div>
-            <div class="module" onclick="location.reload()"><span>🔒</span><label>DIL</label></div>
+        <div class="main-display">
+            <div class="auth-box" id="auth-panel">
+                <h2 style="margin-top:0;">PROTOKOLLI JATAGANI</h2>
+                <p>SHKRUAJ KODIN E AUTORIZIMIT</p>
+                <input type="password" id="passInput" placeholder="********">
+                <p id="msg" style="margin-top:15px; font-size: 12px;"></p>
+            </div>
         </div>
-    </div>
 
-    <div id="overlay">
-        <span class="close-btn" onclick="closeMod()">[ MBYLL MODULIN ]</span>
-        <h1 id="mod-title" style="color: var(--gold); font-family: 'Playfair Display', serif; margin-bottom: 20px; font-size: 2.5rem;"></h1>
-        <p id="mod-body" style="line-height: 1.8; color: #eee; font-size: 1.1rem; border-left: 2px solid var(--gold); padding-left: 20px;"></p>
+        <div class="footer-logs" id="terminal">
+            > [INFO] Inicializimi i Grid-it Sentinel u krye.<br>
+            > [WARN] Kërkohet autorizim për akses të plotë.<br>
+            > [LOG] Duke monitoruar portën 8080...<br>
+        </div>
     </div>
 
     <script>
-        const MASTER = "NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-525156979";
+        // 3D Background with Three.js
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        function login() {
-            const val = document.getElementById('masterkey').value;
-            if(val === MASTER) {
-                document.getElementById('auth-gate').style.display = 'none';
-                document.getElementById('main-ui').style.display = 'flex';
-                log("SISTEMI U ZGJUA.");
-                log("MIRËSEVJEN, Z. MANDI LLAZI JATAGANI.");
-                log("AUTORITETI: ARKITEKT I SISTEMIT.");
-            } else {
-                alert("KOD I GABUAR. AKSESI U REFUZUA.");
+        const grid = new THREE.GridHelper(200, 40, 0x00ff41, 0x002200);
+        scene.add(grid);
+        camera.position.z = 50;
+        camera.position.y = 20;
+        camera.rotation.x = -0.4;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            grid.rotation.y += 0.001;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Terminal Log Interaction
+        const terminal = document.getElementById('terminal');
+        const passInput = document.getElementById('passInput');
+        const msg = document.getElementById('msg');
+
+        passInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const val = passInput.value;
+                terminal.innerHTML += `> Duke testuar kodin: ${val.replace(/./g, '*')}...<br>`;
+                
+                // Këtu mund të vendosësh kodin tënd specifik
+                if(val === "BESA2026") { 
+                    msg.innerHTML = "AKSESI U LEJUA. MIRËSEVJEN MANDI.";
+                    msg.style.color = "lime";
+                    terminal.innerHTML += "> [SUCCESS] Autorizimi u pranua. Mirësevjen Kryetar.<br>";
+                } else {
+                    msg.innerHTML = "KOD I GABUAR. TENTATIVA U REGJISTRUA.";
+                    msg.style.color = "red";
+                    terminal.innerHTML += "> [ERROR] Tentativë e paautorizuar në sistem.<br>";
+                }
+                passInput.value = "";
             }
-        }
+        });
 
-        function log(msg) {
-            const t = document.getElementById('terminal');
-            t.innerHTML += `> [${new Date().toLocaleTimeString()}] ${msg}<br>`;
-            t.scrollTop = t.scrollHeight;
-        }
-
-        function openMod(t, b) {
-            document.getElementById('mod-title').innerText = t;
-            document.getElementById('mod-body').innerText = b;
-            document.getElementById('overlay').style.display = 'block';
-            log("MODULI U HAP: " + t);
-        }
-
-        function closeMod() {
-            document.getElementById('overlay').style.display = 'none';
-            log("KTHIM NË DASHBOARD.");
-        }
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>

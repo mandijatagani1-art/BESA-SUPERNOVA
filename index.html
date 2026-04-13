@@ -31,8 +31,8 @@
         <div class="panel">
             <h2 style="color: var(--gold);">KONTROLLI BESA</h2>
             <div id="auth-box">
-                <p>Shkruaj kodin e sigurisë për t'u lidhur me Supabase:</p>
-                <input type="number" id="secure-code" placeholder="KODI (13)">
+                <p>Shkruaj kodin e sigurisë (13):</p>
+                <input type="number" id="secure-code" placeholder="13">
                 <button class="btn" onclick="startBesa()">AKTIVIZO PROTOKOLLIN</button>
             </div>
             <div id="status-display" style="margin-top: 20px; font-family: monospace;"></div>
@@ -40,8 +40,8 @@
     </div>
 
     <script>
-        // KONFIGURIMI I SUPABASE - PROJEKTI MANDI JATAGANI
         const SB_URL = "https://rpuqfakiocdqwkxyerrz.supabase.co";
+        // Ky është çelësi i plotë JWT që i duhet sistemit:
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwdXFmYWtpb2NkcXdreHllcnJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI5OTkwNDgsImV4cCI6MjAyODU3NTA0OH0.Nolyf1mRzW937G6qY-FpYJ3M8Y_S_T-9g";
 
         async function startBesa() {
@@ -57,23 +57,19 @@
                 document.getElementById('auth-box').style.display = 'none';
                 document.getElementById('status-display').innerHTML = "<p class='status-on'>[ONLINE] MIRËSEVJEN MANDI JATAGANI</p>";
 
-                if (data.length === 0) {
-                    document.getElementById('property-container').innerHTML = "<p>Nuk u gjet asnjë pronë në databazë.</p>";
-                } else {
-                    document.getElementById('property-container').innerHTML = data.map(p => `
-                        <div class="card">
-                            <h2 style="margin:0; color:var(--gold);">${p.title}</h2>
-                            <p style="font-size:1.6rem; margin:5px 0 0 0; color:white;">${p.price.toLocaleString()} €</p>
-                        </div>
-                    `).join('');
-                }
+                document.getElementById('property-container').innerHTML = data.map(p => `
+                    <div class="card">
+                        <h2 style="margin:0; color:var(--gold);">${p.title}</h2>
+                        <p style="font-size:1.6rem; margin:5px 0 0 0; color:white;">${p.price.toLocaleString()} €</p>
+                    </div>
+                `).join('');
             } catch (e) { 
-                console.error("Gabimi:", e);
-                alert("Lidhja dështoi! Kontrollo nëse Policy (Allow public read) është aktive te Supabase."); 
+                console.error(e);
+                alert("Lidhja dështoi! Sigurohu që RLS është 'Allow public read' te Supabase."); 
             }
         }
 
-        // Globi 3D SNBESA
+        // Globi 3D
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true, antialias: true });

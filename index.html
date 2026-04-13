@@ -10,68 +10,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
-        :root {
-            --cyan: #00f2ff;
-            --green: #00ff41;
-            --gold: #d4af37;
-            --red: #ff3b30;
-            --dark: #050505;
-            --glass: rgba(0, 15, 25, 0.85);
-        }
-
+        :root { --cyan: #00f2ff; --green: #00ff41; --gold: #d4af37; --dark: #050505; --glass: rgba(0, 15, 25, 0.85); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--dark); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
-        
         #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; }
-
-        .app-shell {
-            position: relative; z-index: 100;
-            display: grid;
-            grid-template-columns: 80px 1fr 350px;
-            grid-template-rows: 70px 1fr;
-            height: 100vh; width: 100vw;
-        }
-
-        .header {
-            grid-column: 1 / 4;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 30px; border-bottom: 2px solid var(--cyan);
-            background: var(--glass); backdrop-filter: blur(10px);
-        }
-
-        .sidebar {
-            grid-column: 1; border-right: 1px solid rgba(0, 242, 255, 0.2);
-            background: var(--glass); display: flex; flex-direction: column; align-items: center; padding-top: 20px;
-        }
-
-        .main-content {
-            grid-column: 2; padding: 30px; overflow-y: auto;
-        }
-
-        .terminal-panel {
-            grid-column: 3; border-left: 1px solid rgba(0, 242, 255, 0.2);
-            background: rgba(0, 5, 10, 0.9); padding: 20px; font-family: 'JetBrains Mono', monospace;
-        }
-
-        .config-card {
-            background: var(--glass); border: 1px solid var(--gold);
-            padding: 20px; border-radius: 5px; margin-top: 20px;
-        }
-
-        input {
-            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--cyan);
-            color: white; padding: 10px; margin: 10px 0; border-radius: 3px;
-        }
-
-        button {
-            width: 100%; padding: 12px; background: var(--gold); border: none;
-            color: black; font-weight: bold; cursor: pointer; transition: 0.3s;
-        }
-
-        button:hover { background: var(--cyan); box-shadow: 0 0 15px var(--cyan); }
-
-        .status-online { color: var(--green); text-shadow: 0 0 10px var(--green); }
-        .log-entry { margin-bottom: 10px; font-size: 0.85rem; border-left: 2px solid var(--cyan); padding-left: 10px; }
+        .app-shell { position: relative; z-index: 100; display: grid; grid-template-columns: 80px 1fr 350px; grid-template-rows: 70px 1fr; height: 100vh; }
+        .header { grid-column: 1 / 4; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; border-bottom: 2px solid var(--cyan); background: var(--glass); backdrop-filter: blur(10px); }
+        .sidebar { grid-column: 1; border-right: 1px solid rgba(0, 242, 255, 0.2); background: var(--glass); display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
+        .main-content { grid-column: 2; padding: 30px; }
+        .terminal-panel { grid-column: 3; border-left: 1px solid rgba(0, 242, 255, 0.2); background: rgba(0, 5, 10, 0.9); padding: 20px; font-family: 'monospace'; }
+        .config-card { background: var(--glass); border: 1px solid var(--gold); padding: 20px; border-radius: 5px; margin-top: 20px; }
+        input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--cyan); color: white; padding: 10px; margin: 10px 0; }
+        button { width: 100%; padding: 12px; background: var(--gold); border: none; font-weight: bold; cursor: pointer; }
+        .log-entry { margin-bottom: 10px; font-size: 0.8rem; border-left: 2px solid var(--cyan); padding-left: 10px; }
     </style>
 </head>
 <body>
@@ -80,123 +31,69 @@
 
 <div class="app-shell">
     <header class="header">
-        <h1 style="color: var(--cyan); letter-spacing: 5px;">SNBESA v3.1</h1>
-        <div style="font-size: 0.8rem; color: var(--green);">[ AUTORITETI: MANDI LLAZI JATAGANI ]</div>
+        <h1 style="color: var(--cyan);">SNBESA v3.1</h1>
+        <div style="color: var(--green);">[ AUTORITETI: MANDI LLAZI JATAGANI ]</div>
     </header>
 
     <aside class="sidebar">
-        <div style="margin-bottom: 30px; color: var(--cyan);"><i class="fas fa-home fa-2x"></i></div>
-        <div style="margin-bottom: 30px; color: rgba(255,255,255,0.3);"><i class="fas fa-database fa-2x"></i></div>
-        <div style="margin-bottom: 30px; color: rgba(255,255,255,0.3);"><i class="fas fa-shield-alt fa-2x"></i></div>
+        <div style="color: var(--cyan);"><i class="fas fa-shield-alt fa-2x"></i></div>
     </aside>
 
     <main class="main-content">
-        <div id="welcome-msg">
-            <h2 style="color: var(--cyan);">Sistemi Operacional SNBESA</h2>
-            <p style="margin-top: 10px; color: #aaa;">Mirësevjen, Mandi. Sinteza me Supabase është gati për aktivizim.</p>
-        </div>
-
-        <div id="data-display" style="margin-top: 30px; display: none;">
-            <h3 style="color: var(--gold);">PRONAT LIVE:</h3>
-            <div id="properties-list" style="margin-top: 15px;"></div>
-        </div>
+        <h2 id="title-status" style="color: var(--cyan);">Sistemi në pritje...</h2>
+        <div id="data-display" style="margin-top: 20px;"></div>
     </main>
 
     <section class="terminal-panel">
-        <div style="color: var(--cyan); margin-bottom: 15px;">> BESA AI CORE</div>
-        <div id="terminal-logs">
-            <div class="log-entry">Sistemi gati... Pritet lidhja.</div>
-        </div>
-
+        <div id="terminal-logs"><div class="log-entry">Gati për aktivizim...</div></div>
         <div class="config-card" id="config-box">
-            <label style="font-size: 0.7rem; color: var(--gold);">SUPABASE URL</label>
-            <input type="text" id="db-url" placeholder="https://...">
-            
-            <label style="font-size: 0.7rem; color: var(--gold);">ANON KEY</label>
-            <input type="password" id="db-key" placeholder="sb_publishable...">
-            
-            <label style="font-size: 0.7rem; color: var(--gold);">KODI I SIGURISË (4+5+6-2)</label>
-            <input type="number" id="security-code" placeholder="?">
-            
-            <button onclick="connectSystem()">LIDHU ME SISTEMIN</button>
+            <input type="text" id="db-url" placeholder="Supabase URL">
+            <input type="password" id="db-key" placeholder="Anon Key">
+            <input type="number" id="security-code" placeholder="Kodi (13)">
+            <button onclick="connectSystem()">AKTIVIZO SUPERNOVËN</button>
         </div>
     </section>
 </div>
 
 <script>
-    let supabaseClient;
-
-    function addLog(msg, type = 'info') {
-        const logs = document.getElementById('terminal-logs');
-        const entry = document.createElement('div');
-        entry.className = 'log-entry';
-        if(type === 'success') entry.classList.add('status-online');
-        entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}`;
-        logs.prepend(entry);
-    }
-
     async function connectSystem() {
         const url = document.getElementById('db-url').value.trim();
         const key = document.getElementById('db-key').value.trim();
         const code = document.getElementById('security-code').value;
 
-        if (code != "13") {
-            addLog("KODI I GABUAR. Aksesi u refuzua.", "error");
-            return;
-        }
+        if (code !== "13") { alert("Kodi i gabuar!"); return; }
 
         try {
-            addLog("Duke u lidhur me Supabase...");
-            supabaseClient = supabase.createClient(url, key);
-            
-            const { data, error } = await supabaseClient.from('properties').select('*').limit(1);
+            const client = supabase.createClient(url, key);
+            const { data, error } = await client.from('properties').select('*');
             
             if (error) throw error;
 
-            addLog("LIDHUR ME SUKSES! Sistemi është Online.", "success");
+            document.getElementById('terminal-logs').innerHTML = '<div style="color: #00ff41;">[ONLINE] BESA SUPERNOVA U AKTIVIZUA!</div>';
             document.getElementById('config-box').style.display = 'none';
-            document.getElementById('data-display').style.display = 'block';
-            loadProperties();
-
-        } catch (err) {
-            addLog("GABIM: " + err.message, "error");
-            console.error(err);
-        }
-    }
-
-    async function loadProperties() {
-        const { data, error } = await supabaseClient.from('properties').select('*');
-        const list = document.getElementById('properties-list');
-        if (data) {
-            list.innerHTML = data.map(p => `
-                <div style="padding: 15px; border: 1px solid var(--cyan); margin-bottom: 10px; background: rgba(0, 242, 255, 0.05);">
-                    <strong>${p.title}</strong> - <span style="color: var(--green);">${p.price} €</span>
+            document.getElementById('title-status').innerText = "SISTEMI LIVE - PRONAT U NGARKUAN";
+            
+            document.getElementById('data-display').innerHTML = data.map(p => `
+                <div style="padding:10px; border:1px solid var(--gold); margin-bottom:10px;">
+                    ${p.title} - <span style="color:var(--green)">${p.price} €</span>
                 </div>
             `).join('');
+
+        } catch (err) {
+            alert("Gabim lidhjeje: " + err.message);
         }
     }
 
-    // Three.js Background (Matrix/Cyber Effect)
+    // BG Effect
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-
-    const geometry = new THREE.IcosahedronGeometry(20, 1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, transparent: true, opacity: 0.1 });
-    const sphere = new THREE.Mesh(geometry, material);
+    const sphere = new THREE.Mesh(new THREE.IcosahedronGeometry(20, 1), new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true, opacity: 0.1, transparent: true }));
     scene.add(sphere);
-
     camera.position.z = 50;
-
-    function animate() {
-        requestAnimationFrame(animate);
-        sphere.rotation.y += 0.002;
-        sphere.rotation.x += 0.001;
-        renderer.render(scene, camera);
-    }
+    function animate() { requestAnimationFrame(animate); sphere.rotation.y += 0.002; renderer.render(scene, camera); }
     animate();
 </script>
-
 </body>
 </html>

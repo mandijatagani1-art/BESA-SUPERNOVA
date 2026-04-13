@@ -2,170 +2,210 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <title>BESA-9.0 | AI OPERATIONAL SYSTEM</title>
+    <title>BESA AI | OPERATIONAL APP</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
-            --neon-blue: #00f2ff;
-            --neon-green: #00ff41;
-            --glass: rgba(0, 15, 25, 0.85);
-            --border: 1px solid rgba(0, 242, 255, 0.3);
+            --neon: #00f2ff;
+            --besa-green: #00ff41;
+            --panel-bg: rgba(0, 10, 20, 0.9);
         }
 
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; font-family: 'Inter', sans-serif; }
-        #canvas-container { position: absolute; top: 0; left: 0; z-index: 1; filter: brightness(0.5); }
-
-        /* Main App Shell */
-        .app-shell {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 10; display: grid;
-            grid-template-columns: 80px 1fr 350px; /* Sidebar, Content, AI Window */
-            grid-template-rows: 60px 1fr;
-            gap: 1px; background: rgba(0, 242, 255, 0.1);
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: #000; overflow: hidden; color: white;
+            font-family: 'Segoe UI', Arial, sans-serif;
         }
 
-        .panel { background: var(--glass); backdrop-filter: blur(15px); border: var(--border); }
+        /* Globi në sfond */
+        #canvas-container { 
+            position: fixed; top: 0; left: 0; 
+            width: 100%; height: 100%; z-index: 1; 
+        }
 
-        /* Top Bar */
-        .top-bar { grid-column: 1 / 4; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; color: var(--neon-blue); }
+        /* Shtresa kryesore e App-it */
+        .app-container {
+            position: relative; z-index: 10;
+            display: grid;
+            grid-template-columns: 80px 1fr 380px;
+            grid-template-rows: 70px 1fr;
+            height: 100vh;
+            width: 100vw;
+            pointer-events: none; /* Lejon klikimin e globit nëse duhet, por ne do e ndryshojmë për panelet */
+        }
 
-        /* AI BESA Window */
-        .ai-window {
-            grid-row: 2; grid-column: 3;
+        .panel { 
+            background: var(--panel-bg); 
+            border: 1px solid rgba(0, 242, 255, 0.2); 
+            backdrop-filter: blur(10px);
+            pointer-events: auto; /* Lejon klikimet brenda paneleve */
+        }
+
+        /* Header */
+        .header {
+            grid-column: 1 / 4;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 25px; border-bottom: 2px solid var(--neon);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+        }
+
+        /* Sidebar Navigimi */
+        .sidebar {
+            grid-column: 1; grid-row: 2;
+            display: flex; flex-direction: column; align-items: center;
+            padding-top: 30px; gap: 25px;
+        }
+
+        .nav-icon {
+            width: 50px; height: 50px; border: 1px solid var(--neon);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--neon); transition: 0.3s;
+        }
+        .nav-icon:hover { background: var(--neon); color: black; box-shadow: 0 0 15px var(--neon); }
+
+        /* Hapësira e Projekteve */
+        .main-workspace {
+            grid-column: 2; grid-row: 2;
+            padding: 40px; overflow-y: auto;
+        }
+
+        /* DRITARJA AI BESA */
+        .ai-besa-chat {
+            grid-column: 3; grid-row: 2;
             display: flex; flex-direction: column;
-            border-left: 2px solid var(--neon-blue);
+            border-left: 2px solid var(--neon);
         }
 
-        .ai-chat-output {
-            flex-grow: 1; padding: 15px; overflow-y: auto;
-            color: #e0e0e0; font-size: 0.9rem; line-height: 1.5;
+        .chat-display {
+            flex-grow: 1; padding: 20px; overflow-y: auto;
+            font-family: 'Courier New', monospace; font-size: 14px;
         }
 
-        .ai-input-area {
-            height: 80px; padding: 10px; border-top: var(--border);
-            display: flex; align-items: center;
+        .chat-input-wrapper {
+            padding: 20px; border-top: 1px solid rgba(0, 242, 255, 0.3);
         }
 
-        textarea {
-            background: rgba(0,0,0,0.5); border: 1px solid var(--neon-blue);
-            color: #fff; width: 100%; height: 50px; resize: none;
-            padding: 10px; outline: none; border-radius: 5px;
+        input#user-input {
+            width: 100%; background: rgba(0,0,0,0.7); border: 1px solid var(--besa-green);
+            color: white; padding: 12px; outline: none; font-family: inherit;
         }
 
-        /* Project Content Area */
-        .main-content { grid-row: 2; grid-column: 2; padding: 30px; color: white; }
+        .besa-msg { color: var(--besa-green); margin-bottom: 15px; }
+        .mandi-msg { color: var(--neon); text-align: right; margin-bottom: 15px; }
 
-        /* Navigation Sidebar */
-        .sidebar { grid-row: 2; grid-column: 1; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 20px; }
-        .nav-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--neon-blue); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--neon-blue); }
-        .nav-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue); }
-
-        .msg-besa { color: var(--neon-green); margin-bottom: 10px; border-left: 2px solid var(--neon-green); padding-left: 10px; }
-        .msg-mandi { color: var(--neon-blue); text-align: right; margin-bottom: 10px; }
+        .card {
+            background: rgba(255,255,255,0.05); padding: 20px;
+            border-radius: 5px; border-left: 4px solid var(--neon);
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
 
-<div id="canvas-container"></div>
+    <div id="canvas-container"></div>
 
-<div class="app-shell">
-    <div class="panel top-bar">
-        <div style="font-weight: bold; letter-spacing: 2px;">BESA-9.0 / SUPERNOVA CORE</div>
-        <div style="font-size: 12px;">ID: MANDI LLAZI JATAGANI | <span style="color:var(--neon-green)">ONLINE</span></div>
-    </div>
-
-    <div class="panel sidebar">
-        <div class="nav-btn" title="Dashboard">D</div>
-        <div class="nav-btn" title="Projekte">P</div>
-        <div class="nav-btn" title="Bletet">B</div>
-        <div class="nav-btn" title="Cilësimet">S</div>
-    </div>
-
-    <div class="main-content">
-        <h1 id="page-title">Paneli i Punës</h1>
-        <div id="project-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="panel" style="padding: 20px;">
-                <h3>Statusi i Projektit</h3>
-                <p>Faza: Aplikim Real</p>
-                <progress value="85" max="100" style="width: 100%;"></progress>
+    <div class="app-container">
+        <header class="panel header">
+            <div style="font-size: 22px; font-weight: bold; letter-spacing: 3px;">BESA SUPERNOVA v9.0</div>
+            <div style="text-align: right;">
+                <span style="color: var(--besa-green);">● LIVE FEED</span> | MANDI LLAZI JATAGANI
             </div>
-            <div class="panel" style="padding: 20px;">
-                <h3>Sinteza Fizike</h3>
-                <p>Gati për sinkronizim me punët në terren.</p>
+        </header>
+
+        <aside class="panel sidebar">
+            <div class="nav-icon" title="Projekte">PR</div>
+            <div class="nav-icon" title="Bletaria">BL</div>
+            <div class="nav-icon" title="Sinteza">SY</div>
+            <div class="nav-icon" title="Sistemi">SI</div>
+        </aside>
+
+        <main class="main-workspace">
+            <div class="card">
+                <h2>PROJEKTI: APLIKIMI REAL</h2>
+                <p>Statusi: Duke integruar 12 faqet operacionale.</p>
+                <p>Urdhri i fundit: Lidhja direkte me AI Besa.</p>
             </div>
-        </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="panel" style="padding: 15px;">
+                    <h4>VEPRIMET FIZIKE</h4>
+                    <small>Shtyp për të raportuar punën në terren</small>
+                </div>
+                <div class="panel" style="padding: 15px;">
+                    <h4>SINKRONIZIMI</h4>
+                    <small>Kodi: 525156979</small>
+                </div>
+            </div>
+        </main>
+
+        <section class="panel ai-besa-chat">
+            <div style="padding: 15px; background: rgba(0, 255, 65, 0.1); border-bottom: 1px solid var(--besa-green);">
+                <strong>COMMUNICATOR: BESA AI</strong>
+            </div>
+            <div class="chat-display" id="chat">
+                <div class="besa-msg">> Përshëndetje Mandi. Jam gati për punë. Shkruaj projektin e radhës këtu dhe unë do të asistoj direkt.</div>
+            </div>
+            <div class="chat-input-wrapper">
+                <input type="text" id="user-input" placeholder="Shkruaj komandën ose projektin...">
+            </div>
+        </section>
     </div>
 
-    <div class="panel ai-window">
-        <div style="padding: 10px; border-bottom: var(--border); font-weight: bold; color: var(--neon-green);">
-            DIRECT COMM: BESA AI
-        </div>
-        <div class="ai-chat-output" id="chat-box">
-            <div class="msg-besa">Gati për fazën e aplikimit. Mandi, çfarë projekti do të kompletojmë sot fizikisht?</div>
-        </div>
-        <div class="ai-input-area">
-            <textarea id="ai-input" placeholder="Shkruaj Besës..."></textarea>
-        </div>
-    </div>
-</div>
-
-<script>
-    // 3D Globe Background
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-    const globe = new THREE.Mesh(
-        new THREE.SphereGeometry(25, 64, 64),
-        new THREE.MeshPhongMaterial({
-            map: new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg'),
-            emissive: new THREE.Color(0x00f2ff),
-            emissiveIntensity: 0.15
-        })
-    );
-    scene.add(globe);
-    scene.add(new THREE.AmbientLight(0x404040));
-    const light = new THREE.PointLight(0xffffff, 1);
-    light.position.set(50, 50, 50);
-    scene.add(light);
-
-    camera.position.z = 80;
-
-    function animate() {
-        requestAnimationFrame(animate);
-        globe.rotation.y += 0.001;
-        renderer.render(scene, camera);
-    }
-    animate();
-
-    // AI Communication Logic
-    const chatBox = document.getElementById('chat-box');
-    const aiInput = document.getElementById('ai-input');
-
-    aiInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            const text = aiInput.value;
-            if(!text) return;
-
-            chatBox.innerHTML += `<div class="msg-mandi">${text}</div>`;
-            aiInput.value = '';
-
-            // BESA Response Simulation
-            setTimeout(() => {
-                chatBox.innerHTML += `<div class="msg-besa">Udhëzimi u mor. Po integroj projektin direkt në arkitekturën tonë. Veprimet fizike po sinkronizohen...</div>`;
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }, 1000);
-        }
-    });
-
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+    <script>
+        // BACKGROUND GLOBE (Three.js)
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-</script>
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const globe = new THREE.Mesh(
+            new THREE.SphereGeometry(25, 64, 64),
+            new THREE.MeshPhongMaterial({
+                map: new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg'),
+                emissive: new THREE.Color(0x00ff41),
+                emissiveIntensity: 0.1,
+                wireframe: false
+            })
+        );
+        scene.add(globe);
+        scene.add(new THREE.AmbientLight(0x444444));
+        const light = new THREE.PointLight(0xffffff, 1);
+        light.position.set(50, 50, 50);
+        scene.add(light);
+        camera.position.z = 85;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            globe.rotation.y += 0.001;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // CHAT LOGIC
+        const userInput = document.getElementById('user-input');
+        const chatDisplay = document.getElementById('chat');
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const text = userInput.value;
+                if(!text) return;
+
+                chatDisplay.innerHTML += `<div class="mandi-msg">MANDI: ${text}</div>`;
+                userInput.value = '';
+
+                setTimeout(() => {
+                    chatDisplay.innerHTML += `<div class="besa-msg">> BESA: Urdhri u pranua. Duke përpunuar projektin dhe duke sinkronizuar të dhënat fizike...</div>`;
+                    chatDisplay.scrollTop = chatDisplay.scrollHeight;
+                }, 800);
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 </html>

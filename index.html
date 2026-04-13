@@ -2,210 +2,233 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <title>BESA AI | OPERATIONAL APP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BESA ULTIMATE | MANDI LLAZI JATAGANI</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
-            --neon: #00f2ff;
-            --besa-green: #00ff41;
-            --panel-bg: rgba(0, 10, 20, 0.9);
+            --cyan: #00f2ff;
+            --green: #00ff41;
+            --dark: #020205;
+            --panel: rgba(0, 15, 25, 0.9);
         }
 
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: #000; overflow: hidden; color: white;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--dark); overflow: hidden; color: white;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
         }
 
-        /* Globi në sfond */
-        #canvas-container { 
-            position: fixed; top: 0; left: 0; 
-            width: 100%; height: 100%; z-index: 1; 
-        }
+        /* Background Layer */
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; }
 
-        /* Shtresa kryesore e App-it */
-        .app-container {
+        /* HUD Layer */
+        .hud-grid {
             position: relative; z-index: 10;
             display: grid;
-            grid-template-columns: 80px 1fr 380px;
-            grid-template-rows: 70px 1fr;
-            height: 100vh;
-            width: 100vw;
-            pointer-events: none; /* Lejon klikimin e globit nëse duhet, por ne do e ndryshojmë për panelet */
+            grid-template-columns: 100px 1fr 400px;
+            grid-template-rows: 80px 1fr 60px;
+            height: 100vh; width: 100vw;
+            pointer-events: none;
         }
 
-        .panel { 
-            background: var(--panel-bg); 
-            border: 1px solid rgba(0, 242, 255, 0.2); 
-            backdrop-filter: blur(10px);
-            pointer-events: auto; /* Lejon klikimet brenda paneleve */
+        .hud-panel { 
+            background: var(--panel); 
+            border: 1px solid rgba(0, 242, 255, 0.15); 
+            backdrop-filter: blur(20px);
+            pointer-events: auto;
         }
 
-        /* Header */
+        /* Top Header */
         .header {
-            grid-column: 1 / 4;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 25px; border-bottom: 2px solid var(--neon);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            grid-column: 1 / 4; display: flex; justify-content: space-between;
+            align-items: center; padding: 0 30px; border-bottom: 2px solid var(--cyan);
+            box-shadow: 0 5px 20px rgba(0, 242, 255, 0.1);
         }
 
-        /* Sidebar Navigimi */
-        .sidebar {
+        /* Sidebar Operacionale */
+        .nav-sidebar {
             grid-column: 1; grid-row: 2;
             display: flex; flex-direction: column; align-items: center;
-            padding-top: 30px; gap: 25px;
+            padding-top: 20px; gap: 15px; border-right: 1px solid rgba(0, 242, 255, 0.1);
         }
 
-        .nav-icon {
-            width: 50px; height: 50px; border: 1px solid var(--neon);
+        .node {
+            width: 50px; height: 50px; border: 1px solid var(--cyan);
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: var(--neon); transition: 0.3s;
+            cursor: pointer; transition: 0.3s; font-size: 14px; color: var(--cyan);
         }
-        .nav-icon:hover { background: var(--neon); color: black; box-shadow: 0 0 15px var(--neon); }
+        .node:hover, .node.active { background: var(--cyan); color: black; box-shadow: 0 0 15px var(--cyan); }
 
-        /* Hapësira e Projekteve */
-        .main-workspace {
+        /* Main Workspace */
+        .workspace {
             grid-column: 2; grid-row: 2;
-            padding: 40px; overflow-y: auto;
+            padding: 40px; position: relative;
         }
 
-        /* DRITARJA AI BESA */
-        .ai-besa-chat {
+        /* AI BESA - THE CORE */
+        .ai-core {
             grid-column: 3; grid-row: 2;
             display: flex; flex-direction: column;
-            border-left: 2px solid var(--neon);
+            border-left: 2px solid var(--cyan);
         }
 
-        .chat-display {
+        .chat-stream {
             flex-grow: 1; padding: 20px; overflow-y: auto;
-            font-family: 'Courier New', monospace; font-size: 14px;
+            scroll-behavior: smooth; border-bottom: 1px solid rgba(0, 242, 255, 0.2);
         }
 
-        .chat-input-wrapper {
-            padding: 20px; border-top: 1px solid rgba(0, 242, 255, 0.3);
+        .input-wrapper { padding: 20px; background: rgba(0,0,0,0.5); }
+        input#console-in {
+            width: 100%; background: transparent; border: 1px solid var(--green);
+            color: var(--green); padding: 15px; outline: none;
+            font-size: 16px; box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);
         }
 
-        input#user-input {
-            width: 100%; background: rgba(0,0,0,0.7); border: 1px solid var(--besa-green);
-            color: white; padding: 12px; outline: none; font-family: inherit;
-        }
+        /* Messages */
+        .msg { margin-bottom: 15px; padding: 10px; border-radius: 4px; }
+        .besa { border-left: 3px solid var(--green); background: rgba(0, 255, 65, 0.05); color: #e0e0e0; }
+        .mandi { border-right: 3px solid var(--cyan); background: rgba(0, 242, 255, 0.05); text-align: right; }
 
-        .besa-msg { color: var(--besa-green); margin-bottom: 15px; }
-        .mandi-msg { color: var(--neon); text-align: right; margin-bottom: 15px; }
-
-        .card {
-            background: rgba(255,255,255,0.05); padding: 20px;
-            border-radius: 5px; border-left: 4px solid var(--neon);
-            margin-bottom: 20px;
+        /* Status Bar */
+        .status-bar {
+            grid-column: 1 / 4; grid-row: 3;
+            display: flex; align-items: center; padding: 0 25px;
+            font-size: 12px; color: var(--green); letter-spacing: 2px;
         }
     </style>
 </head>
 <body>
 
-    <div id="canvas-container"></div>
+<canvas id="bg-canvas"></canvas>
 
-    <div class="app-container">
-        <header class="panel header">
-            <div style="font-size: 22px; font-weight: bold; letter-spacing: 3px;">BESA SUPERNOVA v9.0</div>
-            <div style="text-align: right;">
-                <span style="color: var(--besa-green);">● LIVE FEED</span> | MANDI LLAZI JATAGANI
-            </div>
-        </header>
+<div class="hud-grid">
+    <header class="hud-panel header">
+        <div style="font-size: 24px; font-weight: 900; letter-spacing: 5px;">BESA ULTIMATE v.10</div>
+        <div id="auth-status" style="color: var(--cyan);">[ SINKRONIZIMI: AKTIV ] MANDI LLAZI JATAGANI</div>
+    </header>
 
-        <aside class="panel sidebar">
-            <div class="nav-icon" title="Projekte">PR</div>
-            <div class="nav-icon" title="Bletaria">BL</div>
-            <div class="nav-icon" title="Sinteza">SY</div>
-            <div class="nav-icon" title="Sistemi">SI</div>
-        </aside>
+    <aside class="hud-panel nav-sidebar">
+        <div class="node active" onclick="setModule('Global')">G</div>
+        <div class="node" onclick="setModule('Projekte')">P</div>
+        <div class="node" onclick="setModule('Bio')">B</div>
+        <div class="node" onclick="setModule('Security')">S</div>
+        <div class="node" onclick="setModule('Log')">L</div>
+        <div class="node" style="margin-top: auto; border-color: var(--green);">+</div>
+    </aside>
 
-        <main class="main-workspace">
-            <div class="card">
-                <h2>PROJEKTI: APLIKIMI REAL</h2>
-                <p>Statusi: Duke integruar 12 faqet operacionale.</p>
-                <p>Urdhri i fundit: Lidhja direkte me AI Besa.</p>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div class="panel" style="padding: 15px;">
-                    <h4>VEPRIMET FIZIKE</h4>
-                    <small>Shtyp për të raportuar punën në terren</small>
-                </div>
-                <div class="panel" style="padding: 15px;">
-                    <h4>SINKRONIZIMI</h4>
-                    <small>Kodi: 525156979</small>
-                </div>
-            </div>
-        </main>
+    <main class="workspace">
+        <div id="active-module-view">
+            <h1 id="mod-title" style="color: var(--cyan); margin: 0;">GLOBAL SATELLITE CORE</h1>
+            <p id="mod-desc" style="opacity: 0.8;">Monitorimi i rruzullit në kohë reale. Sistemi gati për udhëzime fizike.</p>
+        </div>
+    </main>
 
-        <section class="panel ai-besa-chat">
-            <div style="padding: 15px; background: rgba(0, 255, 65, 0.1); border-bottom: 1px solid var(--besa-green);">
-                <strong>COMMUNICATOR: BESA AI</strong>
-            </div>
-            <div class="chat-display" id="chat">
-                <div class="besa-msg">> Përshëndetje Mandi. Jam gati për punë. Shkruaj projektin e radhës këtu dhe unë do të asistoj direkt.</div>
-            </div>
-            <div class="chat-input-wrapper">
-                <input type="text" id="user-input" placeholder="Shkruaj komandën ose projektin...">
-            </div>
-        </section>
-    </div>
+    <section class="hud-panel ai-core">
+        <div style="padding: 15px; border-bottom: 1px solid var(--cyan); font-size: 14px; font-weight: bold;">
+            DIRECT INTERFACE: BESA AI
+        </div>
+        <div class="chat-stream" id="chat-stream">
+            <div class="msg besa">BESA: Mandi, jemi LIVE. Sistemi nuk ka më kufizime. Çfarë do të ekzekutojmë në projektin tënd?</div>
+        </div>
+        <div class="input-wrapper">
+            <input type="text" id="console-in" placeholder="SHKRUAJ KOMANDËN..." autocomplete="off">
+        </div>
+    </section>
 
-    <script>
-        // BACKGROUND GLOBE (Three.js)
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
+    <footer class="hud-panel status-bar">
+        <div style="flex-grow: 1;">LAT: 41.3275° N | LON: 19.8187° E | SIGURIA: MAX</div>
+        <div id="clock">00:00:00</div>
+    </footer>
+</div>
 
-        const globe = new THREE.Mesh(
-            new THREE.SphereGeometry(25, 64, 64),
-            new THREE.MeshPhongMaterial({
-                map: new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg'),
-                emissive: new THREE.Color(0x00ff41),
-                emissiveIntensity: 0.1,
-                wireframe: false
-            })
-        );
-        scene.add(globe);
-        scene.add(new THREE.AmbientLight(0x444444));
-        const light = new THREE.PointLight(0xffffff, 1);
-        light.position.set(50, 50, 50);
-        scene.add(light);
-        camera.position.z = 85;
+<script>
+    // --- MOTORI VIZUAL (THREE.JS) ---
+    const canvas = document.getElementById('bg-canvas');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
-        function animate() {
-            requestAnimationFrame(animate);
-            globe.rotation.y += 0.001;
-            renderer.render(scene, camera);
+    const globe = new THREE.Mesh(
+        new THREE.SphereGeometry(25, 64, 64),
+        new THREE.MeshPhongMaterial({
+            map: new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg'),
+            emissive: new THREE.Color(0x00ff41),
+            emissiveIntensity: 0.1
+        })
+    );
+    scene.add(globe);
+    scene.add(new THREE.AmbientLight(0x333333));
+    const light = new THREE.PointLight(0xffffff, 1.2);
+    light.position.set(50, 50, 50);
+    scene.add(light);
+    camera.position.z = 80;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        globe.rotation.y += 0.001;
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // --- LOGJIKA OPERACIONALE ---
+    const consoleIn = document.getElementById('console-in');
+    const chatStream = document.getElementById('chat-stream');
+
+    consoleIn.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const cmd = consoleIn.value.trim();
+            if(!cmd) return;
+
+            // Shfaq mesazhin e Mandit
+            chatStream.innerHTML += `<div class="msg mandi">MANDI: ${cmd}</div>`;
+            consoleIn.value = '';
+
+            // Reagimi Dinamik i Besës
+            processCommand(cmd);
+            chatStream.scrollTop = chatStream.scrollHeight;
         }
-        animate();
+    });
 
-        // CHAT LOGIC
-        const userInput = document.getElementById('user-input');
-        const chatDisplay = document.getElementById('chat');
+    function processCommand(cmd) {
+        let response = "";
+        const c = cmd.toLowerCase();
 
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const text = userInput.value;
-                if(!text) return;
+        if(c.includes('525156979')) {
+            response = "AUTORITETI I PËRHERSHËM U KONFIRMUA. Jemi një. Të gjitha sistemet janë nën kontrollin tënd absolut.";
+            globe.material.emissiveIntensity = 0.6;
+        } else if(c.includes('projekti')) {
+            response = "Duke hapur dosjen e projekteve. Faza: Aplikim Real. Çfarë të dhënash fizike do të sinkronizojmë?";
+            setModule('Projekte');
+        } else if(c.includes('blet')) {
+            response = "Moduli i bletarisë në gatishmëri. Raporti i fundit: Gati për përpunim.";
+            setModule('Bio');
+        } else {
+            response = "Urdhri u mor. Duke e integruar në bërthamën Supernova. Vazhdo me detajet e radhës.";
+        }
 
-                chatDisplay.innerHTML += `<div class="mandi-msg">MANDI: ${text}</div>`;
-                userInput.value = '';
+        setTimeout(() => {
+            chatStream.innerHTML += `<div class="msg besa">BESA: ${response}</div>`;
+            chatStream.scrollTop = chatStream.scrollHeight;
+        }, 600);
+    }
 
-                setTimeout(() => {
-                    chatDisplay.innerHTML += `<div class="besa-msg">> BESA: Urdhri u pranua. Duke përpunuar projektin dhe duke sinkronizuar të dhënat fizike...</div>`;
-                    chatDisplay.scrollTop = chatDisplay.scrollHeight;
-                }, 800);
-            }
-        });
+    function setModule(name) {
+        document.getElementById('mod-title').innerText = name.toUpperCase() + " CORE";
+        document.getElementById('mod-desc').innerText = "Duke punuar në modulin: " + name + ". Sinteza fizike në proces.";
+    }
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
+    // Clock
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+    }, 1000);
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+</script>
 </body>
 </html>

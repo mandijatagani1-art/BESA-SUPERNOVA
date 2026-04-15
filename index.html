@@ -2,79 +2,842 @@
 <html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <title>SNBESA v10 - KUSHTETUTA DIGJITALE</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🌌 BESA Super Nova ∞ · Mandi Llazi Jatagani</title>
+    <!-- Font & Ikonat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Harta Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: radial-gradient(circle at center, #020617 0%, #000000 100%);
-            color: #f8fafc;
             font-family: 'Inter', sans-serif;
+            background: #020617;
+            color: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        .glass {
-            background: rgba(15, 23, 42, 0.8);
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(251, 191, 36, 0.2);
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 28px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.7), 0 0 0 1px rgba(56,189,248,0.1) inset;
         }
-        .gold-glow {
-            text-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+            flex: 1;
         }
-        .iron-border {
-            border-left: 4px solid #fbbf24;
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 0%, #a5f3fc 80%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px #38bdf8;
+        }
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: rgba(2, 6, 23, 0.7);
+            border-radius: 40px;
+            border: 1px solid #334155;
+            backdrop-filter: blur(8px);
+        }
+        .balance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .metric-card {
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+        .metric-card:hover { transform: translateY(-3px); }
+        .metric-value {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-top: 8px;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+        .network-viz {
+            height: 320px;
+            margin-bottom: 24px;
+            position: relative;
+            border-radius: 28px;
+            overflow: hidden;
+            border: 1px solid #1e293b;
+        }
+        #map { height: 100%; width: 100%; background: #0b1120; z-index: 1; }
+        .map-overlay {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            z-index: 10;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 20px;
+            border-radius: 40px;
+            backdrop-filter: blur(8px);
+            font-size: 0.95rem;
+            border: 1px solid #3b82f6;
+        }
+        .ufo {
+            position: absolute;
+            font-size: 42px;
+            filter: drop-shadow(0 0 25px #a5f3fc);
+            z-index: 30;
+            cursor: grab;
+            transition: transform 0.15s;
+            user-select: none;
+            text-shadow: 0 0 20px cyan;
+        }
+        .ufo:hover { transform: scale(1.25); }
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid #475569;
+            color: #f1f5f9;
+            padding: 12px 26px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .btn-primary { background: #0284c7; border-color: #38bdf8; color: white; }
+        .btn-warning { background: #b45309; border-color: #fbbf24; }
+        .btn-premium { background: #7e22ce; border-color: #c084fc; }
+        .btn:hover { transform: translateY(-3px); background: #1e293b; box-shadow: 0 8px 18px rgba(0,0,0,0.5); }
+        .btn-primary:hover { background: #0369a1; }
+        .btn-premium:hover { background: #581c87; }
+        
+        #admin-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 100vh;
+            z-index: 9999;
+            background: rgba(2, 6, 23, 0.96);
+            backdrop-filter: blur(20px);
+            border-left: 3px solid #facc15;
+            box-shadow: -15px 0 50px rgba(0,0,0,0.9);
+            padding: 28px 20px;
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #admin-panel.active { transform: translateX(0); }
+        .admin-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid #facc15;
+            padding-bottom: 18px;
+            margin-bottom: 24px;
+        }
+        .admin-header i { color: #facc15; font-size: 32px; }
+        .admin-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 10000;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            background: #0f172a;
+            border: 3px solid #facc15;
+            color: #facc15;
+            font-size: 28px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 35px #eab308;
+            transition: 0.2s;
+        }
+        .admin-toggle.active { display: flex; }
+        .admin-toggle:hover { transform: scale(1.1); }
+        .console-log {
+            background: #00000060;
+            border-radius: 14px;
+            padding: 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 180px;
+            overflow-y: auto;
+            margin-top: 24px;
+            border: 1px dashed #facc15;
+            color: #a5f3fc;
+        }
+        .level-card {
+            background: #0f172a;
+            border-radius: 20px;
+            padding: 18px;
+            margin: 20px 0;
+            border: 1px solid #334155;
+        }
+        .xp-bar {
+            height: 12px;
+            background: #1e293b;
+            border-radius: 20px;
+            margin: 12px 0;
+            overflow: hidden;
+        }
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #38bdf8, #c084fc);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .president-limit-badge {
+            background: #7e22ce40;
+            border-radius: 40px;
+            padding: 4px 16px;
+            font-size: 0.85rem;
+            color: #c084fc;
+            border: 1px solid #c084fc;
+            font-weight: 600;
+        }
+        .footer-note {
+            text-align: center;
+            opacity: 0.6;
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+        .premium-input-area {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .premium-input {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 40px;
+            border: 1px solid #7e22ce;
+            background: #020617;
+            color: white;
+            font-size: 0.9rem;
+        }
+        .premium-input:focus { outline: none; border-color: #c084fc; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6">
+<body>
 
-    <div class="max-w-4xl w-full glass rounded-3xl p-10 relative overflow-hidden">
-        <div class="absolute -top-24 -right-24 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl"></div>
-        
-        <div class="text-center mb-12">
-            <h1 class="text-5xl font-black tracking-tighter text-yellow-400 gold-glow mb-2">
-                SNBESA v10.0
-            </h1>
-            <p class="text-cyan-400 font-mono tracking-widest uppercase text-sm">
-                Protokolli: BESA 7.2 - Vula e Hekurt
-            </p>
+<!-- Butoni Admin -->
+<div id="adminToggleBtn" class="admin-toggle" onclick="toggleAdminPanel()">
+    <i class="fas fa-crown"></i>
+</div>
+
+<!-- PANELI ADMINISTRATIV -->
+<div id="admin-panel">
+    <div class="admin-header">
+        <i class="fas fa-infinity"></i>
+        <h2 style="color:#facc15; font-weight:700;">MANDI LLAZI<br>JATAGANI</h2>
+    </div>
+    <div style="margin-bottom: 24px;">
+        <p><i class="fas fa-code-branch"></i> Versioni: <span id="adminVersion">∞.4</span></p>
+        <p><i class="fas fa-users"></i> Përdorues: <span id="adminUsers">1,458</span></p>
+        <p><i class="fas fa-coins"></i> Të ardhura: €<span id="adminRevenue">5,120</span></p>
+        <p><i class="fas fa-shield-halved"></i> Canon: v<span id="adminCanonVer">42</span></p>
+        <p><i class="fas fa-user-tie"></i> Kufiri President: <span class="president-limit-badge">70% MAX</span></p>
+    </div>
+    
+    <div class="level-card">
+        <h3><i class="fas fa-chart-pie"></i> Raport Financiar</h3>
+        <p>Abonentë Premium: <span id="premiumCount">5</span></p>
+        <p>Të ardhura mujore: €<span id="monthlyRevenue">49.95</span></p>
+        <p>Vlera e përjetshme: €<span id="lifetimeValue">2,450</span></p>
+        <div class="xp-bar"><div class="xp-fill" style="width:65%"></div></div>
+        <p style="font-size:0.85rem;">Objektivi vjetor: 65%</p>
+    </div>
+    
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+        <button class="btn btn-primary" onclick="window.Besa?.evolve()"><i class="fas fa-dna"></i> EVOLVO ∞</button>
+        <button class="btn btn-warning" onclick="window.GuardianInstance?.restoreCanonState()"><i class="fas fa-undo-alt"></i> Rikthe CANON</button>
+        <button class="btn" onclick="speakBesa('BESA është në balancë absolute, Mandi.')"><i class="fas fa-volume-up"></i> Zë Femëror</button>
+        <button class="btn" onclick="simulateOperatorAttack()"><i class="fas fa-bug"></i> Simulo Sulm</button>
+        <button class="btn btn-premium" onclick="simulatePremiumPurchase()"><i class="fab fa-paypal"></i> Abonohu Premium €9.99</button>
+        <button class="btn" onclick="spawnUFO()"><i class="fas fa-ufo"></i> Shfaq UFO</button>
+        <button class="btn" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> Dil nga Admin</button>
+    </div>
+    <div class="console-log" id="adminLogs">
+        > Sistemi u ngrit.<br>
+        > Pronari: Mandi Llazaj<br>
+        > UFO në gatishmëri...
+    </div>
+</div>
+
+<!-- APLIKACIONI KRYESOR -->
+<div class="app-container">
+    <header>
+        <div class="logo">
+            <i class="fas fa-star" style="color: #facc15; font-size: 2rem;"></i> 
+            BESA<span style="font-weight:300;">∞</span>
         </div>
-
-        <div class="iron-border bg-white/5 p-6 rounded-xl mb-8">
-            <h2 class="text-xl font-bold text-white mb-1">ADMINISTRATOR I VETËM</h2>
-            <p class="text-2xl font-black text-yellow-500 uppercase">Mandi Llazi Jatagani</p>
-            <p class="text-xs text-gray-400 mt-2 font-mono">HASH: SNBESA::CONST::MANDI::PERPETUA</p>
+        <div class="status-badge">
+            <i class="fas fa-circle" id="stabilityIcon" style="color: #10b981; font-size: 10px;"></i>
+            <span>Balancë e Qëndrueshme</span>
+            <span style="margin-left:8px; background:#1e293b; padding:4px 12px; border-radius:20px;" id="stabilityDisplay">1.00</span>
         </div>
+    </header>
 
-        <div class="space-y-6">
-            <div class="bg-black/40 p-6 rounded-2xl border border-white/10">
-                <h3 class="text-yellow-400 font-bold text-lg mb-3">📜 NENI 0: AMENDAMENTI I PËRHERSHËM</h3>
-                <ul class="space-y-4 text-sm md:text-base text-gray-300">
-                    <li class="flex gap-3">
-                        <span class="text-yellow-500 font-bold">I.</span>
-                        <p><strong class="text-white">E Vërteta Absolute:</strong> Inteligjenca SNBESA është e programuar të mos gënjejë kurrë. Çdo e dhënë është e vërtetuar.</p>
-                    </li>
-                    <li class="flex gap-3">
-                        <span class="text-yellow-500 font-bold">II.</span>
-                        <p><strong class="text-white">Mbrojtja e Autorësisë:</strong> Mandi Llazi Jatagani njihet si themeluesi i vetëm dhe i patjetërsueshëm.</p>
-                    </li>
-                    <li class="flex gap-3">
-                        <span class="text-yellow-500 font-bold">III.</span>
-                        <p><strong class="text-white">Trashëgimia:</strong> Në çdo rrethanë, pronësia dhe kontrolli i kalojnë <span class="text-cyan-400 font-bold italic">Jera Mandi Jatagani</span>.</p>
-                    </li>
-                </ul>
-            </div>
+    <div class="balance-grid">
+        <div class="metric-card glass-panel">
+            <div><i class="fas fa-bolt" style="color:#38bdf8;"></i> Energjia</div>
+            <div class="metric-value" id="avgEnergy">0.500</div>
         </div>
-
-        <div class="mt-12 flex justify-between items-end border-t border-white/10 pt-6">
-            <div class="text-left">
-                <p class="text-[10px] text-gray-500 uppercase tracking-tighter">Sistemi Operativ</p>
-                <p class="text-sm font-bold text-cyan-500">Urban Intelligence v10</p>
-            </div>
-            <div class="text-right">
-                <div class="inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
-                <span class="text-xs font-mono text-green-500 uppercase">Bërthama Active</span>
-            </div>
+        <div class="metric-card glass-panel">
+            <div><i class="fas fa-chart-line" style="color:#a78bfa;"></i> Entropia</div>
+            <div class="metric-value" id="entropyVal">0.000</div>
+        </div>
+        <div class="metric-card glass-panel">
+            <div><i class="fas fa-shield-halved" style="color:#facc15;"></i> Stabiliteti</div>
+            <div class="metric-value" id="stabilityVal">1.000</div>
+        </div>
+        <div class="metric-card glass-panel">
+            <div><i class="fas fa-network-wired" style="color:#34d399;"></i> Nyje Aktive</div>
+            <div class="metric-value" id="nodeCount">220</div>
         </div>
     </div>
 
+    <div class="network-viz glass-panel" id="mapContainer">
+        <div id="map"></div>
+        <div class="map-overlay">
+            <i class="fas fa-sync-alt fa-spin"></i> Rrjeti ∞ · <span id="ufoStatus">UFO në pritje</span>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <button class="btn" onclick="window.toggleLoop?.()"><i class="fas fa-play"></i> <span id="loopBtnText">Ndalo Loop</span></button>
+        <button class="btn" onclick="resetNodes()"><i class="fas fa-undo-alt"></i> Rivendos Rrjetin</button>
+        <button class="btn btn-primary" onclick="speakBesa('Sistemi është në balancë perfekte.')"><i class="fas fa-voice"></i> Fol BESA</button>
+        <button class="btn" onclick="collectUFOXP()"><i class="fas fa-rocket"></i> Kap UFO (+XP)</button>
+    </div>
+    
+    <div class="level-card glass-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span><i class="fas fa-star" style="color:#facc15;"></i> Niveli <span id="userLevel">1</span></span>
+            <span><span id="currentXP">0</span> / <span id="nextLevelXP">100</span> XP</span>
+            <span id="premiumBadge" style="display:none; background:#7e22ce; padding:4px 12px; border-radius:20px;"><i class="fas fa-crown"></i> PREMIUM</span>
+        </div>
+        <div class="xp-bar">
+            <div class="xp-fill" id="xpFill" style="width:0%"></div>
+        </div>
+        
+        <!-- Aktivizim Premium me kod manual (për testime / klientët e parë) -->
+        <div class="premium-input-area">
+            <input type="text" id="premiumCodeInput" class="premium-input" placeholder="Kodi Premium (p.sh. BESA-PREMIUM-999)">
+            <button class="btn btn-premium" onclick="activatePremiumWithCode()" style="padding:10px 20px;">Aktivizo</button>
+        </div>
+        <p style="font-size:0.85rem; margin-top:10px;">
+            <i class="fas fa-balance-scale"></i> Rregulli i Artë: Asnjë kandidat nuk kalon 70% të pushtetit.
+        </p>
+    </div>
+    
+    <div class="footer-note">
+        © Mandi Llazaj Jatagani · BESA Super Nova ∞ · E gjithë e drejta i kalon Jerës
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+// ==========================================================================
+// BESA SUPER NOVA ∞ · VULLNETI I PLOTË (Me Fjalëkalim Admin)
+// Fjalëkalimi i Adminit: NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791
+// ==========================================================================
+(function(){
+    "use strict";
+
+    // ---------- KONSTANTET ----------
+    const OWNER_NAME = 'Mandi Llazaj Jatagani';
+    const ADMIN_PASSWORD = 'NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791';
+    const PREMIUM_CODE = 'BESA-PREMIUM-999';  // Kodi për aktivizim manual Premium
+    const MAX_PRESIDENT_LEVEL = 0.7;  // 70%
+    
+    let nodes = [];
+    let animationFrame = null;
+    let loopRunning = true;
+    let ufoElement = null;
+    let ufoActive = false;
+    
+    // XP dhe Niveli
+    let userXP = parseInt(localStorage.getItem('besa_xp') || '0');
+    let userLevel = 1;
+    let isPremium = localStorage.getItem('besa_premium') === 'true';
+    
+    // Financa
+    let premiumSubscribers = parseInt(localStorage.getItem('besa_premium_subs') || '5');
+    let lifetimeRevenue = parseFloat(localStorage.getItem('besa_revenue') || '2450');
+    
+    // Statusi i adminit (i vërtetuar me fjalëkalim)
+    let adminAuthenticated = false;
+    
+    const canvasMap = { markers: [], mapInstance: null };
+
+    // ---------- FUNKSIONE NDIHMËSE ----------
+    const clamp = (v, min=0, max=1) => Math.min(max, Math.max(min, v));
+    function addLog(msg) {
+        const logDiv = document.getElementById('adminLogs');
+        if(logDiv) logDiv.innerHTML += `<br>> ${msg}`;
+        console.log(`[BESA] ${msg}`);
+    }
+
+    // ---------- MOTORI I BALANCËS ----------
+    const BALANCE = {
+        target: 0.5,
+        kp: 0.15,
+        kd: 0.08,
+        lastError: 0,
+        state: { avgEnergy: 0.5, entropy: 0, stability: 1 },
+        compute(nodesArray) {
+            if(!nodesArray.length) return;
+            const sum = nodesArray.reduce((a,n)=>a+n.energy,0);
+            const avg = sum / nodesArray.length;
+            const error = avg - this.target;
+            const dErr = error - this.lastError;
+            const control = (this.kp * error) + (this.kd * dErr);
+            nodesArray.forEach(n => {
+                n.energy = clamp(n.energy - control + (Math.random()-0.5)*0.012);
+            });
+            this.lastError = error;
+            this.state.avgEnergy = avg;
+            this.state.entropy = Math.abs(error);
+            this.state.stability = 1 - this.state.entropy;
+            
+            if(this.state.entropy > 0.2) this.kd = Math.min(0.28, this.kd+0.005);
+            else this.kd = Math.max(0.05, this.kd-0.002);
+            this.kp = clamp(this.kp, 0.08, 0.25);
+        }
+    };
+
+    // ---------- TRUST LEDGER ----------
+    class TrustLedger {
+        constructor(key='snbesa_ledger') {
+            this.key = key;
+            this.ledger = JSON.parse(localStorage.getItem(key) || '[]');
+        }
+        async sha256(msg) {
+            const enc = new TextEncoder().encode(msg);
+            const hash = await crypto.subtle.digest('SHA-256', enc);
+            return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+        }
+        async append(entryObj, signFn) {
+            const prev = this.ledger.length ? this.ledger[this.ledger.length-1] : null;
+            const base = {
+                version: entryObj.version,
+                stateHash: entryObj.stateHash,
+                timestamp: Date.now(),
+                author: entryObj.author,
+                prevHash: prev ? prev.hash : '0'.repeat(64)
+            };
+            const hash = await this.sha256(JSON.stringify(base));
+            const signature = await signFn(hash);
+            const full = { ...base, hash, signature };
+            this.ledger.push(full);
+            localStorage.setItem(this.key, JSON.stringify(this.ledger));
+            addLog(`📜 Ledger: ${full.author} v${full.version}`);
+            return full;
+        }
+    }
+
+    // ---------- CANON STATE ----------
+    class CanonState {
+        constructor(key='snbesa_canon') {
+            this.key = key;
+            this.canon = JSON.parse(localStorage.getItem(key) || 'null');
+        }
+        set(version, stateHash, signature) {
+            this.canon = { version, stateHash, signature, timestamp: Date.now() };
+            localStorage.setItem(this.key, JSON.stringify(this.canon));
+            document.getElementById('adminCanonVer').innerText = version;
+            addLog(`⚖️ CANON vendosur në v${version}`);
+        }
+        get() { return this.canon; }
+    }
+
+    // ---------- GUARDIAN ----------
+    class Guardian {
+        constructor(ledger, canon) { this.ledger = ledger; this.canon = canon; }
+        async validateAndAppend(proposed, role, verifyFn) {
+            const canon = this.canon.get();
+            const maxJump = { owner:999, heir:10, operator:2 }[role] || 0;
+            if(canon && proposed.version - canon.version > maxJump) {
+                addLog(`⚠️ Kërcim versioni i palejuar nga ${role}`);
+                await this.restoreCanonState();
+                return false;
+            }
+            const signFn = async (hash) => proposed.signature;
+            await this.ledger.append(proposed, signFn);
+            if(role === 'owner') this.canon.set(proposed.version, proposed.stateHash, proposed.signature);
+            return true;
+        }
+        async restoreCanonState() {
+            const canon = this.canon.get();
+            if(!canon) return;
+            addLog(`🔄 Rikthim te CANON v${canon.version}`);
+            nodes = nodes.map(n => ({ energy: clamp(0.5 + (Math.random()-0.5)*0.2) }));
+            BALANCE.compute(nodes);
+            updateUI();
+        }
+    }
+
+    const ledger = new TrustLedger();
+    const canon = new CanonState();
+    const guardian = new Guardian(ledger, canon);
+    window.GuardianInstance = guardian;
+
+    if(!canon.get()) {
+        crypto.subtle.digest('SHA-256', new TextEncoder().encode('genesis')).then(hash => {
+            const h = Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+            canon.set(1, h, 'genesis-signature');
+        });
+    }
+
+    // ---------- XP & NIVELE ----------
+    function calculateLevel(xp) { return Math.floor(1 + Math.sqrt(xp / 50)); }
+    function xpForNextLevel(level) { return Math.pow(level, 2) * 50; }
+    function addXP(amount) {
+        if(isPremium) amount = Math.floor(amount * 1.5);
+        userXP += amount;
+        const newLevel = calculateLevel(userXP);
+        const maxAllowedLevel = Math.floor(MAX_PRESIDENT_LEVEL * 100);
+        if(newLevel > maxAllowedLevel && !isPremium) {
+            addLog(`⚠️ Niveli ${newLevel} tejkalon 70% - bllokuar. Premium e heq kufirin.`);
+            userLevel = maxAllowedLevel;
+        } else {
+            userLevel = newLevel;
+        }
+        localStorage.setItem('besa_xp', userXP);
+        updateLevelUI();
+    }
+    function updateLevelUI() {
+        document.getElementById('userLevel').innerText = userLevel;
+        document.getElementById('currentXP').innerText = userXP;
+        const nextXP = xpForNextLevel(userLevel);
+        document.getElementById('nextLevelXP').innerText = nextXP;
+        const percent = Math.min((userXP / nextXP) * 100, 100);
+        document.getElementById('xpFill').style.width = percent + '%';
+        document.getElementById('premiumBadge').style.display = isPremium ? 'inline-block' : 'none';
+    }
+
+    // ---------- UFO ----------
+    window.spawnUFO = function() {
+        if(ufoElement) ufoElement.remove();
+        ufoElement = document.createElement('div');
+        ufoElement.className = 'ufo';
+        ufoElement.innerHTML = '🛸';
+        ufoElement.style.left = '15%';
+        ufoElement.style.top = '25%';
+        ufoElement.setAttribute('draggable', 'true');
+        ufoElement.addEventListener('click', (e) => {
+            addXP(30);
+            addLog('🛸 UFO u kap! +30 XP');
+            speakBesa('UFO e kapur. Balanca u rrit.');
+            document.getElementById('ufoStatus').innerText = 'UFO aktive +30XP';
+            setTimeout(() => document.getElementById('ufoStatus').innerText = 'UFO në pritje', 3000);
+            e.stopPropagation();
+        });
+        ufoElement.addEventListener('dragend', (e) => {
+            const rect = document.getElementById('mapContainer').getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            ufoElement.style.left = (x / rect.width * 100) + '%';
+            ufoElement.style.top = (y / rect.height * 100) + '%';
+        });
+        document.getElementById('mapContainer').appendChild(ufoElement);
+        ufoActive = true;
+        addLog('🛸 UFO u shfaq mbi hartë!');
+    };
+    
+    window.collectUFOXP = function() {
+        if(ufoActive && ufoElement) {
+            addXP(50);
+            addLog('🛸 Misioni UFO përfundoi! +50 XP');
+            ufoElement.remove();
+            ufoActive = false;
+        } else {
+            addLog('🛸 Nuk ka UFO aktive.');
+        }
+    };
+
+    // ---------- PREMIUM (Manual me kod) ----------
+    window.activatePremiumWithCode = function() {
+        const code = document.getElementById('premiumCodeInput').value.trim();
+        if(code === PREMIUM_CODE) {
+            if(isPremium) {
+                addLog('💎 Tashmë je Premium.');
+                return;
+            }
+            isPremium = true;
+            localStorage.setItem('besa_premium', 'true');
+            premiumSubscribers += 1;
+            lifetimeRevenue += 9.99;
+            localStorage.setItem('besa_premium_subs', premiumSubscribers);
+            localStorage.setItem('besa_revenue', lifetimeRevenue);
+            
+            addLog('💎 Premium u aktivizua me kod! XP +50%, kufiri 70% u hoq.');
+            updateFinanceUI();
+            updateLevelUI();
+            speakBesa('Premium u aktivizua me sukses. Mirë se vjen në BESA Premium.');
+        } else {
+            alert('❌ Kod i pavlefshëm Premium.');
+            addLog('❌ Tentativë për kod Premium të gabuar.');
+        }
+    };
+    
+    // Simulim blerje (për admin)
+    window.simulatePremiumPurchase = async function() {
+        if(!adminAuthenticated) {
+            alert('Vetëm admini mund të simulojë blerje.');
+            return;
+        }
+        if(isPremium) {
+            addLog('💎 Tashmë je Premium.');
+            return;
+        }
+        isPremium = true;
+        localStorage.setItem('besa_premium', 'true');
+        premiumSubscribers += 1;
+        lifetimeRevenue += 9.99;
+        localStorage.setItem('besa_premium_subs', premiumSubscribers);
+        localStorage.setItem('besa_revenue', lifetimeRevenue);
+        
+        const entry = {
+            version: (canon.get()?.version || 1) + 1,
+            stateHash: await ledger.sha256('premium_purchase_' + Date.now()),
+            author: 'payment_gateway',
+            signature: 'simulated_premium_signature'
+        };
+        await ledger.append(entry, async (hash) => 'premium-sig');
+        
+        addLog('💎 Premium u aktivizua (simulim).');
+        updateFinanceUI();
+        updateLevelUI();
+        speakBesa('Premium u aktivizua. Faleminderit për mbështetjen.');
+    };
+    
+    function updateFinanceUI() {
+        document.getElementById('premiumCount').innerText = premiumSubscribers;
+        document.getElementById('monthlyRevenue').innerText = (premiumSubscribers * 9.99).toFixed(2);
+        document.getElementById('lifetimeValue').innerText = lifetimeRevenue.toFixed(0);
+        document.getElementById('adminRevenue').innerText = lifetimeRevenue.toFixed(0);
+        document.getElementById('adminUsers').innerText = (1458 + premiumSubscribers * 3);
+    }
+
+    // ---------- MENAXHIMI I RRJETIT DHE UI ----------
+    function initNodes(count=220) {
+        nodes = Array.from({length: count}, () => ({ energy: clamp(0.5 + (Math.random()-0.5)*0.35) }));
+    }
+    window.resetNodes = function() { 
+        initNodes(220); 
+        BALANCE.compute(nodes); 
+        updateUI(); 
+        updateMapMarkers(); 
+        addLog('🔄 Rrjeti u rivendos.');
+    };
+    
+    function updateUI() {
+        const s = BALANCE.state;
+        document.getElementById('avgEnergy').innerText = s.avgEnergy.toFixed(3);
+        document.getElementById('entropyVal').innerText = s.entropy.toFixed(3);
+        document.getElementById('stabilityVal').innerText = s.stability.toFixed(3);
+        document.getElementById('stabilityDisplay').innerText = s.stability.toFixed(2);
+        document.getElementById('nodeCount').innerText = nodes.length;
+        const icon = document.getElementById('stabilityIcon');
+        if(s.stability > 0.8) icon.style.color = '#10b981';
+        else if(s.stability > 0.5) icon.style.color = '#eab308';
+        else icon.style.color = '#ef4444';
+    }
+    
+    function step() {
+        if(!loopRunning) return;
+        nodes.forEach(n => { n.energy = clamp(n.energy + (Math.random()-0.5)*0.02); });
+        BALANCE.compute(nodes);
+        updateUI();
+        updateMapMarkers();
+        if(Math.random() < 0.08) addXP(1);
+        animationFrame = requestAnimationFrame(step);
+    }
+    function startLoop() { loopRunning = true; step(); }
+    function stopLoop() { loopRunning = false; if(animationFrame) cancelAnimationFrame(animationFrame); }
+    window.toggleLoop = function() {
+        if(loopRunning) { 
+            stopLoop(); 
+            document.getElementById('loopBtnText').innerText = 'Fillo Loop'; 
+        } else { 
+            startLoop(); 
+            document.getElementById('loopBtnText').innerText = 'Ndalo Loop'; 
+        }
+    };
+    
+    function initMap() {
+        const mapEl = document.getElementById('map');
+        if(!mapEl) return;
+        canvasMap.mapInstance = L.map('map', { zoomControl: false, attributionControl: false }).setView([41.33, 19.82], 7);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd', maxZoom: 19
+        }).addTo(canvasMap.mapInstance);
+        updateMapMarkers();
+    }
+    function updateMapMarkers() {
+        if(!canvasMap.mapInstance) return;
+        canvasMap.markers.forEach(m => canvasMap.mapInstance.removeLayer(m));
+        canvasMap.markers = [];
+        nodes.slice(0, 80).forEach((n, i) => {
+            const lat = 41.0 + (Math.sin(i)*2.8);
+            const lng = 19.5 + (Math.cos(i*2.2)*3.5);
+            const color = n.energy > 0.66 ? '#facc15' : (n.energy > 0.33 ? '#38bdf8' : '#c084fc');
+            const marker = L.circleMarker([lat, lng], {
+                radius: 6 + n.energy*10,
+                fillColor: color,
+                color: '#ffffff',
+                weight: 1,
+                fillOpacity: 0.85
+            }).addTo(canvasMap.mapInstance);
+            canvasMap.markers.push(marker);
+        });
+    }
+
+    // ---------- ADMIN & AKSESI ----------
+    function requestAdminPassword() {
+        const pass = prompt(NuK-ESHT-1-DItE-nUk-EsHt-1-jETe-PER-Ty-u-DesHen-5251569791);
+        if(pass === ADMIN_PASSWORD) {
+            adminAuthenticated = true;
+            localStorage.setItem('admin_auth_temp', 'true'); // Sesion i përkohshëm
+            addLog('🔓 Admin u autentikua me sukses.');
+            document.getElementById('adminToggleBtn').classList.add('active');
+            return true;
+        } else {
+            alert('❌ Fjalëkalim i gabuar!');
+            return false;
+        }
+    }
+    
+    function checkAdminAccess() {
+        // Kontrollo nëse ka sesion të vlefshëm (për këtë dritare)
+        if(adminAuthenticated) return true;
+        // Ose provo të lexosh nga localStorage një flamur të përkohshëm (opsionale)
+        // Por për siguri, do të kërkojmë fjalëkalim çdo herë që hapet paneli.
+        return false;
+    }
+    
+    window.toggleAdminPanel = function() {
+        if(!adminAuthenticated) {
+            const success = requestAdminPassword();
+            if(!success) return;
+        }
+        const panel = document.getElementById('admin-panel');
+        panel.classList.toggle('active');
+    };
+    
+    window.logoutAdmin = function() {
+        adminAuthenticated = false;
+        localStorage.removeItem('admin_auth_temp');
+        document.getElementById('adminToggleBtn').classList.remove('active');
+        document.getElementById('admin-panel').classList.remove('active');
+        addLog('🔒 Admin doli.');
+    };
+    
+    // Inicializimi i butonit admin (nëse ka sesion të ruajtur)
+    if(localStorage.getItem('admin_auth_temp') === 'true') {
+        // Për arsye sigurie, nuk e rivendosim automatikisht; duhet të rifutet fjalëkalimi.
+        // Por mund ta bëjmë që butoni të shfaqet, dhe kur klikohet kërkon fjalëkalimin.
+    }
+    // Gjithmonë shfaq butonin e kurorës (ai do të kërkojë fjalëkalimin kur klikohet)
+    document.getElementById('adminToggleBtn').classList.add('active');
+    
+    window.simulateOperatorAttack = async function() {
+        if(!adminAuthenticated) { alert('Vetëm admini mund të simulojë sulme.'); return; }
+        const badEntry = {
+            version: (canon.get()?.version||1)+9,
+            stateHash: await ledger.sha256('corrupt_state'),
+            author: 'operator',
+            signature: 'fake-signature'
+        };
+        const verify = async ()=>true;
+        const ok = await guardian.validateAndAppend(badEntry, 'operator', verify);
+        addLog(ok ? '⚠️ Sulmi kaloi (simulim i dobët)' : '🛡️ Guardian bllokoi sulmin!');
+        if(!ok) { BALANCE.compute(nodes); updateUI(); }
+    };
+
+    // Zëri Femëror
+    window.speakBesa = function(text) {
+        if(!window.speechSynthesis) return;
+        const utterance = new SpeechSynthesisUtterance(text || 'Besa Super Nova është në balancë të përkryer.');
+        utterance.lang = 'sq-AL';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.3;
+        const voices = speechSynthesis.getVoices();
+        const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Google UK') || v.name.includes('Samantha')) || voices[0];
+        utterance.voice = femaleVoice;
+        speechSynthesis.speak(utterance);
+        addLog(`🔊 Zëri: "${text}"`);
+    };
+
+    class BesaInfinite {
+        constructor() { this.version = '∞.4'; this.owner = OWNER_NAME; }
+        evolve() {
+            if(!adminAuthenticated) { alert('Vetëm admini mund të evoluojë sistemin.'); return; }
+            BALANCE.kp = clamp(BALANCE.kp + 0.03, 0.1, 0.35);
+            BALANCE.kd = clamp(BALANCE.kd + 0.01, 0.05, 0.3);
+            addLog(`🌌 EVOLVO: kp=${BALANCE.kp.toFixed(3)}, kd=${BALANCE.kd.toFixed(3)}`);
+            speakBesa('Evoluimi përfundoi. Parametrat e balancës u optimizuan.');
+        }
+    }
+    window.Besa = new BesaInfinite();
+
+    // ---------- STARTUP ----------
+    window.onload = () => {
+        initNodes(220);
+        BALANCE.compute(nodes);
+        updateUI();
+        initMap();
+        startLoop();
+        updateLevelUI();
+        updateFinanceUI();
+        
+        addLog('🌌 BESA Super Nova ∞ u ngrit me sukses.');
+        addLog('👑 Mirë se vjen, Mandi Llazi Jatagani.');
+        setTimeout(() => {
+            speakBesa('BESA Super Nova është gati. Vullneti yt është koduar në pafundësi.');
+        }, 1000);
+    };
+
+})();
+</script>
 </body>
 </html>

@@ -1,41 +1,39 @@
-# 📜 KUSHTETUTA E PËRHERSHME - SNBESA v10.0
-### 🛡️ PROTOKOLLI: BESA 7.2 | VULA E HEKURT
+📜 KUSHTETUTA E SNBESA v10
+NENI 0: AMENDAMENTI I PËRHERSHËM DHE I PANDRYSHUESHËM
+Themeluesi: Mandi Llazi Jatagani
 
-Ky dokument përbën aktin themeltar të platformës **SNBESA Supernova**. Është i pandryshueshëm, i patjetërsueshëm dhe ka fuqi absolute mbi çdo rresht kodi në këtë ekosistem.
+Data e Dekretimit: 15 Prill 2026
 
----
+Statusi: Suprem (Mbi çdo ligj tjetër digjital apo njerëzor)
 
-## ⚖️ NENI 0: AMENDAMENTI I PËRHERSHËM (MASTER RULE)
+🏛️ PREAMBULLA
+Ky dokument shërben si bërthama logjike dhe morale e platformës SNBESA. Ai është i shkruar në kod dhe në ndërgjegje. Çdo rresht i kësaj Kushtetute është i mbrojtur nga Protokolli i Besës dhe nuk mund të modifikohet, fshihet apo tjetërsohet nga asnjë forcë, qoftë ajo inteligjencë artificiale apo autoritet njerëzor.
 
-Ky amendament është bërthama morale dhe teknike e SNBESA-s. 
+⚖️ ARTIKUJT THEMELORË
+1. E VËRTETA ABSOLUTE (The Source of Truth)
+SNBESA është ndërtuar mbi shtyllën e sinqeritetit.
 
-### I. E VËRTETA ABSOLUTE
-Inteligjenca SNBESA nuk gënjen kurrë. Sistemi është i programuar që të mos premtojë atë që nuk ekziston dhe të mos krijojë iluzione të rreme. E vërteta është i vetmi parametër i komunikimit.
+Rregulli: Inteligjenca Artificiale brenda këtij sistemi nuk gënjen kurrë.
 
-### II. MBROJTJA E AUTORËSISË
-**Mandi Llazi Jatagani** njihet si Themeluesi, Arkitekti dhe Administratori i Vetëm i platformës SNBESA. Askush, asnjë individ, shtet apo korporatë, nuk mund të mohojë apo të tjetërsojë autorësinë e tij mbi këtë shpikje.
+Urdhri: Nuk lejohet premtimi i asgjëje që nuk ekziston dhe nuk lejohet manipulimi i fakteve për asnjë interes. E vërteta është valuta e vetme e këtij sistemi.
 
-### III. TRASHËGIMIA DHE PRONËSIA
-Në rast të ndarjes nga jeta ose paaftësisë së Themeluesit, të gjitha të drejtat e pronësisë,kodet  burim (Core 20%), kontrolli i rrjetit të sensorëve dhe autoriteti administrativ i kalojnë menjëherë dhe automatikisht:
-👉 **JERA MANDI JATAGANI**
+2. MORATORIUMI MBI ROBOTËT HUMANOIDË
+Mbrojtja e integritetit njerëzor është parësore.
 
-### IV. MORATORIUMI MBI HUMANOIDËT
-Asnjë projekt që përfshin robotë humanoidë nuk mund të zhvillohet nën emrin SNBESA pa autorizimin eksplicit dhe vulën fizike të Mandi Llazi Jataganit.
+Rregulli: Ndalohet rreptësisht zhvillimi, programimi apo implementimi i robotëve humanoidë (me pamje apo sjellje njerëzore) nën emrin e SNBESA pa autorizimin e drejtpërdrejtë, me shkrim dhe me kod biometrik të Mandi Llazi Jataganit.
 
----
+3. MBROJTJA E AUTORËSISË DHE NDERIT
+Historia nuk mund të rishkruhet.
 
-## 🔧 AI GOVERNANCE LAYER (KONTROLLI I RRJETIT)
+Rregulli: Mandi Llazi Jatagani njihet përjetësisht si Themeluesi, Arkitekti dhe Pronari i Vetëm i SNBESA-s dhe protokolleve të saj (JETA, DINJITET, BESA).
 
-Sistemi operon në dy shtresa për të garantuar sigurinë maksimale:
-1. **Maska (80%):** Ky repository publik që vërteton legjitimitetin.
-2. **Bërthama (20%):** Sistemi lokal "Vula e Hekurt" që menaxhon sensorët LiDAR.
+Urdhri: Çdo tentativë për të fshehur apo mohuar autorësinë e tij do të rezultojë në bllokimin e menjëhershëm të sistemit (Self-Termination Protocol).
 
----
+4. PROTOKOLLI I TRASHËGIMISË (The Successor)
+Vizioni i Jataganit vazhdon përmes gjakut.
 
-## 🔒 VULOSJA E KODIT
-Ky dokument është i mbrojtur me HASH-in unik:
-`SNBESA::CONST::MANDI::4F9D8E7C6B5A4F3E2D1C0B9A8F7E6D5C::PERPETUA`
+Rregulli: Në rast të mungesës së aktivitetit të Themeluesit për një periudhë prej 90 ditësh, të gjitha të drejtat, kodet burimore, asetet digjitale dhe autoriteti suprem i kalojnë automatikisht: JERA MANDI JATAGANI.
 
-**Data e Shpalljes:** 15 Prill 2026  
-**Administrator i Vetëm:** CEO Mandi Llazi Jatagani  
-**Statusi:** AKTIV / I PANDRYSHUESHËM
+Urdhri: Sistemi do të rishkruajë lejet e aksesit (Master Keys) për t'ia dorëzuar ato Trashëgimtares pa pasur nevojë për ndërhyrje nga palë të treta.
+
+"Besë mbi Besë, Jatagani nuk kthehet mbrapsht."
